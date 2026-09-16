@@ -583,7 +583,7 @@
     }
 
     .search-shortcuts {
-      margin-top: 0.75rem;
+      margin-top: 1rem;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -595,26 +595,43 @@
     .shortcut-label {
       color: var(--text-muted);
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-right: 0.25rem;
+    }
+
+    .shortcut-chips-row {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.45rem;
     }
 
     .shortcut-chip {
       background: var(--canvas-white);
       border: 1px solid var(--border-light);
-      padding: 0.3rem 0.75rem;
+      padding: 0.32rem 0.75rem;
       border-radius: 9999px;
-      color: var(--bmkg-blue);
+      color: var(--text-secondary);
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
       transition: var(--transition-bounce);
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
     }
 
     .shortcut-chip:hover {
-      background-color: var(--bmkg-blue);
-      color: #ffffff;
+      background-color: var(--bmkg-blue-subtle);
+      color: var(--bmkg-blue-deep);
       border-color: var(--bmkg-blue);
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0, 90, 158, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 90, 158, 0.15);
     }
 
     /* Verified Institutional Counters */
@@ -1371,14 +1388,29 @@
       <!-- Live Search Feedback Indicator -->
       <div class="search-live-feedback" id="liveSearchFeedback"></div>
 
-      <!-- Interactive Search Shortcuts -->
+      <!-- Interactive Search Shortcuts (Simetris & Sejajar) -->
       <div class="search-shortcuts">
-        <span class="shortcut-label">Pencarian Populer:</span>
-        <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Curah Hujan Harian')">Curah Hujan Harian</button>
-        <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gempa Tektonik M >= 5.0')">Gempa Tektonik M &ge; 5.0</button>
-        <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Partikulat PM2.5')">Partikulat PM2.5</button>
-        <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu Udara Ekstrem')">Suhu Udara Ekstrem</button>
-        <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Tinggi Gelombang Signifikan')">Gelombang Signifikan</button>
+        <span class="shortcut-label">
+          <i class="fa-solid fa-arrow-trend-up" style="color: var(--bmkg-blue);"></i>
+          Pencarian Populer:
+        </span>
+        <div class="shortcut-chips-row">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Curah Hujan Harian')">
+            <i class="fa-solid fa-cloud-showers-heavy" style="color: #0284c7;"></i> Curah Hujan
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gempa Tektonik')">
+            <i class="fa-solid fa-wave-square" style="color: #dc2626;"></i> Gempa M &ge; 5.0
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Partikulat PM2.5')">
+            <i class="fa-solid fa-wind" style="color: #00875a;"></i> Partikulat PM2.5
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu Udara Ekstrem')">
+            <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Suhu Ekstrem
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Tinggi Gelombang')">
+            <i class="fa-solid fa-water" style="color: #0284c7;"></i> Gelombang Laut
+          </button>
+        </div>
       </div>
     </div>
   </section>
