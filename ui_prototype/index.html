@@ -83,24 +83,23 @@
     }
 
     /* ==========================================================================
-       SCROLL REVEAL / POP-UP ANIMATIONS SAAT SCROLL
+       SCROLL REVEAL / POP-UP ANIMATIONS SAAT SCROLL (60 FPS OPTIMIZED)
        ========================================================================== */
     .scroll-reveal {
       opacity: 0;
-      transform: translateY(28px) scale(0.98);
-      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: opacity, transform;
+      transform: translateY(22px);
+      transition: opacity 0.45s ease-out, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .scroll-reveal.revealed {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
     }
 
-    .stagger-1 { transition-delay: 0.08s; }
-    .stagger-2 { transition-delay: 0.16s; }
-    .stagger-3 { transition-delay: 0.24s; }
-    .stagger-4 { transition-delay: 0.32s; }
+    .stagger-1 { transition-delay: 0.04s; }
+    .stagger-2 { transition-delay: 0.08s; }
+    .stagger-3 { transition-delay: 0.12s; }
+    .stagger-4 { transition-delay: 0.16s; }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -1722,8 +1721,8 @@
     </section>
 
     <!-- Geospatial Map Section with Region Selector & Layer Filters -->
-    <section class="spatial-card scroll-reveal" id="peta">
-      <div class="spatial-card-header">
+    <section class="spatial-card" id="peta">
+      <div class="spatial-card-header scroll-reveal">
         <div class="spatial-title-group">
           <h3>Peta Sebaran Stasiun Observasi &amp; Aktivitas Seismik</h3>
           <p>Integrasi ckanext-spatial dan ckanext-geoview untuk penelusuran data berbasis wilayah geografis</p>
@@ -1791,8 +1790,8 @@
     </section>
 
     <!-- DataStore Tabular Preview & Interactive API Explorer -->
-    <section class="preview-split-section scroll-reveal" id="datastore">
-      <div class="preview-tab-controls">
+    <section class="preview-split-section" id="datastore">
+      <div class="preview-tab-controls scroll-reveal">
         <button class="btn-interactive preview-tab-btn active" id="tabBtnTable" onclick="showPreviewTab('table')">
           <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel DataStore
         </button>
@@ -2721,32 +2720,13 @@ if payload.get("success"):
     });
 
     // ==========================================================================
-    // SOFT SCROLL ANIMATION & NAVBAR SYNCHRONIZER
+    // BUTTER-SMOOTH COMPOSITOR SCROLL & NAVBAR SYNCHRONIZER
     // ==========================================================================
-    function softScrollTo(targetY, duration = 650) {
-      const startY = window.pageYOffset;
-      const diff = targetY - startY;
-      let startTime = null;
-
-      // Easing: easeInOutCubic for organic, buttery-smooth acceleration & deceleration
-      function easeInOutCubic(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
-
-      function animationLoop(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-        const ease = easeInOutCubic(progress);
-
-        window.scrollTo(0, startY + diff * ease);
-
-        if (timeElapsed < duration) {
-          window.requestAnimationFrame(animationLoop);
-        }
-      }
-
-      window.requestAnimationFrame(animationLoop);
+    function softScrollTo(targetY) {
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth'
+      });
     }
 
     function initNavbarSoftScroll() {
@@ -2761,10 +2741,10 @@ if payload.get("success"):
             return;
           }
 
-          // Handle Beranda / Logo click (soft scroll smoothly back to top)
+          // Handle Beranda / Logo click (smooth scroll back to top)
           if (href === 'index.html' || href === '#' || href === 'index.html#' || this.classList.contains('brand-section')) {
             e.preventDefault();
-            softScrollTo(0, 650);
+            softScrollTo(0);
             updateActiveNavbarLink(document.querySelector('.primary-nav a[href="index.html"]'));
             return;
           }
@@ -2779,12 +2759,12 @@ if payload.get("success"):
               const headerOffset = header ? header.offsetHeight + 16 : 85;
               const targetY = Math.max(0, targetElem.getBoundingClientRect().top + window.pageYOffset - headerOffset);
 
-              softScrollTo(targetY, 650);
+              softScrollTo(targetY);
               updateActiveNavbarLink(this);
 
               // Soft highlight pulse on the landed section
               targetElem.classList.remove('section-soft-pulse');
-              void targetElem.offsetWidth; // force DOM reflow
+              void targetElem.offsetWidth; // force reflow
               targetElem.classList.add('section-soft-pulse');
               setTimeout(() => {
                 targetElem.classList.remove('section-soft-pulse');
@@ -2794,29 +2774,36 @@ if payload.get("success"):
         });
       });
 
-      // ScrollSpy: auto-update active navbar indicator based on viewport position
+      // Throttled ScrollSpy with requestAnimationFrame
+      let isScrollTicking = false;
       window.addEventListener('scroll', () => {
-        const sections = [
-          { id: 'pilar', link: document.querySelector('.primary-nav a[href="#pilar"]') },
-          { id: 'peta', link: document.querySelector('.primary-nav a[href="#peta"]') },
-          { id: 'datastore', link: document.querySelector('.primary-nav a[href="#datastore"]') }
-        ];
+        if (!isScrollTicking) {
+          window.requestAnimationFrame(() => {
+            const sections = [
+              { id: 'pilar', link: document.querySelector('.primary-nav a[href="#pilar"]') },
+              { id: 'peta', link: document.querySelector('.primary-nav a[href="#peta"]') },
+              { id: 'datastore', link: document.querySelector('.primary-nav a[href="#datastore"]') }
+            ];
 
-        const scrollPos = window.pageYOffset + 150;
-        let matched = false;
+            const scrollPos = window.pageYOffset + 150;
+            let matched = false;
 
-        for (let i = sections.length - 1; i >= 0; i--) {
-          const sec = document.getElementById(sections[i].id);
-          if (sec && scrollPos >= sec.offsetTop) {
-            if (sections[i].link) updateActiveNavbarLink(sections[i].link);
-            matched = true;
-            break;
-          }
-        }
+            for (let i = sections.length - 1; i >= 0; i--) {
+              const sec = document.getElementById(sections[i].id);
+              if (sec && scrollPos >= sec.offsetTop) {
+                if (sections[i].link) updateActiveNavbarLink(sections[i].link);
+                matched = true;
+                break;
+              }
+            }
 
-        if (!matched && window.pageYOffset < 350) {
-          const homeLink = document.querySelector('.primary-nav a[href="index.html"]');
-          if (homeLink) updateActiveNavbarLink(homeLink);
+            if (!matched && window.pageYOffset < 350) {
+              const homeLink = document.querySelector('.primary-nav a[href="index.html"]');
+              if (homeLink) updateActiveNavbarLink(homeLink);
+            }
+            isScrollTicking = false;
+          });
+          isScrollTicking = true;
         }
       }, { passive: true });
     }
@@ -2836,7 +2823,6 @@ if payload.get("success"):
       if (!revealElements.length) return;
 
       if (!('IntersectionObserver' in window)) {
-        // Fallback for older browsers
         revealElements.forEach(el => el.classList.add('revealed'));
         return;
       }
@@ -2845,13 +2831,13 @@ if payload.get("success"):
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('revealed');
-            obs.unobserve(entry.target); // Pop up once smoothly
+            obs.unobserve(entry.target);
           }
         });
       }, {
         root: null,
-        threshold: 0.08,
-        rootMargin: '0px 0px -40px 0px'
+        threshold: 0.05,
+        rootMargin: '0px 0px -20px 0px'
       });
 
       revealElements.forEach(el => observer.observe(el));
