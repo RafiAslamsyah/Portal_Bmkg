@@ -1,0 +1,72 @@
+# ==============================================================================
+# .gitignore - Portal Open Data BMKG
+# Menegakkan Batasan Keselamatan Runbook (Rule 4):
+# Dilarang menyimpan password, API token, ckan.ini produksi, sertifikat, atau backup.
+# ==============================================================================
+
+# --- Konfigurasi Produksi & Kredensial Sensitif ---
+ckan.ini
+*.ini
+!config/ckan.ini.example
+!config/uwsgi/ckan-uwsgi.ini
+!setup.cfg
+*.env
+*.env.*
+*.secret
+*.token
+*.key
+*.pem
+*.crt
+*.pfx
+
+# --- Python Bytecode & Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+/usr/lib/ckan/
+
+# --- FileStore & Database Dumps ---
+storage/
+resources/
+uploads/
+*.dump
+*.sql
+*.sql.gz
+*.tar.gz
+*.bak
+
+# --- Logs ---
+logs/
+*.log
+
+# --- IDE & OS Cache ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+Thumbs.db
+.DS_Store
