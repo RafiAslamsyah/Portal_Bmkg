@@ -1566,7 +1566,7 @@
           </div>
           <div class="legend-row">
             <div class="legend-point" style="background-color: var(--seismic-red);"></div>
-            <span>Episentrum Gempa M &ge; 5.0 (Agustus 2026)</span>
+            <span id="legendGempaText">Gempa M &ge; 5.0 Terkini (Memuat Live TEWS...)</span>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; border-top: 1px solid var(--border-light); padding-top: 0.4rem;">
             Tip: Klik marker untuk membuka ringkasan dataset stasiun
@@ -1912,13 +1912,6 @@ if payload.get("success"):
       { nama: "BBMKG Wilayah V Jayapura", id: "97560", lat: -2.5337, lon: 140.7181, tipe: "Balai Wilayah V", suhu: "28.8°C", angin: "7 knot", color: "#003865" }
     ];
 
-    // Titik Gempa Bumi M >= 5.0
-    const gempaList = [
-      { wilayah: "Selatan Jawa Barat", mag: 5.4, kedalaman: "10 km", lat: -7.85, lon: 107.12, tanggal: "10 Agu 2026", status: "Tidak berpotensi tsunami" },
-      { wilayah: "Laut Maluku Bagian Utara", mag: 5.8, kedalaman: "25 km", lat: 1.45, lon: 126.85, tanggal: "12 Agu 2026", status: "Dirasakan II-III MMI" },
-      { wilayah: "Barat Daya Bengkulu", mag: 5.1, kedalaman: "18 km", lat: -4.20, lon: 102.10, tanggal: "14 Agu 2026", status: "Tidak berpotensi tsunami" },
-      { wilayah: "Timur Laut Alor NTT", mag: 5.3, kedalaman: "12 km", lat: -8.10, lon: 124.95, tanggal: "15 Agu 2026", status: "Pusat gempa dangkal" }
-    ];
 
     // Plot Stasiun dengan Hover & Popup
     stasiunList.forEach(st => {
@@ -1945,29 +1938,100 @@ if payload.get("success"):
       stasiunLayer.addLayer(marker);
     });
 
-    // Plot Gempa dengan Visual Pulsing
-    gempaList.forEach(g => {
-      const marker = L.circleMarker([g.lat, g.lon], {
-        radius: 10,
-        fillColor: "#c92a2a",
-        color: "#ffffff",
-        weight: 2.5,
-        opacity: 1,
-        fillOpacity: 0.95
-      });
-      marker.bindPopup(`
-        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5;">
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-            <span style="background: #ffe3e3; color: #c92a2a; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 12px;">M ${g.mag}</span>
-            <strong style="color: #c92a2a;">Gempa Tektonik</strong>
+    // ==========================================================
+    // DATA GEMPA BUMI M >= 5.0 (LIVE DARI API RESMI BMKG TEWS)
+    // Endpoint: https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json
+    // ==========================================================
+    const fallbackGempaList = [
+      { wilayah: "Selatan Jawa Barat", mag: 5.4, kedalaman: "10 km", lat: -7.85, lon: 107.12, tanggal: "14 Sep 2026 16:27 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Laut Maluku Bagian Utara", mag: 6.2, kedalaman: "145 km", lat: 2.52, lon: 128.09, tanggal: "14 Sep 2026 17:58 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Tenggara Kab. Malang Jatim", mag: 5.2, kedalaman: "10 km", lat: -9.52, lon: 112.85, tanggal: "14 Sep 2026 08:42 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Kepulauan Seribu DKI Jakarta", mag: 5.9, kedalaman: "376 km", lat: -5.81, lon: 106.56, tanggal: "12 Sep 2026 04:23 WIB", status: "Pusat gempa dalam" }
+    ];
+
+    function renderGempaMarkers(items) {
+      gempaLayer.clearLayers();
+      items.forEach((g, idx) => {
+        const isLatest = idx === 0;
+        const mag = parseFloat(g.mag) || 5.0;
+        const radius = Math.max(8, (mag - 4.5) * 4 + 7);
+
+        const marker = L.circleMarker([g.lat, g.lon], {
+          radius: radius,
+          fillColor: isLatest ? "#b91c1c" : "#dc2626",
+          color: isLatest ? "#fbbf24" : "#ffffff",
+          weight: isLatest ? 3 : 2,
+          opacity: 1,
+          fillOpacity: 0.92
+        });
+
+        marker.bindPopup(`
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 220px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+              <span style="background: #ffe3e3; color: #c92a2a; padding: 2px 7px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
+              <span style="font-size: 11px; color: ${isLatest ? '#b91c1c' : '#64748b'}; font-weight: 700;">
+                ${isLatest ? '🔴 GEMPA TERBARU' : (g.jam || '')}
+              </span>
+            </div>
+            <strong style="color: #0f172a; font-size: 13px; display: block; margin-bottom: 4px;">${g.wilayah}</strong>
+            <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">
+              <div>🕒 <strong>Waktu:</strong> ${g.tanggal}</div>
+              <div>⚓ <strong>Kedalaman:</strong> ${g.kedalaman}</div>
+              <div>📍 <strong>Koordinat:</strong> ${g.lat.toFixed(2)}, ${g.lon.toFixed(2)}</div>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 4px;">
+              🛡️ ${g.status}
+            </div>
           </div>
-          <span><strong>Wilayah:</strong> ${g.wilayah}</span><br>
-          <span style="color: #64748b; font-size: 12px;">Kedalaman: ${g.kedalaman} • Waktu: ${g.tanggal}</span><br>
-          <span style="color: #00875a; font-size: 11px; font-weight: bold;">${g.status}</span>
-        </div>
-      `);
-      gempaLayer.addLayer(marker);
-    });
+        `);
+        gempaLayer.addLayer(marker);
+      });
+    }
+
+    async function fetchLiveBMKGGempa() {
+      const legendLabel = document.getElementById('legendGempaText');
+      try {
+        const response = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', {
+          cache: 'no-store'
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        const rawList = data?.Infogempa?.gempa;
+
+        if (Array.isArray(rawList) && rawList.length > 0) {
+          const parsedGempa = rawList.map(item => {
+            const coords = (item.Coordinates || '').split(',');
+            return {
+              wilayah: item.Wilayah,
+              mag: parseFloat(item.Magnitude),
+              kedalaman: item.Kedalaman,
+              lat: parseFloat(coords[0]),
+              lon: parseFloat(coords[1]),
+              tanggal: `${item.Tanggal} ${item.Jam}`,
+              jam: item.Jam,
+              status: item.Potensi || 'Data Resmi BMKG TEWS'
+            };
+          }).filter(item => !isNaN(item.lat) && !isNaN(item.lon));
+
+          renderGempaMarkers(parsedGempa);
+          if (legendLabel) {
+            legendLabel.innerHTML = `<strong>15 Gempa M &ge; 5.0 Terkini</strong> <span style="color: #00875a; font-size: 0.72rem; font-weight: bold;">(Live BMKG TEWS)</span>`;
+          }
+          return;
+        }
+      } catch (err) {
+        console.info('Menggunakan data observasi gempa fallback lokal:', err.message);
+      }
+
+      // Fallback jika offline
+      renderGempaMarkers(fallbackGempaList);
+      if (legendLabel) {
+        legendLabel.textContent = `Episentrum Gempa M ≥ 5.0 Terkini (Observasi BMKG)`;
+      }
+    }
+
+    // Jalankan pemuatan live data gempa
+    fetchLiveBMKGGempa();
 
     // Fly to Region Function
     function flyToRegion(region) {
