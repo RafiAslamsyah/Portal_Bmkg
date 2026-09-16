@@ -1496,8 +1496,8 @@
         </div>
         <div class="spatial-controls-bar">
           <!-- Pilihan Peta Berwarna (Bebas Blokir OSM) -->
-          <select class="region-select" id="basemapSelector" onchange="changeBasemap(this.value)">
-            <option value="voyager">🗺️ Peta Berwarna (CartoDB Voyager)</option>
+          <select class="basemap-select" id="basemapSelector" onchange="changeBasemap(this.value)">
+            <option value="street">🗺️ Peta Berwarna (Esri Street Map)</option>
             <option value="topo">🏔️ Topografi Berwarna (Esri Topo)</option>
             <option value="satellite">🛰️ Citra Satelit Berwarna (Esri World)</option>
             <option value="natgeo">🧭 National Geographic (Esri NatGeo)</option>
@@ -1830,29 +1830,28 @@ if payload.get("success"):
       zoomControl: true
     });
 
-    // Definisi Basemap Berwarna yang Bebas Blokir (Bebas dari 403 OSM Policy Block)
+    // Definisi Basemap Berwarna Bersih (Bebas Watermark, Bebas API Key, Bebas Blokir OSM)
     const basemapLayers = {
-      voyager: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &mdash; Data Resmi BMKG',
-        subdomains: 'abcd',
+      street: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri, HERE, Garmin, USGS | Data Observasi BMKG',
         maxZoom: 19
       }),
       topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri, USGS, NOAA | Data Resmi BMKG',
+        attribution: 'Tiles &copy; Esri, USGS, NOAA | Data Observasi BMKG',
         maxZoom: 19
       }),
       satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri, Earthstar Geographics | Data Resmi BMKG',
+        attribution: 'Tiles &copy; Esri, Earthstar Geographics | Data Observasi BMKG',
         maxZoom: 19
       }),
       natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; National Geographic Society, Esri | Data Resmi BMKG',
+        attribution: 'Tiles &copy; National Geographic Society, Esri | Data Observasi BMKG',
         maxZoom: 16
       })
     };
 
-    // Pasang CartoDB Voyager Berwarna sebagai default
-    let activeBasemap = basemapLayers.voyager.addTo(map);
+    // Pasang Peta Berwarna Esri Street Map (Bersih tanpa watermark) sebagai default
+    let activeBasemap = basemapLayers.street.addTo(map);
 
     function changeBasemap(styleKey) {
       if (basemapLayers[styleKey]) {
@@ -1861,7 +1860,7 @@ if payload.get("success"):
         if (map.hasLayer(stasiunLayer)) stasiunLayer.bringToFront();
         if (map.hasLayer(gempaLayer)) gempaLayer.bringToFront();
         const names = {
-          voyager: "Peta Berwarna (CartoDB Voyager)",
+          street: "Peta Berwarna (Esri Street Map)",
           topo: "Topografi Berwarna (Esri Topo)",
           satellite: "Citra Satelit Berwarna (Esri World)",
           natgeo: "National Geographic (Esri NatGeo)"
