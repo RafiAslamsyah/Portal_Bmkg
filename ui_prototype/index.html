@@ -926,24 +926,73 @@
       bottom: 24px;
       left: 24px;
       z-index: 500;
-      background: var(--canvas-white);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      padding: 1rem 1.25rem;
+      padding: 0.85rem 1.15rem;
       box-shadow: var(--shadow-lg);
       font-size: 0.82rem;
-      max-width: 320px;
-      backdrop-filter: blur(8px);
+      max-width: 325px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .map-legend-box.collapsed {
+      padding: 0.55rem 0.95rem;
+      max-width: 250px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow-md);
     }
 
     .legend-heading {
       font-weight: 700;
       color: var(--bmkg-blue-deep);
-      margin-bottom: 0.6rem;
       font-size: 0.85rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 0.6rem;
+      user-select: none;
+    }
+
+    .legend-toggle-btn {
+      background: var(--canvas-surface);
+      border: 1px solid var(--border-medium);
+      color: var(--text-secondary);
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .legend-toggle-btn:hover {
+      background: var(--bmkg-blue-subtle);
+      color: var(--bmkg-blue);
+      border-color: var(--bmkg-blue);
+    }
+
+    .map-legend-box.collapsed .legend-toggle-btn i {
+      transform: rotate(180deg);
+    }
+
+    .legend-body {
+      max-height: 400px;
+      opacity: 1;
+      overflow: hidden;
+      margin-top: 0.75rem;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-top 0.3s;
+    }
+
+    .map-legend-box.collapsed .legend-body {
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+      pointer-events: none;
     }
 
     .legend-row {
@@ -1583,25 +1632,36 @@
 
       <div class="spatial-map-wrapper">
         <div id="bmkgMap"></div>
-        <div class="map-legend-box">
-          <div class="legend-heading">
-            <span>Legenda Peta Observasi</span>
-            <span style="font-size: 0.72rem; color: var(--bmkg-green-dark); font-weight: bold;">LIVE OBSERVASI</span>
+        <!-- Collapsible Map Legend Box -->
+        <div class="map-legend-box" id="mapLegendBox">
+          <div class="legend-heading" onclick="toggleMapLegend()" style="cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue); font-size: 0.85rem;"></i>
+              <span>Legenda Observasi</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.68rem; background: var(--bmkg-green-light); color: var(--bmkg-green-dark); font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.03em;">LIVE</span>
+              <button class="btn-interactive legend-toggle-btn" id="legendToggleBtn" onclick="event.stopPropagation(); toggleMapLegend()" title="Sembunyikan / Tampilkan Legenda">
+                <i class="fa-solid fa-chevron-up" id="legendToggleIcon"></i>
+              </button>
+            </div>
           </div>
-          <div class="legend-row">
-            <div class="legend-point" style="background-color: var(--bmkg-blue);"></div>
-            <span>Stasiun Meteorologi / Klimatologi UPT</span>
-          </div>
-          <div class="legend-row">
-            <div class="legend-point" style="background-color: var(--bmkg-green);"></div>
-            <span>Stasiun Pemantau Atmosfer Global (GAW)</span>
-          </div>
-          <div class="legend-row">
-            <div class="legend-point" style="background-color: var(--seismic-red);"></div>
-            <span id="legendGempaText">Gempa M &ge; 5.0 Terkini (Memuat Live TEWS...)</span>
-          </div>
-          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; border-top: 1px solid var(--border-light); padding-top: 0.4rem;">
-            Tip: Klik marker untuk membuka ringkasan dataset stasiun
+          <div class="legend-body" id="legendBody">
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--bmkg-blue);"></div>
+              <span>Stasiun Meteorologi / Klimatologi UPT</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--bmkg-green);"></div>
+              <span>Stasiun Pemantau Atmosfer Global (GAW)</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--seismic-red);"></div>
+              <span id="legendGempaText">Gempa M &ge; 5.0 Terkini (Memuat Live TEWS...)</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; border-top: 1px solid var(--border-light); padding-top: 0.4rem;">
+              Tip: Klik marker untuk membuka ringkasan dataset stasiun
+            </div>
           </div>
         </div>
       </div>
@@ -2111,7 +2171,25 @@ if payload.get("success"):
       }
     }
 
-    // Interactive Tab Switching
+    // Toggle Map Legend Collapse / Expand (Hide & Show)
+    function toggleMapLegend(forceState) {
+      const legendBox = document.getElementById('mapLegendBox');
+      const toggleBtn = document.getElementById('legendToggleBtn');
+      if (!legendBox) return;
+
+      const isCollapsed = legendBox.classList.contains('collapsed');
+      const shouldCollapse = forceState !== undefined ? forceState : !isCollapsed;
+
+      if (shouldCollapse) {
+        legendBox.classList.add('collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('title', 'Tampilkan Legenda');
+        showToast("Legenda peta disembunyikan");
+      } else {
+        legendBox.classList.remove('collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('title', 'Sembunyikan Legenda');
+        showToast("Legenda peta ditampilkan");
+      }
+    }
     function showPreviewTab(tab) {
       const pTable = document.getElementById('panelTable');
       const pApi = document.getElementById('panelApi');
