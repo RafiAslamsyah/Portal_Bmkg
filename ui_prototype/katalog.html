@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Dataset Terbuka — Satu Data BMKG</title>
+  
+  <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bmkg-blue-deep: #003865;
+      --bmkg-blue: #005a9e;
+      --bmkg-blue-light: #0070ba;
+      --bmkg-blue-subtle: #e8f1f8;
+      --bmkg-blue-hover: #002b4d;
+      
+      --bmkg-green: #00875a;
+      --bmkg-green-light: #e3fcef;
+      --bmkg-green-dark: #006644;
+      --bmkg-green-glow: rgba(0, 135, 90, 0.25);
+      
+      --alert-amber: #b76e00;
+      --alert-amber-light: #fff0d4;
+      --seismic-red: #c92a2a;
+      --seismic-red-light: #ffe3e3;
+      
+      --format-csv: #00875a;
+      --format-geojson: #d97706;
+      --format-netcdf: #7c3aed;
+      --format-kml: #0284c7;
+      --format-pdf: #dc2626;
+      
+      --canvas-white: #ffffff;
+      --canvas-subtle: #f8fafc;
+      --canvas-surface: #f1f5f9;
+      
+      --text-main: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-caption: #94a3b8;
+      
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --border-focus: #005a9e;
+      
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+
+      --transition-bounce: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-sm: 0 2px 6px rgba(0, 56, 101, 0.05);
+      --shadow-md: 0 6px 18px rgba(0, 56, 101, 0.08);
+      --shadow-lg: 0 12px 28px rgba(0, 56, 101, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--canvas-subtle);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Interactive Buttons */
+    .btn-interactive {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      outline: none;
+      transition: var(--transition-bounce);
+    }
+
+    .btn-interactive:active {
+      transform: scale(0.96) !important;
+    }
+
+    /* Top Government Identity Bar */
+    .gov-identity-bar {
+      background-color: var(--bmkg-blue-deep);
+      color: #ffffff;
+      font-size: 0.8rem;
+      padding: 0.4rem 2rem;
+      border-bottom: 2px solid var(--bmkg-green);
+    }
+
+    .gov-identity-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gov-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 500;
+    }
+
+    .gov-badge {
+      background-color: rgba(255, 255, 255, 0.18);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .gov-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .gov-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .gov-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    /* Main Navigation Header */
+    header.site-header {
+      background: var(--canvas-white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.85rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    .site-header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .bmkg-official-logo {
+      width: 44px;
+      height: 52px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-section:hover .bmkg-official-logo {
+      transform: scale(1.08) rotate(3deg);
+    }
+
+    .bmkg-official-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 56, 101, 0.15));
+    }
+
+    .brand-names {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--bmkg-blue-deep);
+      line-height: 1.15;
+    }
+
+    .brand-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    nav.primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    nav.primary-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-md);
+      transition: var(--transition-smooth);
+    }
+
+    nav.primary-nav a:hover {
+      color: var(--bmkg-blue);
+      background-color: var(--bmkg-blue-subtle);
+    }
+
+    nav.primary-nav a.active {
+      color: var(--bmkg-blue-deep);
+      background-color: var(--bmkg-blue-subtle);
+      font-weight: 700;
+    }
+
+    .header-login-btn {
+      background-color: var(--canvas-white);
+      color: var(--bmkg-blue-deep);
+      border: 1.5px solid var(--border-medium);
+      padding: 0.45rem 1.05rem;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-login-btn:hover {
+      background-color: var(--bmkg-blue-subtle);
+      border-color: var(--bmkg-blue);
+      color: var(--bmkg-blue);
+      transform: translateY(-2px);
+    }
+
+    /* Page Header Banner */
+    .catalog-top-banner {
+      background: linear-gradient(180deg, var(--bmkg-blue-subtle) 0%, var(--canvas-subtle) 100%);
+      border-bottom: 1px solid var(--border-light);
+      padding: 2.25rem 2rem 2rem 2rem;
+    }
+
+    .catalog-top-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .breadcrumbs a {
+      color: var(--bmkg-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .catalog-header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--bmkg-blue-deep);
+      letter-spacing: -0.025em;
+      margin-bottom: 0.35rem;
+    }
+
+    .catalog-header-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      max-width: 780px;
+    }
+
+    /* Search & Filter Bar in Hero */
+    .catalog-search-row {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      min-width: 320px;
+      position: relative;
+    }
+
+    .search-input-wrapper i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--bmkg-blue);
+      font-size: 1.05rem;
+    }
+
+    .catalog-search-input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.85rem;
+      background: var(--canvas-white);
+      border: 1.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .catalog-search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(0, 90, 158, 0.15);
+    }
+
+    .btn-search-catalog {
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      padding: 0.8rem 1.6rem;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      box-shadow: 0 2px 8px rgba(0, 56, 101, 0.2);
+    }
+
+    .btn-search-catalog:hover {
+      background: var(--bmkg-blue-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Main Two-Column Layout */
+    .catalog-layout-container {
+      max-width: 1280px;
+      margin: 2rem auto 4rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Facet Filter Sidebar */
+    .facet-sidebar {
+      background: var(--canvas-white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.85rem;
+      border-bottom: 2px solid var(--canvas-subtle);
+      margin-bottom: 1.25rem;
+    }
+
+    .sidebar-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--bmkg-blue-deep);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-reset-filters {
+      background: none;
+      border: none;
+      color: var(--bmkg-blue);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .btn-reset-filters:hover {
+      color: var(--bmkg-blue-deep);
+    }
+
+    .filter-group {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 1.25rem;
+    }
+
+    .filter-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .filter-group-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .filter-group-title:hover {
+      color: var(--bmkg-blue);
+    }
+
+    .filter-items-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .filter-item-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.3rem 0.45rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .filter-item-label:hover {
+      background: var(--bmkg-blue-subtle);
+      color: var(--bmkg-blue-deep);
+    }
+
+    .filter-checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .filter-checkbox-wrap input[type="checkbox"] {
+      cursor: pointer;
+      width: 15px;
+      height: 15px;
+      accent-color: var(--bmkg-blue-deep);
+    }
+
+    .filter-count-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: var(--canvas-subtle);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    /* Spatial Bounding Box Filter Banner in Sidebar */
+    .spatial-filter-box {
+      background: var(--bmkg-blue-subtle);
+      border: 1px solid rgba(0, 90, 158, 0.2);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .spatial-filter-box h5 {
+      font-size: 0.85rem;
+      color: var(--bmkg-blue-deep);
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .spatial-filter-box p {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.65rem;
+    }
+
+    .btn-spatial-toggle {
+      width: 100%;
+      background: var(--canvas-white);
+      border: 1px solid var(--bmkg-blue);
+      color: var(--bmkg-blue);
+      padding: 0.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .btn-spatial-toggle:hover {
+      background: var(--bmkg-blue);
+      color: #ffffff;
+    }
+
+    /* Main Dataset Content Area */
+    .catalog-main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Active Filter Chips & Bar */
+    .filter-status-bar {
+      background: var(--canvas-white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .result-count-text {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .result-count-text strong {
+      color: var(--bmkg-blue-deep);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sort-control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .sort-control-group label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .sort-select {
+      background: var(--canvas-white);
+      border: 1px solid var(--border-medium);
+      color: var(--bmkg-blue-deep);
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .active-chips-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.2rem 0;
+    }
+
+    .chip-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--bmkg-blue-subtle);
+      color: var(--bmkg-blue-deep);
+      border: 1px solid rgba(0, 90, 158, 0.25);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+    }
+
+    .chip-badge button {
+      background: none;
+      border: none;
+      color: var(--bmkg-blue-deep);
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Dataset Cards List */
+    .dataset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .dataset-card {
+      background: var(--canvas-white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.6rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-bounce);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    .dataset-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-medium);
+    }
+
+    .card-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pillar-tag {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.02em;
+    }
+
+    .pillar-tag.met { background: var(--bmkg-blue-subtle); color: var(--bmkg-blue); }
+    .pillar-tag.klim { background: var(--alert-amber-light); color: var(--alert-amber); }
+    .pillar-tag.geo { background: var(--seismic-red-light); color: var(--seismic-red); }
+    .pillar-tag.ku { background: var(--bmkg-green-light); color: var(--bmkg-green); }
+
+    .org-producer-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dataset-card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--bmkg-blue-deep);
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .dataset-card-title:hover {
+      color: var(--bmkg-blue-light);
+      text-decoration: underline;
+    }
+
+    .dataset-card-description {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .card-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .format-pills-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .format-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .format-badge.csv { background-color: var(--format-csv); }
+    .format-badge.geojson { background-color: var(--format-geojson); }
+    .format-badge.netcdf { background-color: var(--format-netcdf); }
+    .format-badge.kml { background-color: var(--format-kml); }
+    .format-badge.pdf { background-color: var(--format-pdf); }
+
+    .temporal-range-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-action-links {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-sub-btn {
+      background: var(--canvas-subtle);
+      border: 1px solid var(--border-medium);
+      color: var(--bmkg-blue-deep);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .card-sub-btn:hover {
+      background: var(--bmkg-blue-subtle);
+      border-color: var(--bmkg-blue);
+      color: var(--bmkg-blue);
+      transform: translateY(-2px);
+    }
+
+    /* Pagination */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 2rem;
+    }
+
+    .page-btn {
+      background: var(--canvas-white);
+      border: 1px solid var(--border-medium);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      font-weight: 700;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .page-btn:hover {
+      background: var(--bmkg-blue-subtle);
+      color: var(--bmkg-blue);
+      border-color: var(--bmkg-blue);
+      transform: translateY(-2px);
+    }
+
+    .page-btn.active {
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      border-color: var(--bmkg-blue-deep);
+    }
+
+    /* Institutional Footer */
+    footer.gov-footer {
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      padding: 3rem 2rem 2rem 2rem;
+      border-top: 4px solid var(--bmkg-green);
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand-header img {
+      width: 40px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .footer-col h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
+    .footer-col p {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col ul li {
+      margin-bottom: 0.55rem;
+    }
+
+    .footer-col ul li a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.15s;
+    }
+
+    .footer-col ul li a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom-bar {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* Toast */
+    .toast-feedback {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      padding: 0.85rem 1.4rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--bmkg-green);
+      font-weight: 600;
+      font-size: 0.88rem;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .toast-feedback.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .catalog-layout-container {
+        grid-template-columns: 1fr;
+      }
+      .facet-sidebar {
+        position: static;
+      }
+      .footer-inner {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer-inner {
+        grid-template-columns: 1fr;
+      }
+      .card-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Government Identity Bar -->
+  <div class="gov-identity-bar">
+    <div class="gov-identity-inner">
+      <div class="gov-title">
+        <i class="fa-solid fa-flag"></i>
+        <span>Republik Indonesia</span>
+        <span class="gov-badge">Satu Data Indonesia</span>
+      </div>
+      <div class="gov-links">
+        <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Portal Utama BMKG</a>
+        <a href="https://data.go.id" target="_blank" rel="noreferrer">data.go.id</a>
+        <a href="index.html">Kembali ke Beranda</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Site Header -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="index.html" class="brand-section">
+        <div class="bmkg-official-logo">
+          <img src="logo-bmkg.png" alt="Logo Resmi BMKG">
+        </div>
+        <div class="brand-names">
+          <div class="brand-title">Satu Data BMKG</div>
+          <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+        </div>
+      </a>
+
+      <nav class="primary-nav">
+        <a href="index.html">Beranda</a>
+        <a href="katalog.html" class="active">Katalog Data</a>
+        <a href="index.html#pilar">4 Pilar MKG</a>
+        <a href="index.html#peta">Peta Observasi</a>
+        <a href="index.html#datastore">DataStore API</a>
+      </nav>
+
+      <button class="btn-interactive header-login-btn" onclick="showToast('Membuka dialog SSO BMKG')">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <span>Masuk</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 3. Top Banner & Catalog Search -->
+  <section class="catalog-top-banner">
+    <div class="catalog-top-inner">
+      <div class="breadcrumbs">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span>Katalog Dataset Terbuka</span>
+      </div>
+
+      <h1 class="catalog-header-title">Katalog Dataset Terbuka BMKG</h1>
+      <p class="catalog-header-desc">
+        Temukan data observasi meteorologi, deret waktu iklim, katalog seismik gempa bumi, dan pemantauan kualitas udara di seluruh Indonesia dengan filter multi-pilar.
+      </p>
+
+      <div class="catalog-search-row">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            id="catalogSearchInput" 
+            class="catalog-search-input" 
+            placeholder="Cari kata kunci dataset, kode WMO, stasiun UPT, atau parameter cuaca..."
+            oninput="applyFilterAndSearch()"
+          />
+        </div>
+        <button class="btn-interactive btn-search-catalog" onclick="applyFilterAndSearch()">
+          <i class="fa-solid fa-filter"></i> Saring Data
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Main Two-Column Layout (Facet Sidebar + Results) -->
+  <div class="catalog-layout-container">
+    
+    <!-- Left Column: Facet Filters -->
+    <aside class="facet-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-sliders"></i> Filter Pencarian
+        </div>
+        <button class="btn-reset-filters" onclick="resetAllFilters()">Reset Saring</button>
+      </div>
+
+      <!-- Spatial Filter Callout -->
+      <div class="spatial-filter-box">
+        <h5><i class="fa-solid fa-map-location-dot"></i> Filter Wilayah Spasial</h5>
+        <p>Saring dataset berdasarkan Bounding Box peta (ckanext-spatial).</p>
+        <button class="btn-interactive btn-spatial-toggle" onclick="toggleSpatialFilter()">
+          <i class="fa-solid fa-draw-polygon"></i> Buka Bounding Box Peta
+        </button>
+      </div>
+
+      <!-- Facet 1: 4 Pilar MKG -->
+      <div class="filter-group">
+        <div class="filter-group-title">
+          <span>4 Pilar Layanan MKG</span>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+        </div>
+        <ul class="filter-items-list">
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="meteorologi" class="facet-pilar" onchange="applyFilterAndSearch()">
+                <span>Meteorologi</span>
+              </span>
+              <span class="filter-count-badge">548</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="klimatologi" class="facet-pilar" onchange="applyFilterAndSearch()">
+                <span>Klimatologi</span>
+              </span>
+              <span class="filter-count-badge">412</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="geofisika" class="facet-pilar" onchange="applyFilterAndSearch()">
+                <span>Geofisika</span>
+              </span>
+              <span class="filter-count-badge">320</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="kualitas-udara" class="facet-pilar" onchange="applyFilterAndSearch()">
+                <span>Kualitas Udara</span>
+              </span>
+              <span class="filter-count-badge">202</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Facet 2: Format Berkas -->
+      <div class="filter-group">
+        <div class="filter-group-title">
+          <span>Format Data Terbuka</span>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+        </div>
+        <ul class="filter-items-list">
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="csv" class="facet-format" onchange="applyFilterAndSearch()">
+                <span>CSV (DataStore API)</span>
+              </span>
+              <span class="filter-count-badge">1.120</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="geojson" class="facet-format" onchange="applyFilterAndSearch()">
+                <span>GeoJSON (Geospasial)</span>
+              </span>
+              <span class="filter-count-badge">384</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="netcdf" class="facet-format" onchange="applyFilterAndSearch()">
+                <span>NetCDF / GRIB2 (Model)</span>
+              </span>
+              <span class="filter-count-badge">145</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="kml" class="facet-format" onchange="applyFilterAndSearch()">
+                <span>KML / KMZ</span>
+              </span>
+              <span class="filter-count-badge">89</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Facet 3: Unit Kerja / Balai Besar -->
+      <div class="filter-group">
+        <div class="filter-group-title">
+          <span>Unit Kerja / Balai Besar</span>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+        </div>
+        <ul class="filter-items-list">
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="pusat" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>Kedeputian Teknis Pusat</span>
+              </span>
+              <span class="filter-count-badge">620</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="balai2" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>BBMKG Wilayah II (Jawa)</span>
+              </span>
+              <span class="filter-count-badge">240</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="balai1" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>BBMKG Wilayah I (Sumatera)</span>
+              </span>
+              <span class="filter-count-badge">195</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="balai3" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>BBMKG Wilayah III (Bali/NT)</span>
+              </span>
+              <span class="filter-count-badge">160</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="balai4" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>BBMKG Wilayah IV (Sulawesi)</span>
+              </span>
+              <span class="filter-count-badge">142</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="balai5" class="facet-org" onchange="applyFilterAndSearch()">
+                <span>BBMKG Wilayah V (Papua)</span>
+              </span>
+              <span class="filter-count-badge">125</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Facet 4: Resolusi Waktu -->
+      <div class="filter-group">
+        <div class="filter-group-title">
+          <span>Resolusi Temporal</span>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+        </div>
+        <ul class="filter-items-list">
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="harian" class="facet-time" onchange="applyFilterAndSearch()">
+                <span>Data Harian (Daily)</span>
+              </span>
+              <span class="filter-count-badge">840</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="jam" class="facet-time" onchange="applyFilterAndSearch()">
+                <span>Per Jam (Hourly)</span>
+              </span>
+              <span class="filter-count-badge">310</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="dasarian" class="facet-time" onchange="applyFilterAndSearch()">
+                <span>Dasarian (10 Harian)</span>
+              </span>
+              <span class="filter-count-badge">180</span>
+            </label>
+          </li>
+          <li>
+            <label class="filter-item-label">
+              <span class="filter-checkbox-wrap">
+                <input type="checkbox" value="bulanan" class="facet-time" onchange="applyFilterAndSearch()">
+                <span>Bulanan (Monthly)</span>
+              </span>
+              <span class="filter-count-badge">152</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Right Column: Result Status Bar & Cards -->
+    <main class="catalog-main-content">
+      
+      <!-- Top Control Bar (Item Count & Sorting) -->
+      <div class="filter-status-bar">
+        <div class="result-count-text">
+          Ditemukan <strong id="datasetResultCount">6</strong> dari <strong>1.482</strong> dataset terbuka
+        </div>
+
+        <div class="sort-control-group">
+          <label for="sortSelector">Urutkan:</label>
+          <select id="sortSelector" class="sort-select" onchange="applySorting(this.value)">
+            <option value="relevance">Paling Relevan</option>
+            <option value="date-desc">Terbaru Diperbarui</option>
+            <option value="downloads">Paling Banyak Diunduh</option>
+            <option value="alpha">Judul Dataset (A - Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filter Chips Row -->
+      <div class="active-chips-row" id="activeChipsContainer"></div>
+
+      <!-- Dataset Cards List -->
+      <div class="dataset-list" id="datasetListContainer">
+        
+        <!-- Card 1: Cuaca Harian Cengkareng -->
+        <article class="dataset-card" data-pilar="meteorologi" data-format="csv" data-org="balai2" data-time="harian">
+          <div class="card-top-meta">
+            <span class="pillar-tag met"><i class="fa-solid fa-cloud-sun"></i> Meteorologi</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Stasiun Meteorologi Kelas I Soekarno-Hatta (BBMKG Wilayah II)</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('cuaca-harian-cengkareng')">
+            Data Observasi Cuaca Harian Permukaan Stasiun Soekarno-Hatta (WMO: 96749) Tahun 2026
+          </a>
+
+          <p class="dataset-card-description">
+            Dataset time-series rekaman harian parameter atmosfer permukaan meliputi suhu minimum, suhu maksimum, suhu rata-rata, kelembapan nisbi udara, kecepatan angin maksimum, dan curah hujan harian terkalibrasi.
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge csv">CSV</span>
+              <span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
+                <i class="fa-solid fa-database"></i> DataStore API Aktif
+              </span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-calendar"></i> 01 Agu 2026 – 31 Agu 2026
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel DataStore...')">
+                <i class="fa-solid fa-table-cells"></i> Pratinjau
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas CSV resmi...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Gempa Bumi Tektonik M5+ -->
+        <article class="dataset-card" data-pilar="geofisika" data-format="geojson kml" data-org="pusat" data-time="harian">
+          <div class="card-top-meta">
+            <span class="pillar-tag geo"><i class="fa-solid fa-volcano"></i> Geofisika</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Gempa Bumi dan Tsunami (Kedeputian Bidang Geofisika)</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('katalog-gempa-m5')">
+            Katalog Riwayat Gempa Bumi Tektonik Magnitudo &ge; 5.0 Wilayah Indonesia Bulan Agustus 2026
+          </a>
+
+          <p class="dataset-card-description">
+            Data geospasial titik episentrum, kedalaman sumber gempa, magnitudo, estimasi waktu penjalaran gelombang, dan status potensi ancaman tsunami di seluruh zona seismogenik dan subduksi lempeng nusantara.
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge geojson">GeoJSON</span>
+              <span class="format-badge kml">KML</span>
+              <span class="format-badge csv">CSV</span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-calendar"></i> 01 Agu 2026 – 15 Agu 2026
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Peta Geoview Leaflet...')">
+                <i class="fa-solid fa-map"></i> Peta Geoview
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh GeoJSON...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Curah Hujan Dasarian Iklim -->
+        <article class="dataset-card" data-pilar="klimatologi" data-format="csv netcdf" data-org="pusat" data-time="dasarian">
+          <div class="card-top-meta">
+            <span class="pillar-tag klim"><i class="fa-solid fa-temperature-sun"></i> Klimatologi</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Layanan Informasi Iklim Terapan (Kedeputian Bidang Klimatologi)</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('curah-hujan-dasarian')">
+            Distribusi Curah Hujan Dasarian dan Analisis Sifat Hujan Nasional Periode 2026
+          </a>
+
+          <p class="dataset-card-description">
+            Informasi akumulasi curah hujan per periode 10-harian (Dasarian I, II, III) dari seluruh jaringan pos hujan dan stasiun klimatologi BMKG, dilengkapi klasifikasi sifat hujan Atas Normal (AN), Normal (N), dan Bawah Normal (BN).
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge csv">CSV</span>
+              <span class="format-badge netcdf">NetCDF</span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-calendar"></i> Januari 2026 – Agustus 2026
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel...')">
+                <i class="fa-solid fa-table-cells"></i> Pratinjau
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Kualitas Udara Partikulat PM2.5 -->
+        <article class="dataset-card" data-pilar="kualitas-udara" data-format="csv" data-org="balai2" data-time="jam">
+          <div class="card-top-meta">
+            <span class="pillar-tag ku"><i class="fa-solid fa-wind"></i> Kualitas Udara</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Stasiun Pemantau Atmosfer Global (GAW) Kemayoran</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('kualitas-udara-pm25')">
+            Konsentrasi Partikulat Atmosfer PM2.5 Per Jam Stasiun Kemayoran Jakarta Pusat 2026
+          </a>
+
+          <p class="dataset-card-description">
+            Pemantauan instan konsentrasi partikel udara berukuran diameter &le; 2.5 mikrometer (&mu;g/m&sup3;) yang diukur menggunakan alat ukur otomatis Beta Attenuation Monitor (BAM-1020) sesuai standar World Meteorological Organization (WMO).
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge csv">CSV</span>
+              <span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
+                <i class="fa-solid fa-bolt"></i> Realtime Stream
+              </span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-clock"></i> Observasi Per Jam
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel...')">
+                <i class="fa-solid fa-table-cells"></i> Pratinjau
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas CSV...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5: Prakiraan Gelombang Maritim -->
+        <article class="dataset-card" data-pilar="meteorologi" data-format="geojson netcdf" data-org="pusat" data-time="harian">
+          <div class="card-top-meta">
+            <span class="pillar-tag met"><i class="fa-solid fa-cloud-sun"></i> Meteorologi</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Meteorologi Maritim (Kedeputian Bidang Meteorologi)</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('gelombang-maritim')">
+            Prakiraan Tinggi Gelombang Signifikan dan Angin Permukaan Wilayah Perairan Indonesia
+          </a>
+
+          <p class="dataset-card-description">
+            Hasil pemodelan numerik gelombang laut (WaveWatch III) beresolusi tinggi yang memetakan potensi tinggi gelombang kategori tenang, sedang, tinggi (2.5 - 4.0 m), hingga sangat tinggi di jalur pelayaran nusantara.
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge geojson">GeoJSON</span>
+              <span class="format-badge netcdf">NetCDF</span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-calendar"></i> Prakiraan Harian 7 Hari
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Geoview...')">
+                <i class="fa-solid fa-map"></i> Peta Gelombang
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6: Kerapatan Sambaran Petir -->
+        <article class="dataset-card" data-pilar="geofisika" data-format="csv geojson" data-org="balai1" data-time="harian">
+          <div class="card-top-meta">
+            <span class="pillar-tag geo"><i class="fa-solid fa-volcano"></i> Geofisika</span>
+            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Balai Besar MKG Wilayah I Medan</span>
+          </div>
+
+          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('petir-sumatera')">
+            Peta Kerapatan Sambaran Petir (Lightning Detector CG/IC) Wilayah Sumatera Bagian Utara
+          </a>
+
+          <p class="dataset-card-description">
+            Data deteksi sambaran petir Cloud-to-Ground (CG) dan Intra-Cloud (IC) dari sensor Lightning Detector jaringan BMKG Wilayah I untuk analisis kerentanan infrastruktur ketenagalistrikan dan telekomunikasi.
+          </p>
+
+          <div class="card-bottom-row">
+            <div class="format-pills-group">
+              <span class="format-badge csv">CSV</span>
+              <span class="format-badge geojson">GeoJSON</span>
+            </div>
+
+            <div class="temporal-range-tag">
+              <i class="fa-regular fa-calendar"></i> Juli 2026 – Agustus 2026
+            </div>
+
+            <div class="card-action-links">
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Pratinjau Tabel...')">
+                <i class="fa-solid fa-table-cells"></i> Pratinjau
+              </button>
+              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Pagination Component -->
+      <div class="pagination-container">
+        <button class="btn-interactive page-btn" onclick="showToast('Halaman Sebelumnya')"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="btn-interactive page-btn active">1</button>
+        <button class="btn-interactive page-btn" onclick="showToast('Halaman 2')">2</button>
+        <button class="btn-interactive page-btn" onclick="showToast('Halaman 3')">3</button>
+        <span style="color: var(--text-muted); font-family: monospace;">...</span>
+        <button class="btn-interactive page-btn" onclick="showToast('Halaman Terakhir (148)')">148</button>
+        <button class="btn-interactive page-btn" onclick="showToast('Halaman Selanjutnya')"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- 5. Institutional Footer -->
+  <footer class="gov-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand-header">
+          <img src="logo-bmkg.png" alt="Logo BMKG">
+          <div>
+            <h4 style="margin-bottom: 2px;">Satu Data BMKG</h4>
+            <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
+          </div>
+        </div>
+        <p>
+          Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)<br>
+          Jl. Angkasa I No. 2, Kemayoran, Jakarta Pusat 10610<br>
+          Email: satudata@bmkg.go.id • Call Center: 196
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>4 Pilar Layanan</h4>
+        <ul>
+          <li><a href="#">Katalog Meteorologi</a></li>
+          <li><a href="#">Katalog Klimatologi</a></li>
+          <li><a href="#">Katalog Geofisika</a></li>
+          <li><a href="#">Katalog Kualitas Udara</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Akses Pengembang</h4>
+        <ul>
+          <li><a href="#">CKAN 2.12 Action API</a></li>
+          <li><a href="#">DataStore SQL Query</a></li>
+          <li><a href="#">Spatial Harvest (WFS/WMS)</a></li>
+          <li><a href="#">Dokumentasi Integrasi</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kepatuhan &amp; Regulasi</h4>
+        <ul>
+          <li><a href="#">Perpres No. 39 Tahun 2019 (SDI)</a></li>
+          <li><a href="#">Lisensi Terbuka CC-BY 4.0</a></li>
+          <li><a href="#">Prinsip Data Terbuka WMO</a></li>
+          <li><a href="#">Standar Metadata Nasional</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom-bar">
+      <div>&copy; 2026 Badan Meteorologi, Klimatologi, dan Geofisika. Hak Cipta Dilindungi Undang-Undang.</div>
+      <div>Platform CKAN 2.12 Stable • Native Ubuntu 22.04 LTS Stack</div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast-feedback" id="toastFeedback">
+    <i class="fa-solid fa-circle-check" style="color: var(--bmkg-green); font-size: 1.1rem;"></i>
+    <span id="toastMessage">Pencarian diperbarui!</span>
+  </div>
+
+  <script>
+    // Live Filter & Search Logic
+    function applyFilterAndSearch() {
+      const searchInput = document.getElementById('catalogSearchInput').value.trim().toLowerCase();
+      
+      const selectedPilars = Array.from(document.querySelectorAll('.facet-pilar:checked')).map(cb => cb.value);
+      const selectedFormats = Array.from(document.querySelectorAll('.facet-format:checked')).map(cb => cb.value);
+      const selectedOrgs = Array.from(document.querySelectorAll('.facet-org:checked')).map(cb => cb.value);
+      const selectedTimes = Array.from(document.querySelectorAll('.facet-time:checked')).map(cb => cb.value);
+
+      const cards = document.querySelectorAll('.dataset-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.dataset-card-title').textContent.toLowerCase();
+        const desc = card.querySelector('.dataset-card-description').textContent.toLowerCase();
+        const pilar = card.getAttribute('data-pilar') || '';
+        const formats = (card.getAttribute('data-format') || '').split(' ');
+        const org = card.getAttribute('data-org') || '';
+        const time = card.getAttribute('data-time') || '';
+
+        // Search text match
+        const matchesText = !searchInput || title.includes(searchInput) || desc.includes(searchInput);
+        
+        // Facet filter match
+        const matchesPilar = selectedPilars.length === 0 || selectedPilars.includes(pilar);
+        const matchesFormat = selectedFormats.length === 0 || selectedFormats.some(f => formats.includes(f));
+        const matchesOrg = selectedOrgs.length === 0 || selectedOrgs.includes(org);
+        const matchesTime = selectedTimes.length === 0 || selectedTimes.includes(time);
+
+        if (matchesText && matchesPilar && matchesFormat && matchesOrg && matchesTime) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Update Result Count
+      document.getElementById('datasetResultCount').textContent = visibleCount;
+
+      // Update Active Filter Chips
+      renderActiveChips(selectedPilars, selectedFormats, selectedOrgs, selectedTimes, searchInput);
+    }
+
+    function renderActiveChips(pilars, formats, orgs, times, searchInput) {
+      const container = document.getElementById('activeChipsContainer');
+      container.innerHTML = '';
+
+      if (searchInput) {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Kata Kunci: "${searchInput}"</span>
+            <button onclick="clearSearchInput()"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      }
+
+      pilars.forEach(p => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Pilar: ${p.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-pilar', '${p}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      formats.forEach(f => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Format: ${f.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-format', '${f}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      orgs.forEach(o => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Unit: ${o.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-org', '${o}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      times.forEach(t => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Waktu: ${t.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-time', '${t}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+    }
+
+    function clearSearchInput() {
+      document.getElementById('catalogSearchInput').value = '';
+      applyFilterAndSearch();
+    }
+
+    function uncheckFacet(className, val) {
+      const cb = document.querySelector(`.${className}[value="${val}"]`);
+      if (cb) {
+        cb.checked = false;
+        applyFilterAndSearch();
+      }
+    }
+
+    function resetAllFilters() {
+      document.getElementById('catalogSearchInput').value = '';
+      document.querySelectorAll('.facet-pilar, .facet-format, .facet-org, .facet-time').forEach(cb => cb.checked = false);
+      applyFilterAndSearch();
+      showToast('Seluruh filter telah di-reset');
+    }
+
+    function applySorting(sortVal) {
+      showToast(`Mengurutkan dataset berdasarkan: ${sortVal}`);
+    }
+
+    function toggleSpatialFilter() {
+      showToast('Membuka modal seleksi Bounding Box (ckanext-spatial)');
+    }
+
+    function openDatasetDetail(datasetId) {
+      showToast(`Membuka halaman detail dataset: ${datasetId}`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastFeedback');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
