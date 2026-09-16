@@ -897,6 +897,11 @@
       background: #e5eef4;
     }
 
+    /* Sembunyikan attribution bar di pojok kanan bawah peta */
+    .leaflet-control-attribution {
+      display: none !important;
+    }
+
     .map-legend-box {
       position: absolute;
       bottom: 24px;
@@ -1847,7 +1852,8 @@ if payload.get("success"):
       zoom: 5,
       minZoom: 4,
       maxZoom: 18,
-      zoomControl: true
+      zoomControl: true,
+      attributionControl: false
     });
 
     // Definisi Basemap Berwarna Bersih (Bebas Watermark, Bebas API Key, Bebas Blokir OSM)
