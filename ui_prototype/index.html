@@ -976,6 +976,10 @@
       border-color: var(--bmkg-blue);
     }
 
+    .legend-toggle-btn i {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     .map-legend-box.collapsed .legend-toggle-btn i {
       transform: rotate(180deg);
     }
@@ -1639,12 +1643,9 @@
               <i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue); font-size: 0.85rem;"></i>
               <span>Legenda Observasi</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 0.68rem; background: var(--bmkg-green-light); color: var(--bmkg-green-dark); font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.03em;">LIVE</span>
-              <button class="btn-interactive legend-toggle-btn" id="legendToggleBtn" onclick="event.stopPropagation(); toggleMapLegend()" title="Sembunyikan / Tampilkan Legenda">
-                <i class="fa-solid fa-chevron-up" id="legendToggleIcon"></i>
-              </button>
-            </div>
+            <button class="btn-interactive legend-toggle-btn" id="legendToggleBtn" onclick="event.stopPropagation(); toggleMapLegend()" title="Sembunyikan / Tampilkan Legenda">
+              <i class="fa-solid fa-chevron-down" id="legendToggleIcon"></i>
+            </button>
           </div>
           <div class="legend-body" id="legendBody">
             <div class="legend-row">
