@@ -59,10 +59,27 @@
       --shadow-lg: 0 12px 28px rgba(0, 56, 101, 0.12);
     }
 
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    /* Highlight pulse when navigated via soft scroll */
+    @keyframes sectionSoftPulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 90, 158, 0.45); }
+      50% { box-shadow: 0 0 0 12px rgba(0, 90, 158, 0.12); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 90, 158, 0); }
+    }
+
+    .section-soft-pulse {
+      animation: sectionSoftPulse 1.2s ease-out;
+      border-radius: var(--radius-lg);
     }
 
     body {
@@ -250,18 +267,21 @@
       font-weight: 600;
       padding: 0.5rem 0.85rem;
       border-radius: var(--radius-md);
-      transition: var(--transition-smooth);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
     }
 
     nav.primary-nav a:hover {
       color: var(--bmkg-blue);
       background-color: var(--bmkg-blue-subtle);
+      transform: translateY(-1px);
     }
 
     nav.primary-nav a.active {
       color: var(--bmkg-blue-deep);
       background-color: var(--bmkg-blue-subtle);
       font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 56, 101, 0.08);
     }
 
     .header-action-btn {
@@ -2173,6 +2193,116 @@ if payload.get("success"):
         closeLoginModal();
       }
     });
+
+    // ==========================================================================
+    // SOFT SCROLL ANIMATION & NAVBAR SYNCHRONIZER
+    // ==========================================================================
+    function softScrollTo(targetY, duration = 650) {
+      const startY = window.pageYOffset;
+      const diff = targetY - startY;
+      let startTime = null;
+
+      // Easing: easeInOutCubic for organic, buttery-smooth acceleration & deceleration
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function animationLoop(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+
+        window.scrollTo(0, startY + diff * ease);
+
+        if (timeElapsed < duration) {
+          window.requestAnimationFrame(animationLoop);
+        }
+      }
+
+      window.requestAnimationFrame(animationLoop);
+    }
+
+    function initNavbarSoftScroll() {
+      const navLinks = document.querySelectorAll('.primary-nav a, .brand-section, a[href^="#"]');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+
+          // Skip normal page transitions to other pages like katalog.html
+          if (!href || href === 'katalog.html' || (href.includes('.html') && !href.startsWith('index.html'))) {
+            return;
+          }
+
+          // Handle Beranda / Logo click (soft scroll smoothly back to top)
+          if (href === 'index.html' || href === '#' || href === 'index.html#' || this.classList.contains('brand-section')) {
+            e.preventDefault();
+            softScrollTo(0, 650);
+            updateActiveNavbarLink(document.querySelector('.primary-nav a[href="index.html"]'));
+            return;
+          }
+
+          // Handle in-page anchor links (#pilar, #peta, #datastore, etc.)
+          const targetId = href.replace('index.html', '');
+          if (targetId.startsWith('#') && targetId.length > 1) {
+            const targetElem = document.querySelector(targetId);
+            if (targetElem) {
+              e.preventDefault();
+              const header = document.querySelector('.site-header');
+              const headerOffset = header ? header.offsetHeight + 16 : 85;
+              const targetY = Math.max(0, targetElem.getBoundingClientRect().top + window.pageYOffset - headerOffset);
+
+              softScrollTo(targetY, 650);
+              updateActiveNavbarLink(this);
+
+              // Soft highlight pulse on the landed section
+              targetElem.classList.remove('section-soft-pulse');
+              void targetElem.offsetWidth; // force DOM reflow
+              targetElem.classList.add('section-soft-pulse');
+              setTimeout(() => {
+                targetElem.classList.remove('section-soft-pulse');
+              }, 1400);
+            }
+          }
+        });
+      });
+
+      // ScrollSpy: auto-update active navbar indicator based on viewport position
+      window.addEventListener('scroll', () => {
+        const sections = [
+          { id: 'pilar', link: document.querySelector('.primary-nav a[href="#pilar"]') },
+          { id: 'peta', link: document.querySelector('.primary-nav a[href="#peta"]') },
+          { id: 'datastore', link: document.querySelector('.primary-nav a[href="#datastore"]') }
+        ];
+
+        const scrollPos = window.pageYOffset + 150;
+        let matched = false;
+
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const sec = document.getElementById(sections[i].id);
+          if (sec && scrollPos >= sec.offsetTop) {
+            if (sections[i].link) updateActiveNavbarLink(sections[i].link);
+            matched = true;
+            break;
+          }
+        }
+
+        if (!matched && window.pageYOffset < 350) {
+          const homeLink = document.querySelector('.primary-nav a[href="index.html"]');
+          if (homeLink) updateActiveNavbarLink(homeLink);
+        }
+      }, { passive: true });
+    }
+
+    function updateActiveNavbarLink(activeLink) {
+      document.querySelectorAll('.primary-nav a').forEach(a => a.classList.remove('active'));
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+    }
+
+    initNavbarSoftScroll();
   </script>
 </body>
 </html>
