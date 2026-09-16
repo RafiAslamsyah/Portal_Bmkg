@@ -1961,6 +1961,24 @@
   </div>
 
   <script>
+    // ==========================================================================
+    // AUTO RESET POSISI SCROLL KE ATAS PADA SETIAP REFRESH
+    // ==========================================================================
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
+    });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 10);
+    });
+
     // Modal Login & Register Handlers
     function openLoginModal(defaultTab = 'login') {
       const modal = document.getElementById('loginModal');

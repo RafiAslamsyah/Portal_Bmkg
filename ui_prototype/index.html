@@ -2175,6 +2175,29 @@ if payload.get("success"):
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
+    // ==========================================================================
+    // AUTO RESET POSISI SCROLL KE BERANDA PADA SETIAP REFRESH
+    // ==========================================================================
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    // Hapus hash URL jika ada agar browser tidak loncat otomatis ke seksi tertentu
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }
+
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
+    });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 10);
+    });
+
     // Peta Leaflet Berbasis Peta Standar Berwarna
     const map = L.map('bmkgMap', {
       center: [-2.5489, 118.0149],
