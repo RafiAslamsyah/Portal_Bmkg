@@ -82,6 +82,26 @@
       border-radius: var(--radius-lg);
     }
 
+    /* ==========================================================================
+       SCROLL REVEAL / POP-UP ANIMATIONS SAAT SCROLL
+       ========================================================================== */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .stagger-1 { transition-delay: 0.08s; }
+    .stagger-2 { transition-delay: 0.16s; }
+    .stagger-3 { transition-delay: 0.24s; }
+    .stagger-4 { transition-delay: 0.32s; }
+
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--canvas-white);
@@ -319,6 +339,25 @@
       box-shadow: var(--shadow-md);
     }
 
+    .header-register-btn {
+      background-color: var(--bmkg-green);
+      color: #ffffff;
+      border: 1.5px solid transparent;
+      padding: 0.5rem 1.05rem;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 135, 90, 0.2);
+      transition: var(--transition-bounce);
+      cursor: pointer;
+    }
+
+    .header-register-btn:hover {
+      background-color: #00704a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 135, 90, 0.3);
+    }
+
     /* Modal Dialog Login BMKG */
     .modal-backdrop {
       position: fixed;
@@ -346,12 +385,13 @@
       background: var(--canvas-white);
       border-radius: var(--radius-lg);
       width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 40px rgba(0, 56, 101, 0.25);
+      max-width: 480px;
+      box-shadow: 0 24px 50px rgba(0, 56, 101, 0.28);
       border: 1px solid var(--border-light);
       overflow: hidden;
       transform: translateY(20px) scale(0.96);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin: auto;
     }
 
     .modal-backdrop.active .login-dialog-card {
@@ -361,7 +401,7 @@
     .login-card-header {
       background: var(--bmkg-blue-deep);
       color: #ffffff;
-      padding: 1.5rem 1.75rem;
+      padding: 1.35rem 1.75rem;
       position: relative;
       border-bottom: 3px solid var(--bmkg-green);
       display: flex;
@@ -393,21 +433,56 @@
     }
 
     .login-card-body {
-      padding: 1.75rem;
+      padding: 1.5rem 1.75rem;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    /* Auth Main Switcher (Login vs Register) */
+    .auth-main-tabs {
+      display: flex;
+      background: var(--canvas-surface);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .auth-main-tab-btn {
+      flex: 1;
+      padding: 0.55rem 0.75rem;
+      border: none;
+      background: transparent;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: all 0.2s;
+    }
+
+    .auth-main-tab-btn.active {
+      background: var(--canvas-white);
+      color: var(--bmkg-blue-deep);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
 
     .login-tabs {
       display: flex;
       border-bottom: 2px solid var(--border-light);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .login-tab-btn {
       flex: 1;
-      padding: 0.6rem 0.5rem;
+      padding: 0.55rem 0.5rem;
       background: transparent;
       border: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
@@ -422,7 +497,7 @@
     }
 
     .form-group {
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.05rem;
     }
 
     .form-group label {
@@ -430,7 +505,21 @@
       font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-secondary);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .input-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      pointer-events: none;
     }
 
     .form-control-input {
@@ -438,15 +527,68 @@
       padding: 0.65rem 0.9rem;
       border: 1px solid var(--border-medium);
       border-radius: var(--radius-md);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-family: inherit;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
+    .form-control-input.with-icon {
+      padding-left: 2.35rem;
+    }
+
+    .form-control-input.with-eye {
+      padding-right: 2.4rem;
+    }
+
     .form-control-input:focus {
       border-color: var(--bmkg-blue);
       box-shadow: 0 0 0 3px rgba(0, 90, 158, 0.15);
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.88rem;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+
+    .password-toggle-btn:hover {
+      color: var(--bmkg-blue);
+    }
+
+    .pwd-strength-bar {
+      height: 4px;
+      background: var(--border-light);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .pwd-strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    .pwd-strength-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 3px;
     }
 
     .btn-login-submit {
@@ -457,7 +599,7 @@
       border: none;
       border-radius: var(--radius-md);
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0, 56, 101, 0.2);
     }
@@ -1394,14 +1536,18 @@
         <a href="#datastore">DataStore API</a>
       </nav>
 
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <button class="btn-interactive header-login-btn" onclick="openLoginModal()">
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <button class="btn-interactive header-login-btn" onclick="openLoginModal('login')" title="Masuk ke Akun Portal / SSO BMKG">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
           <span>Masuk</span>
         </button>
-        <a href="katalog.html" class="btn-interactive header-action-btn">
-          <i class="fa-solid fa-arrow-down-to-bracket"></i>
-          <span>Akses Dataset</span>
+        <button class="btn-interactive header-register-btn" onclick="openLoginModal('register')" title="Daftar Akun Pengembang & API Key">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Daftar</span>
+        </button>
+        <a href="katalog.html" class="btn-interactive header-action-btn" title="Jelajahi Katalog Dataset Terbuka">
+          <i class="fa-solid fa-database"></i>
+          <span>Katalog</span>
         </a>
       </div>
     </div>
@@ -1470,7 +1616,7 @@
 
   <!-- 4. Verified Institutional Metrics Bar -->
   <div class="metrics-container">
-    <div class="metrics-bar">
+    <div class="metrics-bar scroll-reveal">
       <div class="metric-item">
         <div class="metric-number">1.482</div>
         <div class="metric-desc">Dataset Terbuka Terverifikasi</div>
@@ -1495,14 +1641,14 @@
     
     <!-- 4 Pillars Section with Interactive Cards -->
     <section id="pilar">
-      <div class="section-headline-group">
+      <div class="section-headline-group scroll-reveal">
         <h2 class="section-title">4 Pilar Layanan Data BMKG</h2>
         <p class="section-subtitle">Struktur taksonomi data terbuka yang dikurasi oleh masing-masing unit teknis kedeputian</p>
       </div>
 
       <div class="pillars-grid">
         <!-- Meteorologi -->
-        <a href="#peta" class="pillar-box meteorologi" onclick="filterByPilar('meteorologi')">
+        <a href="#peta" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi')">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1524,7 +1670,7 @@
         </a>
 
         <!-- Klimatologi -->
-        <a href="#peta" class="pillar-box klimatologi" onclick="filterByPilar('klimatologi')">
+        <a href="#peta" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi')">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1552,7 +1698,7 @@
         </a>
 
         <!-- Geofisika -->
-        <a href="#peta" class="pillar-box geofisika" onclick="filterByPilar('geofisika')">
+        <a href="#peta" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika')">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1574,7 +1720,7 @@
         </a>
 
         <!-- Kualitas Udara -->
-        <a href="#peta" class="pillar-box kualitas-udara" onclick="filterByPilar('kualitas-udara')">
+        <a href="#peta" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara')">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1600,7 +1746,7 @@
     </section>
 
     <!-- Geospatial Map Section with Region Selector & Layer Filters -->
-    <section class="spatial-card" id="peta">
+    <section class="spatial-card scroll-reveal" id="peta">
       <div class="spatial-card-header">
         <div class="spatial-title-group">
           <h3>Peta Sebaran Stasiun Observasi &amp; Aktivitas Seismik</h3>
@@ -1669,7 +1815,7 @@
     </section>
 
     <!-- DataStore Tabular Preview & Interactive API Explorer -->
-    <section class="preview-split-section" id="datastore">
+    <section class="preview-split-section scroll-reveal" id="datastore">
       <div class="preview-tab-controls">
         <button class="btn-interactive preview-tab-btn active" id="tabBtnTable" onclick="showPreviewTab('table')">
           <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel DataStore
@@ -1824,7 +1970,7 @@ if payload.get("success"):
   <!-- 6. Institutional Footer with Official Logo -->
   <footer class="gov-footer" id="kontak">
     <div class="footer-inner">
-      <div class="footer-col">
+      <div class="footer-col scroll-reveal stagger-1">
         <div class="footer-brand-header">
           <div class="footer-logo-svg">
             <img src="logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
@@ -1840,7 +1986,7 @@ if payload.get("success"):
           Email: satudata@bmkg.go.id • Call Center: 196
         </p>
       </div>
-      <div class="footer-col">
+      <div class="footer-col scroll-reveal stagger-2">
         <h4>4 Pilar Layanan</h4>
         <ul>
           <li><a href="#">Katalog Meteorologi</a></li>
@@ -1849,7 +1995,7 @@ if payload.get("success"):
           <li><a href="#">Katalog Kualitas Udara</a></li>
         </ul>
       </div>
-      <div class="footer-col">
+      <div class="footer-col scroll-reveal stagger-3">
         <h4>Akses Pengembang</h4>
         <ul>
           <li><a href="#">CKAN 2.12 Action API</a></li>
@@ -1858,7 +2004,7 @@ if payload.get("success"):
           <li><a href="#">Dokumentasi Integrasi</a></li>
         </ul>
       </div>
-      <div class="footer-col">
+      <div class="footer-col scroll-reveal stagger-4">
         <h4>Kepatuhan &amp; Regulasi</h4>
         <ul>
           <li><a href="#">Perpres No. 39 Tahun 2019 (SDI)</a></li>
@@ -1874,7 +2020,7 @@ if payload.get("success"):
     </div>
   </footer>
 
-  <!-- Modal Dialog Login BMKG (SSO / Public) -->
+  <!-- Modal Dialog Login & Register BMKG -->
   <div class="modal-backdrop" id="loginModal" onclick="handleModalBackdropClick(event)">
     <div class="login-dialog-card" onclick="event.stopPropagation()">
       <div class="login-card-header">
@@ -1882,8 +2028,8 @@ if payload.get("success"):
           <img src="logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
         <div>
-          <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #ffffff;">Masuk ke Satu Data BMKG</h3>
-          <div style="font-size: 0.78rem; color: #cbd5e1;">Portal Terintegrasi SSO &amp; Layanan Data Terbuka</div>
+          <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Satu Data BMKG</h3>
+          <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Akses SSO Resmi &amp; Akun Terbuka Publik</div>
         </div>
         <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup">
           <i class="fa-solid fa-xmark"></i>
@@ -1891,40 +2037,153 @@ if payload.get("success"):
       </div>
 
       <div class="login-card-body">
-        <div class="login-tabs">
-          <button class="login-tab-btn active" id="tabLoginAsn" onclick="switchLoginTab('asn')">
-            <i class="fa-solid fa-id-card"></i> SSO ASN / BMKG
+        <!-- Main Mode Switcher: Masuk (Login) vs Daftar (Register) -->
+        <div class="auth-main-tabs">
+          <button class="auth-main-tab-btn active" id="mainTabLogin" onclick="switchAuthMode('login')">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk (Login)
           </button>
-          <button class="login-tab-btn" id="tabLoginPublic" onclick="switchLoginTab('public')">
-            <i class="fa-solid fa-user"></i> Pengembang / Publik
+          <button class="auth-main-tab-btn" id="mainTabRegister" onclick="switchAuthMode('register')">
+            <i class="fa-solid fa-user-plus"></i> Daftar Akun Baru
           </button>
         </div>
 
-        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
-          <div class="form-group" id="formGroupIdentifier">
-            <label id="labelIdentifier">NIP / Akun Email BMKG</label>
-            <input type="text" id="loginIdentifier" class="form-control-input" placeholder="contoh: 19900815... atau nama@bmkg.go.id" required autocomplete="username">
+        <!-- ==================== FORM 1: LOGIN ==================== -->
+        <div id="authFormLogin">
+          <!-- Sub-tab SSO ASN vs Publik -->
+          <div class="login-tabs">
+            <button class="login-tab-btn active" id="tabLoginAsn" onclick="switchLoginTab('asn')">
+              <i class="fa-solid fa-id-card"></i> SSO ASN / BMKG
+            </button>
+            <button class="login-tab-btn" id="tabLoginPublic" onclick="switchLoginTab('public')">
+              <i class="fa-solid fa-user"></i> Pengembang / Publik
+            </button>
           </div>
 
-          <div class="form-group">
-            <label>Kata Sandi</label>
-            <input type="password" id="loginPassword" class="form-control-input" placeholder="Masukkan kata sandi akun Anda" required autocomplete="current-password">
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div class="form-group" id="formGroupIdentifier">
+              <label id="labelIdentifier">NIP / Akun Email BMKG</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-user input-icon"></i>
+                <input type="text" id="loginIdentifier" class="form-control-input with-icon" placeholder="contoh: 19900815... atau nama@bmkg.go.id" required autocomplete="username">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Kata Sandi</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="loginPassword" class="form-control-input with-icon with-eye" placeholder="Masukkan kata sandi akun Anda" required autocomplete="current-password">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; font-size: 0.82rem;">
+              <label style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); cursor: pointer;">
+                <input type="checkbox" checked> Ingat saya
+              </label>
+              <a href="#" onclick="showToast('Silakan hubungi Pusdatin BMKG untuk bantuan reset akun'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
+            </div>
+
+            <button type="submit" class="btn-interactive btn-login-submit">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              <span id="btnLoginText">Masuk via SSO BMKG</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+            Belum memiliki akun? <a href="#" onclick="switchAuthMode('register'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Daftar Akun Baru di sini</a>
           </div>
+        </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; font-size: 0.82rem;">
-            <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); cursor: pointer;">
-              <input type="checkbox" checked> Ingat saya di perangkat ini
-            </label>
-            <a href="#" onclick="showToast('Silakan hubungi Pusdatin BMKG untuk reset kata sandi')" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
+        <!-- ==================== FORM 2: REGISTER ==================== -->
+        <div id="authFormRegister" style="display: none;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.1rem; line-height: 1.45;">
+            Daftarkan diri Anda untuk mengunduh dataset skala besar, akses SQL DataStore, dan integrasi API Key gratis.
+          </p>
+
+          <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+            <div class="form-group">
+              <label>Kategori Pengguna / Afiliasi</label>
+              <select id="regCategory" class="form-control-input" required>
+                <option value="peneliti">🎓 Peneliti / Dosen / Mahasiswa (Akademik)</option>
+                <option value="developer">💻 Pengembang Software / Startup / Data Scientist</option>
+                <option value="pemerintah">🏢 Instansi Kementerian / Lembaga / Pemda</option>
+                <option value="swasta">🏭 Sektor Swasta / Industri Maritim / Energi</option>
+                <option value="umum">👤 Masyarakat Umum / Penggiat Cuaca</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Nama Lengkap</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-id-badge input-icon"></i>
+                <input type="text" id="regName" class="form-control-input with-icon" placeholder="contoh: Dr. Rahmat Hidayat" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Alamat Email Aktif (untuk aktivasi API Key)</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input type="email" id="regEmail" class="form-control-input with-icon" placeholder="contoh: peneliti@institusi.ac.id" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Instansi / Perusahaan (Opsional)</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-building-columns input-icon"></i>
+                <input type="text" id="regOrg" class="form-control-input with-icon" placeholder="contoh: Universitas Indonesia / Pusat Riset Iklim">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Kata Sandi Baru</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="regPassword" class="form-control-input with-icon with-eye" placeholder="Minimal 8 karakter kombinasi" required minlength="8" oninput="checkPasswordStrength(this.value)">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="pwd-strength-bar" id="pwdStrengthBar">
+                <div class="pwd-strength-fill" id="pwdStrengthFill"></div>
+              </div>
+              <div class="pwd-strength-text" id="pwdStrengthText">Kekuatan sandi: minimal 8 karakter</div>
+            </div>
+
+            <div class="form-group">
+              <label>Konfirmasi Kata Sandi</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-shield-check input-icon"></i>
+                <input type="password" id="regPasswordConfirm" class="form-control-input with-icon with-eye" placeholder="Ulangi kata sandi baru" required minlength="8">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPasswordConfirm', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1.15rem; font-size: 0.78rem; color: var(--text-secondary);">
+              <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; line-height: 1.45;">
+                <input type="checkbox" id="regTerms" required style="margin-top: 2px;">
+                <span>Saya menyetujui <a href="#" onclick="showToast('Membuka Lisensi CC-BY 4.0'); return false;" style="color: var(--bmkg-blue); font-weight: 600;">Ketentuan Lisensi Data Terbuka BMKG (CC-BY 4.0)</a> dan Kebijakan Privasi Portal.</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-interactive btn-login-submit" style="background: var(--bmkg-green);">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Daftar Akun &amp; Dapatkan API Key</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+            Sudah memiliki akun? <a href="#" onclick="switchAuthMode('login'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Masuk di sini</a>
           </div>
+        </div>
 
-          <button type="submit" class="btn-interactive btn-login-submit">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            <span id="btnLoginText">Masuk via SSO BMKG</span>
-          </button>
-        </form>
-
-        <div style="margin-top: 1.25rem; text-align: center; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.9rem;">
+        <div style="margin-top: 1.25rem; text-align: center; font-size: 0.76rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
           <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
           Terproteksi Single Sign-On (SSO) Pusdatin BMKG &amp; Enkripsi TLS 1.3
         </div>
@@ -2320,13 +2579,20 @@ if payload.get("success"):
       }, 3000);
     }
 
-    // Modal Login Handlers
-    function openLoginModal() {
+    // Modal Login & Register Handlers
+    function openLoginModal(defaultTab = 'login') {
       const modal = document.getElementById('loginModal');
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
+      switchAuthMode(defaultTab);
       setTimeout(() => {
-        document.getElementById('loginIdentifier').focus();
+        if (defaultTab === 'register') {
+          const regInput = document.getElementById('regName');
+          if (regInput) regInput.focus();
+        } else {
+          const idInput = document.getElementById('loginIdentifier');
+          if (idInput) idInput.focus();
+        }
       }, 100);
     }
 
@@ -2339,6 +2605,33 @@ if payload.get("success"):
     function handleModalBackdropClick(e) {
       if (e.target.id === 'loginModal') {
         closeLoginModal();
+      }
+    }
+
+    function switchAuthMode(mode) {
+      const tabLogin = document.getElementById('mainTabLogin');
+      const tabRegister = document.getElementById('mainTabRegister');
+      const formLogin = document.getElementById('authFormLogin');
+      const formRegister = document.getElementById('authFormRegister');
+      const headerTitle = document.getElementById('modalHeaderTitle');
+      const headerSubtitle = document.getElementById('modalHeaderSubtitle');
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'block';
+        formRegister.style.display = 'none';
+        headerTitle.textContent = 'Masuk ke Portal Satu Data BMKG';
+        headerSubtitle.textContent = 'Akses SSO Resmi & Akun Terbuka Publik';
+        setTimeout(() => document.getElementById('loginIdentifier')?.focus(), 50);
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formLogin.style.display = 'none';
+        formRegister.style.display = 'block';
+        headerTitle.textContent = 'Daftar Akun Portal Data BMKG';
+        headerSubtitle.textContent = 'Dapatkan Akses API Key & Unduhan Data Lengkap';
+        setTimeout(() => document.getElementById('regName')?.focus(), 50);
       }
     }
 
@@ -2364,11 +2657,85 @@ if payload.get("success"):
       }
     }
 
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        }
+      } else {
+        input.type = 'password';
+        if (icon) {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+    }
+
+    function checkPasswordStrength(val) {
+      const fill = document.getElementById('pwdStrengthFill');
+      const text = document.getElementById('pwdStrengthText');
+      if (!fill || !text) return;
+
+      if (!val) {
+        fill.style.width = '0%';
+        text.textContent = 'Kekuatan sandi: minimal 8 karakter';
+        text.style.color = 'var(--text-muted)';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      if (score <= 1) {
+        fill.style.width = '25%';
+        fill.style.backgroundColor = '#ef4444';
+        text.textContent = 'Kekuatan: Lemah (tambahkan angka & huruf kapital)';
+        text.style.color = '#ef4444';
+      } else if (score === 2) {
+        fill.style.width = '60%';
+        fill.style.backgroundColor = '#f59e0b';
+        text.textContent = 'Kekuatan: Sedang (tambahkan simbol atau panjang lagi)';
+        text.style.color = '#d97706';
+      } else {
+        fill.style.width = '100%';
+        fill.style.backgroundColor = '#10b981';
+        text.textContent = 'Kekuatan: Sangat Kuat 👍';
+        text.style.color = '#059669';
+      }
+    }
+
     function handleLoginSubmit(e) {
       e.preventDefault();
       const id = document.getElementById('loginIdentifier').value;
       closeLoginModal();
-      showToast(`Autentikasi Berhasil! Selamat datang, ${id}`);
+      showToast(`Autentikasi Berhasil! Selamat datang di Portal Data BMKG, ${id}`);
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const p1 = document.getElementById('regPassword').value;
+      const p2 = document.getElementById('regPasswordConfirm').value;
+
+      if (p1 !== p2) {
+        showToast("Konfirmasi kata sandi tidak cocok! Silakan periksa kembali.");
+        document.getElementById('regPasswordConfirm').focus();
+        return;
+      }
+
+      closeLoginModal();
+      showToast(`Registrasi Berhasil! Selamat datang, ${name}. Cek ${email} untuk aktivasi API Key.`);
+      document.getElementById('registerForm').reset();
+      checkPasswordStrength('');
     }
 
     document.addEventListener('keydown', (e) => {
@@ -2485,7 +2852,38 @@ if payload.get("success"):
       }
     }
 
+    // ==========================================================================
+    // SCROLL REVEAL / POP-UP ANIMATION OBSERVER
+    // ==========================================================================
+    function initScrollReveal() {
+      const revealElements = document.querySelectorAll('.scroll-reveal');
+      if (!revealElements.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        // Fallback for older browsers
+        revealElements.forEach(el => el.classList.add('revealed'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target); // Pop up once smoothly
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0.08,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      revealElements.forEach(el => observer.observe(el));
+    }
+
+    // Initializations
     initNavbarSoftScroll();
+    initScrollReveal();
   </script>
 </body>
 </html>
