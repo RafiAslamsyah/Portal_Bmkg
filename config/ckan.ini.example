@@ -1,0 +1,47 @@
+# ==============================================================================
+# CKAN 2.12 Configuration Template - Portal Open Data BMKG
+# PERINGATAN KESELAMATAN: File produksi berisi secret dilarang di-commit ke Git!
+# ==============================================================================
+
+[app:main]
+use = egg:ckan
+
+# --- Brand & Identity ---
+ckan.site_title = Portal Open Data BMKG
+ckan.site_logo = /img/logo-bmkg.png
+ckan.site_url = http://localhost:5000
+ckan.site_description = Portal Data Terbuka Badan Meteorologi, Klimatologi, dan Geofisika
+
+# --- Database Katalog (PostgreSQL - Localhost Only) ---
+sqlalchemy.url = postgresql://ckan_default:GANTI_DENGAN_PASSWORD_AMAN@127.0.0.1:5432/ckan_default
+
+# --- DataStore (PostgreSQL Dual-Account Isolation) ---
+ckan.datastore.write_url = postgresql://ckan_default:GANTI_DENGAN_PASSWORD_AMAN@127.0.0.1:5432/datastore_default
+ckan.datastore.read_url = postgresql://datastore_ro:GANTI_DENGAN_PASSWORD_RO@127.0.0.1:5432/datastore_default
+
+# --- Search (Apache Solr 9 - Localhost Only) ---
+solr_url = http://127.0.0.1:8983/solr/ckan
+
+# --- Queue & Cache (Redis - Localhost Only) ---
+ckan.redis.url = redis://127.0.0.1:6379/1
+
+# --- FileStore (Storage Unggahan Berkas) ---
+ckan.storage_path = /var/lib/ckan/default
+
+# --- Ekstensi & Plugins (Aturan: hanya 1 loader aktif: xloader ATAU datapusher_plus) ---
+ckan.plugins = bmkg_theme bmkg_schema stats text_view image_view datastore xloader spatial_metadata spatial_query geo_view geojson_view
+
+# --- Spatial & Geospasial Settings ---
+ckanext.spatial.search_backend = solr
+ckan.spatial.validator.profiles = default
+
+# --- Internationalization ---
+ckan.locale_default = id
+ckan.locales_offered = id en
+
+# --- Keamanan & Sesi ---
+ckan.auth.anon_create_dataset = false
+ckan.auth.create_unowned_dataset = false
+ckan.auth.create_dataset_if_not_in_organization = false
+ckan.auth.user_create_groups = false
+ckan.auth.user_create_organizations = false

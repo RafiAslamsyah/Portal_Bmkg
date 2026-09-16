@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "name": "Katalog_Gempa_BMKG_M5",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "bmkg20260810_01",
+        "waktu_utc": "2026-08-10T04:12:30Z",
+        "magnitude": 5.4,
+        "kedalaman_km": 10,
+        "wilayah": "Selatan Jawa Barat",
+        "potensi_tsunami": "Tidak Berpotensi Tsunami"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [107.12, -7.85]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "bmkg20260812_02",
+        "waktu_utc": "2026-08-12T11:45:15Z",
+        "magnitude": 5.8,
+        "kedalaman_km": 25,
+        "wilayah": "Laut Maluku Bagian Utara",
+        "potensi_tsunami": "Tidak Berpotensi Tsunami"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.85, 1.45]
+      }
+    }
+  ]
+}

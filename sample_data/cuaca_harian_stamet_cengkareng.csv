@@ -1,0 +1,8 @@
+tanggal,stasiun_id,nama_stasiun,suhu_min,suhu_max,suhu_rata,kelembapan_rata,curah_hujan,kecepatan_angin_max
+2026-08-01,96749,Stasiun Meteorologi Soekarno-Hatta,24.2,32.8,28.5,78,0.0,14
+2026-08-02,96749,Stasiun Meteorologi Soekarno-Hatta,24.0,33.2,28.9,76,0.0,12
+2026-08-03,96749,Stasiun Meteorologi Soekarno-Hatta,23.8,32.0,27.8,82,14.5,18
+2026-08-04,96749,Stasiun Meteorologi Soekarno-Hatta,24.4,31.5,27.2,85,32.0,22
+2026-08-05,96749,Stasiun Meteorologi Soekarno-Hatta,24.6,33.0,28.6,79,4.2,15
+2026-08-06,96749,Stasiun Meteorologi Soekarno-Hatta,25.0,33.5,29.1,74,0.0,11
+2026-08-07,96749,Stasiun Meteorologi Soekarno-Hatta,24.8,34.0,29.4,72,0.0,10
