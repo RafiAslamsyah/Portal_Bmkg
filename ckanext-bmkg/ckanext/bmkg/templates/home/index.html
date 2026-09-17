@@ -943,13 +943,13 @@ if payload.get("success"):
     }
 
     function handleLoginSubmit(e) {
-      const id = document.getElementById('loginIdentifier').value;
       const form = document.getElementById('loginForm');
-      // If running on CKAN live backend, let standard form POST happen
-      if (form && form.action && !form.action.includes('{{')) {
+      // If running inside live CKAN backend (http/https), allow standard form POST
+      if (window.location.protocol.startsWith('http') && form && form.action) {
         return true;
       }
       e.preventDefault();
+      const id = document.getElementById('loginIdentifier')?.value || 'Admin';
       closeLoginModal();
       showToast(`Login Administrator Berhasil! Hak akses CRUD aktif untuk akun: ${id}`);
     }
