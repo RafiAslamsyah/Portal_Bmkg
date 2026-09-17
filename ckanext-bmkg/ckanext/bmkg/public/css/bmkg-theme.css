@@ -1477,3 +1477,53 @@ footer.gov-footer, .gov-footer {
   transform: none !important;
   visibility: visible !important;
 }
+
+/* Live BMKG TEWS Radar Pulse & Marker Styling */
+.tews-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+.tews-radar-wrapper {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tews-radar-ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.5);
+  animation: tews-radar-pulse 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.tews-radar-core {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #dc2626;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+@keyframes tews-radar-pulse {
+  70%, 100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+@keyframes tews-ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

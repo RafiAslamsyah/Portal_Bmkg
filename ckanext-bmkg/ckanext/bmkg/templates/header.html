@@ -61,10 +61,17 @@
             <i class="fa-solid fa-user-shield"></i>
             <span>{{ c.userobj.display_name }} (Admin)</span>
           </a>
+          <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline; margin: 0;">
+            {{ h.csrf_input() }}
+            <button type="submit" class="btn-interactive" title="Keluar dari Sesi Admin (Kembali ke Mode User Publik Bebas)" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Keluar</span>
+            </button>
+          </form>
         {% else %}
-          <button class="btn-interactive header-login-btn" onclick="openLoginModal()" title="Login Khusus Administrator / Pengelola Data BMKG (CRUD)">
+          <button class="btn-interactive header-login-btn" onclick="openLoginModal()" title="Login Administrator / Pengelola Data BMKG">
             <i class="fa-solid fa-lock"></i>
-            <span>Login Admin</span>
+            <span>Login</span>
           </button>
         {% endif %}
         <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive header-action-btn" title="Jelajahi & Unduh Katalog Dataset Terbuka Bebas Tanpa Login">

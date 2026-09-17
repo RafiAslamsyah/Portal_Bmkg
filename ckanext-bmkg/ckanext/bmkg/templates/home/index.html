@@ -228,6 +228,25 @@
         </div>
       </div>
 
+      <!-- Live BMKG TEWS Alert Bar -->
+      <div class="live-tews-alert-bar" id="liveTewsBar" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.96) 100%); border: 1px solid rgba(239, 68, 68, 0.45); border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);">
+        <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: #dc2626; color: #ffffff; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #ffffff; animation: tews-ping 1.5s infinite;"></span>
+            LIVE BMKG TEWS
+          </span>
+          <span id="liveTewsHeadline" style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">
+            Memuat data gempa terkini dari server BMKG TEWS...
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.78rem;">
+          <span id="liveTewsMeta" style="color: #94a3b8; font-family: 'JetBrains Mono', monospace;"></span>
+          <button class="btn-interactive" onclick="fetchLiveBMKGGempa(true)" title="Perbarui Data Gempa Detik Ini" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #38bdf8; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+      </div>
+
       <div class="spatial-map-wrapper">
         <div id="bmkgMap"></div>
         <!-- Collapsible Map Legend Box -->
@@ -612,44 +631,77 @@ if payload.get("success"):
     // Endpoint: https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json
     // ==========================================================
     const fallbackGempaList = [
-      { wilayah: "Selatan Jawa Barat", mag: 5.4, kedalaman: "10 km", lat: -7.85, lon: 107.12, tanggal: "14 Sep 2026 16:27 WIB", status: "Tidak berpotensi tsunami" },
-      { wilayah: "Laut Maluku Bagian Utara", mag: 6.2, kedalaman: "145 km", lat: 2.52, lon: 128.09, tanggal: "14 Sep 2026 17:58 WIB", status: "Tidak berpotensi tsunami" },
-      { wilayah: "Tenggara Kab. Malang Jatim", mag: 5.2, kedalaman: "10 km", lat: -9.52, lon: 112.85, tanggal: "14 Sep 2026 08:42 WIB", status: "Tidak berpotensi tsunami" },
-      { wilayah: "Kepulauan Seribu DKI Jakarta", mag: 5.9, kedalaman: "376 km", lat: -5.81, lon: 106.56, tanggal: "12 Sep 2026 04:23 WIB", status: "Pusat gempa dalam" }
+      { wilayah: "Pusat gempa berada di laut 118 km BaratLaut Jailolo", mag: 5.1, kedalaman: "24 km", lat: 1.35, lon: 126.44, tanggal: "17 Sep 2026 13:20:53 WIB", jam: "13:20:53 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III-IV Batang Dua, III Manado, III Ternate", shakemap: "https://data.bmkg.go.id/DataMKG/TEWS/20260917132053.mmi.jpg", isLatestLive: true },
+      { wilayah: "42 km TimurLaut PULAUDOI-MALUT", mag: 6.2, kedalaman: "145 km", lat: 2.52, lon: 128.09, tanggal: "14 Sep 2026 17:58:04 WIB", jam: "17:58 WIB", status: "Tidak berpotensi tsunami", isLatestLive: false },
+      { wilayah: "186 km BaratDaya BAYAH-BANTEN", mag: 5.6, kedalaman: "10 km", lat: -8.54, lon: 105.78, tanggal: "14 Sep 2026 16:27:39 WIB", jam: "16:27 WIB", status: "Tidak berpotensi tsunami", isLatestLive: false },
+      { wilayah: "Kepulauan Seribu DKI Jakarta", mag: 5.9, kedalaman: "376 km", lat: -5.81, lon: 106.56, tanggal: "12 Sep 2026 04:23 WIB", jam: "04:23 WIB", status: "Pusat gempa dalam", isLatestLive: false }
     ];
 
     function renderGempaMarkers(items) {
       gempaLayer.clearLayers();
       items.forEach((g, idx) => {
-        const isLatest = idx === 0;
+        const isLatest = idx === 0 || g.isLatestLive;
         const mag = parseFloat(g.mag) || 5.0;
-        const radius = Math.max(8, (mag - 4.5) * 4 + 7);
 
-        const marker = L.circleMarker([g.lat, g.lon], {
-          radius: radius,
-          fillColor: isLatest ? "#b91c1c" : "#dc2626",
-          color: isLatest ? "#fbbf24" : "#ffffff",
-          weight: isLatest ? 3 : 2,
-          opacity: 1,
-          fillOpacity: 0.92
-        });
+        let marker;
+        if (isLatest) {
+          // Radar pulsing animation marker for the most recent live earthquake
+          const radarIcon = L.divIcon({
+            className: 'tews-div-icon',
+            html: `
+              <div class="tews-radar-wrapper" title="Gempa Terkini M ${g.mag}">
+                <div class="tews-radar-ping"></div>
+                <div class="tews-radar-core">M${g.mag}</div>
+              </div>
+            `,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+          });
+          marker = L.marker([g.lat, g.lon], { icon: radarIcon, zIndexOffset: 1000 });
+        } else {
+          const radius = Math.max(7, (mag - 4.5) * 3.5 + 6);
+          marker = L.circleMarker([g.lat, g.lon], {
+            radius: radius,
+            fillColor: "#dc2626",
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.88
+          });
+        }
+
+        const shakemapHtml = g.shakemap ? `
+          <div style="margin-top: 6px; border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0;">
+            <a href="${g.shakemap}" target="_blank" rel="noreferrer" title="Lihat Peta Shakemap BMKG">
+              <img src="${g.shakemap}" alt="Shakemap BMKG" style="width: 100%; max-height: 120px; object-fit: cover; display: block;">
+            </a>
+          </div>
+        ` : '';
+
+        const dirasakanHtml = g.dirasakan ? `
+          <div style="font-size: 11px; color: #b45309; background: #fef3c7; padding: 3px 6px; border-radius: 4px; margin-top: 4px;">
+            📢 <strong>Dirasakan:</strong> ${g.dirasakan}
+          </div>
+        ` : '';
 
         marker.bindPopup(`
-          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 220px;">
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 240px; max-width: 280px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
-              <span style="background: #ffe3e3; color: #c92a2a; padding: 2px 7px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
-              <span style="font-size: 11px; color: ${isLatest ? '#b91c1c' : '#64748b'}; font-weight: 700;">
-                ${isLatest ? '🔴 GEMPA TERBARU' : (g.jam || '')}
+              <span style="background: #dc2626; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
+              <span style="font-size: 11px; color: ${isLatest ? '#dc2626' : '#64748b'}; font-weight: 700;">
+                ${isLatest ? '🔴 GEMPA TERKINI (LIVE)' : (g.jam || '')}
               </span>
             </div>
             <strong style="color: #0f172a; font-size: 13px; display: block; margin-bottom: 4px;">${g.wilayah}</strong>
-            <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">
+            <div style="font-size: 12px; color: #475569; margin-bottom: 4px;">
               <div>🕒 <strong>Waktu:</strong> ${g.tanggal}</div>
               <div>⚓ <strong>Kedalaman:</strong> ${g.kedalaman}</div>
               <div>📍 <strong>Koordinat:</strong> ${g.lat.toFixed(2)}, ${g.lon.toFixed(2)}</div>
             </div>
-            <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 4px;">
-              🛡️ ${g.status}
+            ${dirasakanHtml}
+            ${shakemapHtml}
+            <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 5px; margin-top: 6px;">
+              🛡️ ${g.status || g.potensi || 'Tidak berpotensi tsunami'}
             </div>
           </div>
         `);
@@ -657,50 +709,112 @@ if payload.get("success"):
       });
     }
 
-    async function fetchLiveBMKGGempa() {
+    async function fetchLiveBMKGGempa(isManual = false) {
       const legendLabel = document.getElementById('legendGempaText');
-      try {
-        const response = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', {
-          cache: 'no-store'
-        });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const data = await response.json();
-        const rawList = data?.Infogempa?.gempa;
+      const headline = document.getElementById('liveTewsHeadline');
+      const meta = document.getElementById('liveTewsMeta');
 
-        if (Array.isArray(rawList) && rawList.length > 0) {
-          const parsedGempa = rawList.map(item => {
-            const coords = (item.Coordinates || '').split(',');
-            return {
-              wilayah: item.Wilayah,
-              mag: parseFloat(item.Magnitude),
-              kedalaman: item.Kedalaman,
+      try {
+        const cacheBuster = `?_t=${Date.now()}`;
+        const [resAuto, resList] = await Promise.allSettled([
+          fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json' + cacheBuster, { cache: 'no-store' }),
+          fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json' + cacheBuster, { cache: 'no-store' })
+        ]);
+
+        let items = [];
+
+        // 1. Ambil Autogempa (gempa terbaru realtime detik ini)
+        if (resAuto.status === 'fulfilled' && resAuto.value.ok) {
+          const autoJson = await resAuto.value.json();
+          const g = autoJson?.Infogempa?.gempa;
+          if (g && g.Coordinates) {
+            const coords = g.Coordinates.split(',');
+            items.push({
+              wilayah: g.Wilayah,
+              mag: parseFloat(g.Magnitude),
+              kedalaman: g.Kedalaman,
               lat: parseFloat(coords[0]),
               lon: parseFloat(coords[1]),
-              tanggal: `${item.Tanggal} ${item.Jam}`,
-              jam: item.Jam,
-              status: item.Potensi || 'Data Resmi BMKG TEWS'
-            };
-          }).filter(item => !isNaN(item.lat) && !isNaN(item.lon));
+              tanggal: `${g.Tanggal} ${g.Jam}`,
+              jam: g.Jam,
+              status: g.Potensi || 'Data Resmi BMKG TEWS',
+              dirasakan: g.Dirasakan || '',
+              shakemap: g.Shakemap ? `https://data.bmkg.go.id/DataMKG/TEWS/${g.Shakemap}` : null,
+              isLatestLive: true
+            });
+          }
+        }
 
-          renderGempaMarkers(parsedGempa);
+        // 2. Ambil Gempaterkini (Daftar 15 gempa M >= 5.0)
+        if (resList.status === 'fulfilled' && resList.value.ok) {
+          const listJson = await resList.value.json();
+          const rawList = listJson?.Infogempa?.gempa;
+          if (Array.isArray(rawList)) {
+            rawList.forEach(g => {
+              const coords = (g.Coordinates || '').split(',');
+              const lat = parseFloat(coords[0]);
+              const lon = parseFloat(coords[1]);
+              const isDup = items.some(existing => 
+                Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
+              );
+              if (!isDup && !isNaN(lat) && !isNaN(lon)) {
+                items.push({
+                  wilayah: g.Wilayah,
+                  mag: parseFloat(g.Magnitude),
+                  kedalaman: g.Kedalaman,
+                  lat: lat,
+                  lon: lon,
+                  tanggal: `${g.Tanggal} ${g.Jam}`,
+                  jam: g.Jam,
+                  status: g.Potensi || 'Tidak berpotensi tsunami',
+                  dirasakan: '',
+                  shakemap: null,
+                  isLatestLive: false
+                });
+              }
+            });
+          }
+        }
+
+        if (items.length > 0) {
+          renderGempaMarkers(items);
+
+          const latest = items[0];
+          if (headline) {
+            headline.innerHTML = `<span style="background: #ef4444; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 800; margin-right: 6px;">M ${latest.mag}</span> ${latest.wilayah} (Kedalaman ${latest.kedalaman})`;
+          }
+          if (meta) {
+            meta.textContent = latest.tanggal;
+          }
           if (legendLabel) {
-            legendLabel.innerHTML = `<strong>15 Gempa M &ge; 5.0 Terkini</strong> <span style="color: #00875a; font-size: 0.72rem; font-weight: bold;">(Live BMKG TEWS)</span>`;
+            legendLabel.innerHTML = `<strong>${items.length} Gempa Terkini</strong> <span style="color: #10b981; font-size: 0.72rem; font-weight: bold;">(Live BMKG TEWS)</span>`;
+          }
+          if (isManual) {
+            showToast(`Data BMKG TEWS berhasil diperbarui (Terbaru: M ${latest.mag})`);
           }
           return;
         }
       } catch (err) {
-        console.info('Menggunakan data observasi gempa fallback lokal:', err.message);
+        console.warn('Gagal memuat API Live BMKG TEWS, beralih ke observasi lokal:', err);
       }
 
       // Fallback jika offline
       renderGempaMarkers(fallbackGempaList);
+      const fallbackLatest = fallbackGempaList[0];
+      if (headline) {
+        headline.innerHTML = `<span style="background: #ef4444; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 800; margin-right: 6px;">M ${fallbackLatest.mag}</span> ${fallbackLatest.wilayah} (Kedalaman ${fallbackLatest.kedalaman})`;
+      }
+      if (meta) {
+        meta.textContent = fallbackLatest.tanggal;
+      }
       if (legendLabel) {
-        legendLabel.textContent = `Episentrum Gempa M ≥ 5.0 Terkini (Observasi BMKG)`;
+        legendLabel.textContent = 'Episentrum Gempa M ≥ 5.0 Terkini (Observasi BMKG)';
       }
     }
 
-    // Jalankan pemuatan live data gempa
+    // Jalankan pemuatan live data gempa awal & polling setiap 60 detik
     fetchLiveBMKGGempa();
+    setInterval(fetchLiveBMKGGempa, 60000);
 
     // Fly to Region Function
     function flyToRegion(region) {
