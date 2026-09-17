@@ -1526,13 +1526,13 @@
       </nav>
 
       <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <button class="btn-interactive header-login-btn" onclick="openLoginModal('login')" title="Masuk / Daftar Akun Portal">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Masuk</span>
+        <button class="btn-interactive header-login-btn" onclick="openLoginModal()" title="Login Khusus Administrator / Pengelola Data BMKG (CRUD)">
+          <i class="fa-solid fa-lock"></i>
+          <span>Login Admin</span>
         </button>
-        <a href="katalog.html" class="btn-interactive header-action-btn" title="Jelajahi Katalog Dataset Terbuka">
-          <i class="fa-solid fa-arrow-down-to-bracket"></i>
-          <span>Akses Dataset</span>
+        <a href="katalog.html" class="btn-interactive header-action-btn" title="Jelajahi & Unduh Katalog Dataset Terbuka Bebas Tanpa Login">
+          <i class="fa-solid fa-database"></i>
+          <span>Akses Data Publik</span>
         </a>
       </div>
     </div>
@@ -1542,14 +1542,14 @@
   <section class="hero-banner">
     <div class="hero-content">
       <div class="hero-meta-tag">
-        <i class="fa-solid fa-check-double"></i>
-        <span>Katalog Data Terbuka Publik Resmi</span>
+        <i class="fa-solid fa-unlock-keyhole"></i>
+        <span>Data Terbuka Publik Resmi — Bebas Akses, Unduh &amp; API Tanpa Perlu Login</span>
       </div>
       <h1 class="hero-title">
         Satu Pintu Akses Data Meteorologi, Klimatologi, dan Geofisika
       </h1>
       <p class="hero-lead">
-        Menyediakan ribuan dataset observasi terpercaya, deret waktu iklim, pemantauan kualitas udara, dan katalog seismik Indonesia yang dapat diakses publik dan diintegrasikan melalui API.
+        Menyediakan ribuan dataset observasi terpercaya, deret waktu iklim, pemantauan kualitas udara, dan katalog seismik Indonesia yang dapat diakses publik, diunduh, dan diintegrasikan melalui API secara bebas tanpa perlu registrasi akun.
       </p>
 
       <!-- Search Box Panel -->
@@ -2005,7 +2005,7 @@ if payload.get("success"):
     </div>
   </footer>
 
-  <!-- Modal Dialog Login & Register BMKG -->
+  <!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
   <div class="modal-backdrop" id="loginModal" onclick="handleModalBackdropClick(event)">
     <div class="login-dialog-card" onclick="event.stopPropagation()">
       <div class="login-card-header">
@@ -2014,159 +2014,55 @@ if payload.get("success"):
         </div>
         <div>
           <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Data BMKG</h3>
-          <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Akses SSO Resmi &amp; Akun Terbuka Publik</div>
+          <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Login Khusus Administrator &amp; Pengelola Data (CRUD)</div>
         </div>
-        <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup">
+        <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup Dialog">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <div class="login-card-body">
-        <!-- Main Mode Switcher: Masuk (Login) vs Daftar (Register) -->
-        <div class="auth-main-tabs">
-          <button class="auth-main-tab-btn active" id="mainTabLogin" onclick="switchAuthMode('login')">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk (Login)
+        <!-- Banner Informasi Hak Akses Publik vs Admin -->
+        <div style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.3rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 1.15rem; margin-top: 2px; flex-shrink: 0;"></i>
+          <div>
+            <strong style="color: var(--text-primary); display: block; margin-bottom: 2px;">Data Terbuka untuk Publik (Bebas Akses):</strong>
+            Masyarakat, akademisi, dan pengembang <strong>tidak perlu login</strong> untuk mengunduh dataset, melihat tabel, atau mengambil data lewat API. Form ini <strong>hanya untuk Administrator / Petugas BMKG</strong> guna melakukan manajemen data (Create, Read, Update, Delete / CRUD).
+          </div>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group" id="formGroupIdentifier">
+            <label id="labelIdentifier">NIP Pegawai / Username Admin BMKG</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-user-shield input-icon"></i>
+              <input type="text" id="loginIdentifier" class="form-control-input with-icon" placeholder="contoh: 19900815... atau admin.mkg" required autocomplete="username">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Kata Sandi Administrator</label>
+            <div class="password-wrapper">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" id="loginPassword" class="form-control-input with-icon with-eye" placeholder="Masukkan kata sandi pengelola data" required autocomplete="current-password">
+              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.35rem; font-size: 0.82rem;">
+            <label style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); cursor: pointer;">
+              <input type="checkbox" checked> Ingat sesi login
+            </label>
+            <a href="#" onclick="showToast('Silakan hubungi Pusdatin BMKG untuk bantuan akun Administrator'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi Admin?</a>
+          </div>
+
+          <button type="submit" class="btn-interactive btn-login-submit" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span id="btnLoginText">Masuk sebagai Administrator (CRUD)</span>
           </button>
-          <button class="auth-main-tab-btn" id="mainTabRegister" onclick="switchAuthMode('register')">
-            <i class="fa-solid fa-user-plus"></i> Daftar Akun Baru
-          </button>
-        </div>
-
-        <!-- ==================== FORM 1: LOGIN ==================== -->
-        <div id="authFormLogin">
-          <!-- Sub-tab SSO ASN vs Publik -->
-          <div class="login-tabs">
-            <button class="login-tab-btn active" id="tabLoginAsn" onclick="switchLoginTab('asn')">
-              <i class="fa-solid fa-id-card"></i> SSO ASN / BMKG
-            </button>
-            <button class="login-tab-btn" id="tabLoginPublic" onclick="switchLoginTab('public')">
-              <i class="fa-solid fa-user"></i> Pengembang / Publik
-            </button>
-          </div>
-
-          <form id="loginForm" onsubmit="handleLoginSubmit(event)">
-            <div class="form-group" id="formGroupIdentifier">
-              <label id="labelIdentifier">NIP / Akun Email BMKG</label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-user input-icon"></i>
-                <input type="text" id="loginIdentifier" class="form-control-input with-icon" placeholder="contoh: 19900815... atau nama@bmkg.go.id" required autocomplete="username">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Kata Sandi</label>
-              <div class="password-wrapper">
-                <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" id="loginPassword" class="form-control-input with-icon with-eye" placeholder="Masukkan kata sandi akun Anda" required autocomplete="current-password">
-                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-              </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; font-size: 0.82rem;">
-              <label style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); cursor: pointer;">
-                <input type="checkbox" checked> Ingat saya
-              </label>
-              <a href="#" onclick="showToast('Silakan hubungi Pusdatin BMKG untuk bantuan reset akun'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
-            </div>
-
-            <button type="submit" class="btn-interactive btn-login-submit">
-              <i class="fa-solid fa-arrow-right-to-bracket"></i>
-              <span id="btnLoginText">Masuk via SSO BMKG</span>
-            </button>
-          </form>
-
-          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
-            Belum memiliki akun? <a href="#" onclick="switchAuthMode('register'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Daftar Akun Baru di sini</a>
-          </div>
-        </div>
-
-        <!-- ==================== FORM 2: REGISTER ==================== -->
-        <div id="authFormRegister" style="display: none;">
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.1rem; line-height: 1.45;">
-            Daftarkan diri Anda untuk mengunduh dataset skala besar, akses SQL DataStore, dan integrasi API Key gratis.
-          </p>
-
-          <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
-            <div class="form-group">
-              <label>Kategori Pengguna / Afiliasi</label>
-              <select id="regCategory" class="form-control-input" required>
-                <option value="peneliti">🎓 Peneliti / Dosen / Mahasiswa (Akademik)</option>
-                <option value="developer">💻 Pengembang Software / Startup / Data Scientist</option>
-                <option value="pemerintah">🏢 Instansi Kementerian / Lembaga / Pemda</option>
-                <option value="swasta">🏭 Sektor Swasta / Industri Maritim / Energi</option>
-                <option value="umum">👤 Masyarakat Umum / Penggiat Cuaca</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Nama Lengkap</label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-id-badge input-icon"></i>
-                <input type="text" id="regName" class="form-control-input with-icon" placeholder="contoh: Dr. Rahmat Hidayat" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Alamat Email Aktif (untuk aktivasi API Key)</label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-envelope input-icon"></i>
-                <input type="email" id="regEmail" class="form-control-input with-icon" placeholder="contoh: peneliti@institusi.ac.id" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Instansi / Perusahaan (Opsional)</label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-building-columns input-icon"></i>
-                <input type="text" id="regOrg" class="form-control-input with-icon" placeholder="contoh: Universitas Indonesia / Pusat Riset Iklim">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Kata Sandi Baru</label>
-              <div class="password-wrapper">
-                <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" id="regPassword" class="form-control-input with-icon with-eye" placeholder="Minimal 8 karakter kombinasi" required minlength="8" oninput="checkPasswordStrength(this.value)">
-                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword', this)" title="Lihat/Sembunyikan Sandi">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-              </div>
-              <div class="pwd-strength-bar" id="pwdStrengthBar">
-                <div class="pwd-strength-fill" id="pwdStrengthFill"></div>
-              </div>
-              <div class="pwd-strength-text" id="pwdStrengthText">Kekuatan sandi: minimal 8 karakter</div>
-            </div>
-
-            <div class="form-group">
-              <label>Konfirmasi Kata Sandi</label>
-              <div class="password-wrapper">
-                <i class="fa-solid fa-shield-check input-icon"></i>
-                <input type="password" id="regPasswordConfirm" class="form-control-input with-icon with-eye" placeholder="Ulangi kata sandi baru" required minlength="8">
-                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPasswordConfirm', this)" title="Lihat/Sembunyikan Sandi">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-              </div>
-            </div>
-
-            <div style="margin-bottom: 1.15rem; font-size: 0.78rem; color: var(--text-secondary);">
-              <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; line-height: 1.45;">
-                <input type="checkbox" id="regTerms" required style="margin-top: 2px;">
-                <span>Saya menyetujui <a href="#" onclick="showToast('Membuka Lisensi CC-BY 4.0'); return false;" style="color: var(--bmkg-blue); font-weight: 600;">Ketentuan Lisensi Data Terbuka BMKG (CC-BY 4.0)</a> dan Kebijakan Privasi Portal.</span>
-              </label>
-            </div>
-
-            <button type="submit" class="btn-interactive btn-login-submit" style="background: var(--bmkg-green);">
-              <i class="fa-solid fa-user-plus"></i>
-              <span>Daftar Akun &amp; Dapatkan API Key</span>
-            </button>
-          </form>
-
-          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
-            Sudah memiliki akun? <a href="#" onclick="switchAuthMode('login'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Masuk di sini</a>
-          </div>
-        </div>
+        </form>
 
         <div style="margin-top: 1.25rem; text-align: center; font-size: 0.76rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
           <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
@@ -2587,25 +2483,23 @@ if payload.get("success"):
       }, 3000);
     }
 
-    // Modal Login & Register Handlers
-    function openLoginModal(defaultTab = 'login') {
+    // ==========================================================================
+    // MODAL LOGIN ADMINISTRATOR (CRUD HANDLERS)
+    // ==========================================================================
+    function openLoginModal() {
       const modal = document.getElementById('loginModal');
+      if (!modal) return;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
-      switchAuthMode(defaultTab);
       setTimeout(() => {
-        if (defaultTab === 'register') {
-          const regInput = document.getElementById('regName');
-          if (regInput) regInput.focus();
-        } else {
-          const idInput = document.getElementById('loginIdentifier');
-          if (idInput) idInput.focus();
-        }
+        const idInput = document.getElementById('loginIdentifier');
+        if (idInput) idInput.focus();
       }, 100);
     }
 
     function closeLoginModal() {
       const modal = document.getElementById('loginModal');
+      if (!modal) return;
       modal.classList.remove('active');
       document.body.style.overflow = '';
     }
@@ -2613,55 +2507,6 @@ if payload.get("success"):
     function handleModalBackdropClick(e) {
       if (e.target.id === 'loginModal') {
         closeLoginModal();
-      }
-    }
-
-    function switchAuthMode(mode) {
-      const tabLogin = document.getElementById('mainTabLogin');
-      const tabRegister = document.getElementById('mainTabRegister');
-      const formLogin = document.getElementById('authFormLogin');
-      const formRegister = document.getElementById('authFormRegister');
-      const headerTitle = document.getElementById('modalHeaderTitle');
-      const headerSubtitle = document.getElementById('modalHeaderSubtitle');
-
-      if (mode === 'login') {
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-        formLogin.style.display = 'block';
-        formRegister.style.display = 'none';
-        headerTitle.textContent = 'Masuk ke Portal Data BMKG';
-        headerSubtitle.textContent = 'Akses SSO Resmi & Akun Terbuka Publik';
-        setTimeout(() => document.getElementById('loginIdentifier')?.focus(), 50);
-      } else {
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
-        formLogin.style.display = 'none';
-        formRegister.style.display = 'block';
-        headerTitle.textContent = 'Daftar Akun Portal Data BMKG';
-        headerSubtitle.textContent = 'Dapatkan Akses API Key & Unduhan Data Lengkap';
-        setTimeout(() => document.getElementById('regName')?.focus(), 50);
-      }
-    }
-
-    function switchLoginTab(type) {
-      const tabAsn = document.getElementById('tabLoginAsn');
-      const tabPublic = document.getElementById('tabLoginPublic');
-      const labelId = document.getElementById('labelIdentifier');
-      const inputId = document.getElementById('loginIdentifier');
-      const btnText = document.getElementById('btnLoginText');
-
-      if (type === 'asn') {
-        tabAsn.classList.add('active');
-        tabPublic.classList.remove('active');
-        labelId.textContent = 'NIP / Akun Email BMKG';
-        inputId.placeholder = 'contoh: 19900815... atau nama@bmkg.go.id';
-        btnText.textContent = 'Masuk via SSO BMKG';
-      } else {
-        tabPublic.classList.add('active');
-        tabAsn.classList.remove('active');
-        labelId.textContent = 'Alamat Email Pengembang / Publik';
-        inputId.placeholder = 'contoh: peneliti@universitas.ac.id';
-        btnText.textContent = 'Masuk ke Portal';
       }
     }
 
@@ -2684,66 +2529,11 @@ if payload.get("success"):
       }
     }
 
-    function checkPasswordStrength(val) {
-      const fill = document.getElementById('pwdStrengthFill');
-      const text = document.getElementById('pwdStrengthText');
-      if (!fill || !text) return;
-
-      if (!val) {
-        fill.style.width = '0%';
-        text.textContent = 'Kekuatan sandi: minimal 8 karakter';
-        text.style.color = 'var(--text-muted)';
-        return;
-      }
-
-      let score = 0;
-      if (val.length >= 8) score++;
-      if (/[A-Z]/.test(val)) score++;
-      if (/[0-9]/.test(val)) score++;
-      if (/[^A-Za-z0-9]/.test(val)) score++;
-
-      if (score <= 1) {
-        fill.style.width = '25%';
-        fill.style.backgroundColor = '#ef4444';
-        text.textContent = 'Kekuatan: Lemah (tambahkan angka & huruf kapital)';
-        text.style.color = '#ef4444';
-      } else if (score === 2) {
-        fill.style.width = '60%';
-        fill.style.backgroundColor = '#f59e0b';
-        text.textContent = 'Kekuatan: Sedang (tambahkan simbol atau panjang lagi)';
-        text.style.color = '#d97706';
-      } else {
-        fill.style.width = '100%';
-        fill.style.backgroundColor = '#10b981';
-        text.textContent = 'Kekuatan: Sangat Kuat 👍';
-        text.style.color = '#059669';
-      }
-    }
-
     function handleLoginSubmit(e) {
       e.preventDefault();
       const id = document.getElementById('loginIdentifier').value;
       closeLoginModal();
-      showToast(`Autentikasi Berhasil! Selamat datang di Portal Data BMKG, ${id}`);
-    }
-
-    function handleRegisterSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
-      const p1 = document.getElementById('regPassword').value;
-      const p2 = document.getElementById('regPasswordConfirm').value;
-
-      if (p1 !== p2) {
-        showToast("Konfirmasi kata sandi tidak cocok! Silakan periksa kembali.");
-        document.getElementById('regPasswordConfirm').focus();
-        return;
-      }
-
-      closeLoginModal();
-      showToast(`Registrasi Berhasil! Selamat datang, ${name}. Cek ${email} untuk aktivasi API Key.`);
-      document.getElementById('registerForm').reset();
-      checkPasswordStrength('');
+      showToast(`Login Administrator Berhasil! Hak akses CRUD aktif untuk akun: ${id}`);
     }
 
     document.addEventListener('keydown', (e) => {

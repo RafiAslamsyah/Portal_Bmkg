@@ -53,19 +53,23 @@
 
       <div style="display: flex; align-items: center; gap: 0.75rem;">
         {% if c.userobj %}
-          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive header-login-btn">
-            <i class="fa-solid fa-user"></i>
-            <span>{{ c.userobj.display_name }}</span>
+          <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive" title="Tambah Dataset Baru (Akses CRUD Admin)" style="background: var(--bmkg-gold); color: #0f172a; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: 6px; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span>+ Tambah Data</span>
+          </a>
+          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive header-login-btn" title="Dashboard Admin: Kelola Dataset & Hak Akses CRUD">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>{{ c.userobj.display_name }} (Admin)</span>
           </a>
         {% else %}
-          <button class="btn-interactive header-login-btn" onclick="openLoginModal('login')" title="Masuk / Daftar Akun Portal">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i>
-            <span>Masuk</span>
+          <button class="btn-interactive header-login-btn" onclick="openLoginModal()" title="Login Khusus Administrator / Pengelola Data BMKG (CRUD)">
+            <i class="fa-solid fa-lock"></i>
+            <span>Login Admin</span>
           </button>
         {% endif %}
-        <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive header-action-btn" title="Jelajahi Katalog Dataset Terbuka">
-          <i class="fa-solid fa-arrow-down-to-bracket"></i>
-          <span>Akses Dataset</span>
+        <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive header-action-btn" title="Jelajahi & Unduh Katalog Dataset Terbuka Bebas Tanpa Login">
+          <i class="fa-solid fa-database"></i>
+          <span>Akses Data Publik</span>
         </a>
       </div>
     </div>
