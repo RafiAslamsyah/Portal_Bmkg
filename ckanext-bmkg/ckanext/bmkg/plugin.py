@@ -4,7 +4,7 @@ import ckan.plugins.toolkit as toolkit
 
 class BMKGThemePlugin(plugins.SingletonPlugin):
     """
-    Plugin kustomisasi tema visual Portal Satu Data BMKG.
+    Plugin kustomisasi tema visual Portal Data BMKG.
     Mengoverride template CKAN standar, menyematkan CSS khas BMKG,
     dan menyediakan helper untuk visualisasi statistik 4 pilar MKG.
     """
@@ -15,7 +15,6 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('public', 'ckanext-bmkg')
 
     # ITemplateHelpers
     def get_helpers(self):
@@ -44,7 +43,7 @@ class BMKGSchemaPlugin(plugins.SingletonPlugin):
     Plugin skema metadata khusus BMKG untuk 4 Pilar Data.
     Memvalidasi dan menambahkan custom fields: ID Stasiun WMO, tipe sensor, dsb.
     """
-    plugins.implements(plugins.IPackageController, custom=True)
+    plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
 
     # IFacets: Tambahkan facet pilar_mkg ke sidebar pencarian

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Katalog Dataset Terbuka — Satu Data BMKG</title>
+  <title>Katalog Dataset Terbuka — Portal Data BMKG</title>
   
   <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1175,9 +1175,11 @@
   <!-- 1. Top Identity Bar -->
   <div class="gov-identity-bar">
     <div class="gov-identity-inner">
-      <div class="gov-title">
-        <i class="fa-solid fa-shield-halved"></i>
-        <span>Badan Meteorologi, Klimatologi, dan Geofisika</span>
+      <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
+        <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
+        <span id="liveClockDate" style="color: #cbd5e1;"></span>
+        <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
+        <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
       </div>
       <div class="gov-links">
         <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
@@ -1194,7 +1196,7 @@
           <img src="logo-bmkg.png" alt="Logo Resmi BMKG">
         </div>
         <div class="brand-names">
-          <div class="brand-title">Satu Data BMKG</div>
+          <div class="brand-title">Portal Data BMKG</div>
           <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
         </div>
       </a>
@@ -1739,14 +1741,14 @@
         <div class="footer-brand-header">
           <img src="logo-bmkg.png" alt="Logo BMKG">
           <div>
-            <h4 style="margin-bottom: 2px;">Satu Data BMKG</h4>
+            <h4 style="margin-bottom: 2px;">Portal Data BMKG</h4>
             <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
           </div>
         </div>
         <p>
           Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)<br>
           Jl. Angkasa I No. 2, Kemayoran, Jakarta Pusat 10610<br>
-          Email: satudata@bmkg.go.id • Call Center: 196
+          Email: portaldata@bmkg.go.id • Call Center: 196
         </p>
       </div>
       <div class="footer-col">
@@ -1791,7 +1793,7 @@
           <img src="logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
         <div>
-          <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Satu Data BMKG</h3>
+          <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Data BMKG</h3>
           <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Akses SSO Resmi &amp; Akun Terbuka Publik</div>
         </div>
         <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup">
@@ -2021,7 +2023,7 @@
         tabRegister.classList.remove('active');
         formLogin.style.display = 'block';
         formRegister.style.display = 'none';
-        headerTitle.textContent = 'Masuk ke Portal Satu Data BMKG';
+        headerTitle.textContent = 'Masuk ke Portal Data BMKG';
         headerSubtitle.textContent = 'Akses SSO Resmi & Akun Terbuka Publik';
         setTimeout(() => document.getElementById('loginIdentifier')?.focus(), 50);
       } else {
@@ -2276,6 +2278,38 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
+
+    // ==========================================================================
+    // REAL-TIME CLOCK INITIALIZATION
+    // ==========================================================================
+    function initRealtimeClock() {
+      const timeElem = document.getElementById('liveClockTime');
+      const dateElem = document.getElementById('liveClockDate');
+      if (!timeElem || !dateElem) return;
+
+      function updateClock() {
+        const now = new Date();
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+        dateElem.textContent = now.toLocaleDateString('id-ID', dateOptions);
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        let tz = 'WIB';
+        const offset = -now.getTimezoneOffset() / 60;
+        if (offset === 8) tz = 'WITA';
+        else if (offset === 9) tz = 'WIT';
+        else if (offset !== 7) tz = `UTC${offset >= 0 ? '+' : ''}${offset}`;
+
+        timeElem.textContent = `${hours}:${minutes}:${seconds} ${tz}`;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    initRealtimeClock();
   </script>
 </body>
 </html>

@@ -7,8 +7,8 @@ setup(
     version=version,
     description="Custom Theme, Metadata Schema, and Geospatial Integration for BMKG Open Data Portal",
     long_description="""\
-    Ekstensi resmi CKAN untuk Portal Satu Data Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG).
-    Menyediakan tema visual Satu Data, skema metadata 4 pilar MKG, dan pratinjau data interaktif.
+    Ekstensi resmi CKAN untuk Portal Data Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG).
+    Menyediakan tema visual Portal Data, skema metadata 4 pilar MKG, dan pratinjau data interaktif.
     """,
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -16,8 +16,8 @@ setup(
         'Programming Language :: Python :: 3.10',
     ],
     keywords='CKAN BMKG Open Data Meteorologi Klimatologi Geofisika',
-    author='Tim Satu Data BMKG',
-    author_email='satudata@bmkg.go.id',
+    author='Tim Portal Data BMKG',
+    author_email='portaldata@bmkg.go.id',
     url='https://github.com/bmkg/ckanext-bmkg',
     license='GPL-3.0',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
@@ -29,6 +29,7 @@ setup(
     ],
     entry_points="""
     [ckan.plugins]
+    bmkg=ckanext.bmkg.plugin:BMKGThemePlugin
     bmkg_theme=ckanext.bmkg.plugin:BMKGThemePlugin
     bmkg_schema=ckanext.bmkg.plugin:BMKGSchemaPlugin
     """,

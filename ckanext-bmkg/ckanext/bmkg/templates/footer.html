@@ -1,0 +1,54 @@
+{# INSTITUTIONAL BMKG FOOTER #}
+<footer class="gov-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-brand-header">
+        <img src="/img/logo-bmkg.png" alt="Logo BMKG">
+        <div>
+          <h4 style="margin-bottom: 2px;">Portal Data BMKG</h4>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
+        </div>
+      </div>
+      <p>
+        Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)<br>
+        Jl. Angkasa I No. 2, Kemayoran, Jakarta Pusat 10610<br>
+        Email: portaldata@bmkg.go.id • Call Center: 196
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h4>4 Pilar Layanan</h4>
+      <ul>
+        <li><a href="{{ h.url_for('group.read', id='meteorologi') if h.url_for else '#' }}">Katalog Meteorologi</a></li>
+        <li><a href="{{ h.url_for('group.read', id='klimatologi') if h.url_for else '#' }}">Katalog Klimatologi</a></li>
+        <li><a href="{{ h.url_for('group.read', id='geofisika') if h.url_for else '#' }}">Katalog Geofisika</a></li>
+        <li><a href="{{ h.url_for('group.read', id='kualitas-udara') if h.url_for else '#' }}">Katalog Kualitas Udara</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Akses Pengembang</h4>
+      <ul>
+        <li><a href="/api/3/action/package_list" target="_blank">CKAN 2.12 Action API</a></li>
+        <li><a href="/api/3/action/help_show?name=datastore_search" target="_blank">DataStore SQL Query</a></li>
+        <li><a href="{{ h.url_for('dataset.search') }}">Katalog Data Terbuka</a></li>
+        <li><a href="https://docs.ckan.org" target="_blank">Dokumentasi Integrasi</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Kepatuhan &amp; Regulasi</h4>
+      <ul>
+        <li><a href="https://data.go.id" target="_blank">Perpres No. 39 Tahun 2019 (SDI)</a></li>
+        <li><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Lisensi Terbuka CC-BY 4.0</a></li>
+        <li><a href="https://wmo.int" target="_blank">Prinsip Data Terbuka WMO</a></li>
+        <li><a href="#">Standar Metadata MKG</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom-bar">
+    <div>&copy; 2026 Badan Meteorologi, Klimatologi, dan Geofisika. Hak Cipta Dilindungi Undang-Undang.</div>
+    <div>Platform CKAN 2.12 Stable • Native Ubuntu 22.04 LTS Stack</div>
+  </div>
+</footer>

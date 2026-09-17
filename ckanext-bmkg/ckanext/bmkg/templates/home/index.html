@@ -1,70 +1,198 @@
 {% ckan_extends %}
 
 {% block main_content %}
-  {# Hero Section ala Satu Data BMKG #}
-  <div class="bmkg-hero">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12 text-center">
-          <span class="badge badge-warning text-uppercase mb-3" style="background: var(--bmkg-gold); color: #000; font-weight: bold; padding: 6px 12px; border-radius: 20px;">
-            Satu Data BMKG
-          </span>
-          <h1>Portal Data Terbuka BMKG</h1>
-          <p>
-            Akses resmi data meteorologi, klimatologi, geofisika, dan kualitas udara Indonesia yang terstandarisasi, terbuka, dan dapat diakses publik secara gratis.
-          </p>
-          
-          {# Search Box #}
-          <div class="bmkg-search-wrapper" style="max-width: 650px; margin: 0 auto;">
-            <form class="section" method="get" action="{% url_for 'dataset.search' %}">
-              <div class="input-group input-group-lg">
-                <input type="text" class="form-control" name="q" value="" placeholder="Cari dataset, misal: gempa bumi, curah hujan Jakarta, suhu..." autocomplete="off">
-                <span class="input-group-btn">
-                  <button class="btn btn-warning" type="submit" style="background: var(--bmkg-gold); border-color: var(--bmkg-gold); color: #002244; font-weight: bold;">
-                    <i class="fa fa-search"></i> Cari Data
-                  </button>
-                </span>
-              </div>
-            </form>
+  {# 1. HERO SECTION #}
+  <section class="hero-modern">
+    <div class="hero-modern-inner">
+      <div class="hero-badge">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>Portal Data Resmi BMKG</span>
+      </div>
+      <h1>Portal Data Terbuka BMKG</h1>
+      <p>
+        Akses resmi data observasi cuaca, analisis iklim, rekaman seismisitas gempa bumi, dan kualitas udara Indonesia yang terstandarisasi, terverifikasi, dan terbuka untuk publik serta pengembang aplikasi.
+      </p>
+
+      {# Unified Dataset Search Box #}
+      <form class="hero-search-box" method="get" action="{% url_for 'dataset.search' %}">
+        <i class="fa-solid fa-magnifying-glass" style="margin-left: 0.75rem; align-self: center; color: var(--text-muted);"></i>
+        <input type="text" class="hero-search-input" name="q" placeholder="Cari dataset, misal: gempa bumi, curah hujan harian, suhu, PM2.5..." autocomplete="off">
+        <button type="submit" class="hero-search-btn">
+          <span>Cari Dataset</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
+        <span style="font-size: 0.82rem; color: var(--text-muted); align-self: center;">Pencarian Populer:</span>
+        <a href="{% url_for 'dataset.search', q='gempa' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Gempa M&ge;5.0</a>
+        <a href="{% url_for 'dataset.search', q='hujan' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Curah Hujan</a>
+        <a href="{% url_for 'dataset.search', q='cuaca maritim' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Cuaca Maritim</a>
+        <a href="{% url_for 'dataset.search', q='pm2.5' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Partikulat PM2.5</a>
+      </div>
+    </div>
+  </section>
+
+  {# 2. 4 PILAR LAYANAN MKG #}
+  <section class="pillars-section" id="pilar">
+    <div style="max-width: 1280px; margin: 0 auto; text-align: center;">
+      <h2 style="font-size: 1.95rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
+        Jelajahi 4 Pilar Data BMKG
+      </h2>
+      <p style="color: var(--text-muted); font-size: 1rem; max-width: 680px; margin: 0 auto;">
+        Klasifikasi dataset resmi berdasarkan mandat pilar keilmuan dan operasional Badan Meteorologi, Klimatologi, dan Geofisika
+      </p>
+
+      <div class="pillars-grid">
+        {# Pilar 1: Meteorologi #}
+        <a href="{% url_for 'dataset.search', q='meteorologi' %}" class="pillar-card-v2 pillar-meteorologi">
+          <div class="pillar-icon-wrap">
+            <i class="fa-solid fa-cloud-sun-rain"></i>
           </div>
+          <h3>Meteorologi</h3>
+          <p>Pengamatan cuaca permukaan, cuaca maritim/kelautan, citra radar cuaca, dan informasi cuaca penerbangan.</p>
+          <div class="pillar-footer-stat">
+            <span>Akses Koleksi</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+
+        {# Pilar 2: Klimatologi #}
+        <a href="{% url_for 'dataset.search', q='klimatologi' %}" class="pillar-card-v2 pillar-klimatologi">
+          <div class="pillar-icon-wrap">
+            <i class="fa-solid fa-sun-plant-wilt"></i>
+          </div>
+          <h3>Klimatologi</h3>
+          <p>Data historis curah hujan dasarian/bulanan, anomali suhu, indeks kekeringan, dan analisis variabilitas iklim.</p>
+          <div class="pillar-footer-stat">
+            <span>Akses Koleksi</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+
+        {# Pilar 3: Geofisika #}
+        <a href="{% url_for 'dataset.search', q='geofisika' %}" class="pillar-card-v2 pillar-geofisika">
+          <div class="pillar-icon-wrap">
+            <i class="fa-solid fa-volcano"></i>
+          </div>
+          <h3>Geofisika</h3>
+          <p>Katalog rekaman seismisitas gempa bumi tektonik, potensi tsunami, kerapatan sambaran petir, dan geomagnetisme.</p>
+          <div class="pillar-footer-stat">
+            <span>Akses Koleksi</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+
+        {# Pilar 4: Kualitas Udara #}
+        <a href="{% url_for 'dataset.search', q='kualitas udara' %}" class="pillar-card-v2 pillar-kualitas-udara">
+          <div class="pillar-icon-wrap">
+            <i class="fa-solid fa-smog"></i>
+          </div>
+          <h3>Kualitas Udara</h3>
+          <p>Monitoring konsentrasi partikulat polusi PM2.5, PM10, kimia air hujan, serta konsentrasi Gas Rumah Kaca (GRK).</p>
+          <div class="pillar-footer-stat">
+            <span>Akses Koleksi</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {# 3. INTERACTIVE OBSERVATION STATIONS MAP SECTION #}
+  <section style="background: #f8fafc; padding: 4.5rem 1.5rem; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);" id="peta">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue); text-transform: uppercase; letter-spacing: 0.05em;">Integrasi Geospasial CKAN</span>
+          <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--bmkg-blue-deep); margin: 0.25rem 0 0 0;">Peta Sebaran Stasiun Observasi MKG</h2>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-secondary); background: #ffffff; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-light);">
+          <i class="fa-solid fa-tower-broadcast" style="color: var(--bmkg-green); margin-right: 6px;"></i>
+          <strong>4 Pilar Stasiun Terkoneksi Real-Time</strong>
         </div>
       </div>
-    </div>
-  </div>
 
-  {# 4 Pilar Layanan Data BMKG #}
-  <div class="container my-5">
-    <div class="row">
-      <div class="col-md-12 text-center mb-4">
-        <h2 style="font-weight: 700; color: var(--bmkg-navy);">Jelajahi 4 Pilar Data BMKG</h2>
-        <p class="text-muted">Pilih kategori dataset sesuai dengan kebutuhan riset dan analisis Anda</p>
+      <!-- Leaflet CSS & JS -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+      <div id="bmkgObservationMap" style="height: 480px; width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 56, 101, 0.08); border: 1px solid var(--border-medium); z-index: 1;"></div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          var mapContainer = document.getElementById('bmkgObservationMap');
+          if (!mapContainer || mapContainer._leaflet_id) return;
+
+          var map = L.map('bmkgObservationMap', {
+            center: [-2.5, 118.0],
+            zoom: 5,
+            scrollWheelZoom: false
+          });
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> | BMKG'
+          }).addTo(map);
+
+          var stations = [
+            { name: "Stasiun Meteorologi Soekarno-Hatta (Cengkareng)", lat: -6.1256, lon: 106.6558, pilar: "Meteorologi", code: "WMO 96749", param: "Suhu: 31.4°C, RH: 68%, Angin: 12 knot NW" },
+            { name: "Stasiun Geofisika Lembang (Jawa Barat)", lat: -6.8286, lon: 107.6167, pilar: "Geofisika", code: "LEM", param: "Status Seismik: Normal, Akselerograf: Aktif" },
+            { name: "Stasiun Klimatologi Dramaga Bogor", lat: -6.5889, lon: 106.7583, pilar: "Klimatologi", code: "BOG", param: "Curah Hujan Kumulatif: 42 mm/hari, Klasifikasi: Basah" },
+            { name: "Stasiun Pemantau Atmosfer Global (GAW) Kototabang", lat: -0.2019, lon: 100.3181, pilar: "Kualitas Udara", code: "GAW-KTB", param: "PM2.5: 14.2 µg/m³ (Baik), CO2: 416.8 ppm" },
+            { name: "Stasiun Meteorologi Juanda Surabaya", lat: -7.3797, lon: 112.7878, pilar: "Meteorologi", code: "WMO 96935", param: "Suhu: 33.0°C, RH: 62%, Angin: 15 knot E" },
+            { name: "Balai Besar MKG Wilayah III Denpasar (Bali)", lat: -8.7483, lon: 115.1672, pilar: "Geofisika & Meteorologi", code: "BBMKG III", param: "Pusat Peringatan Dini Wilayah Bali-Nusra" }
+          ];
+
+          stations.forEach(function(st) {
+            var marker = L.marker([st.lat, st.lon]).addTo(map);
+            var popupContent = '<div style="font-family: sans-serif; font-size: 13px; line-height: 1.4;">' +
+              '<span style="display:inline-block; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: bold; font-size: 11px; margin-bottom: 4px;">' + st.pilar + '</span>' +
+              '<h4 style="margin: 2px 0 6px 0; font-size: 14px; font-weight: bold; color: #003865;">' + st.name + '</h4>' +
+              '<div style="color: #64748b; font-size: 11px;">Identitas: <strong>' + st.code + '</strong></div>' +
+              '<div style="margin-top: 6px; padding: 6px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">' +
+                '<strong style="color: #0f172a;">Data Terkini:</strong><br>' + st.param +
+              '</div>' +
+            '</div>';
+            marker.bindPopup(popupContent);
+          });
+        });
+      </script>
+    </div>
+  </section>
+
+  {# 4. DATASTORE API SECTION #}
+  <section style="padding: 4.5rem 1.5rem; background: #ffffff;">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-green); text-transform: uppercase; letter-spacing: 0.05em;">Akses Programmatic Data Terbuka</span>
+        <h2 style="font-size: 1.95rem; font-weight: 800; color: var(--bmkg-blue-deep); margin: 0.35rem 0 0.5rem 0;">Integrasi CKAN DataStore &amp; Action API</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; max-width: 720px; margin: 0 auto;">
+          Dapatkan akses data tabel cuaca, iklim, dan gempa bumi via endpoint RESTful JSON dengan kemampuan filter SQL canggih secara read-only tanpa autentikasi berbelit.
+        </p>
+      </div>
+
+      <div style="background: #0f172a; border-radius: 12px; padding: 1.75rem; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; overflow-x: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.75rem;">
+          <div style="display: flex; gap: 6px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+          </div>
+          <span style="font-size: 0.75rem; color: #94a3b8;">RESTful Endpoint — GET</span>
+        </div>
+        <p style="color: #38bdf8; margin: 0 0 0.5rem 0;"># Contoh Query DataStore Search untuk Data Pengamatan Cuaca</p>
+        <code style="color: #f1f5f9; display: block; word-break: break-all;">
+          curl -X GET "http://localhost:5000/api/3/action/datastore_search?resource_id=ID_RESOURCE&amp;limit=5"
+        </code>
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url_for 'dataset.search' %}" class="header-action-btn" style="padding: 0.75rem 2rem; font-size: 1rem;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Jelajahi Semua Dataset di Katalog</span>
+        </a>
       </div>
     </div>
-
-    <div class="bmkg-pilar-grid">
-      <a href="{% url_for 'group.read', id='meteorologi' %}" class="bmkg-pilar-card meteorologi">
-        <h4 style="color: #0284c7; font-weight: bold;"><i class="fa fa-cloud"></i> Meteorologi</h4>
-        <p class="text-muted small">Data pengamatan cuaca permukaan, cuaca maritim/kelautan, dan cuaca penerbangan.</p>
-        <span class="badge badge-sky">Jelajahi Data &rarr;</span>
-      </a>
-
-      <a href="{% url_for 'group.read', id='klimatologi' %}" class="bmkg-pilar-card klimatologi">
-        <h4 style="color: #d97706; font-weight: bold;"><i class="fa fa-sun-o"></i> Klimatologi</h4>
-        <p class="text-muted small">Data iklim historis, tren variabilitas, curah hujan dasarian/bulanan, dan perubahan iklim.</p>
-        <span class="badge badge-amber">Jelajahi Data &rarr;</span>
-      </a>
-
-      <a href="{% url_for 'group.read', id='geofisika' %}" class="bmkg-pilar-card geofisika">
-        <h4 style="color: #e11d48; font-weight: bold;"><i class="fa fa-globe"></i> Geofisika</h4>
-        <p class="text-muted small">Katalog gempa bumi tektonik, data tsunami, kerapatan sambaran petir, dan geomagnetisme.</p>
-        <span class="badge badge-rose">Jelajahi Data &rarr;</span>
-      </a>
-
-      <a href="{% url_for 'group.read', id='kualitas-udara' %}" class="bmkg-pilar-card kualitas-udara">
-        <h4 style="color: #059669; font-weight: bold;"><i class="fa fa-leaf"></i> Kualitas Udara</h4>
-        <p class="text-muted small">Konsentrasi partikulat polusi PM2.5, PM10, kimia air hujan, dan gas rumah kaca (GRK).</p>
-        <span class="badge badge-emerald">Jelajahi Data &rarr;</span>
-      </a>
-    </div>
-  </div>
+  </section>
 {% endblock %}
