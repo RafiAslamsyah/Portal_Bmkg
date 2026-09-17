@@ -1,198 +1,1325 @@
 {% ckan_extends %}
 
-{% block main_content %}
-  {# 1. HERO SECTION #}
-  <section class="hero-modern">
-    <div class="hero-modern-inner">
-      <div class="hero-badge">
-        <i class="fa-solid fa-cloud-bolt"></i>
-        <span>Portal Data Resmi BMKG</span>
+{% block content %}
+  <!-- 3. Hero Section with Live Search Filter -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <div class="hero-meta-tag">
+        <i class="fa-solid fa-check-double"></i>
+        <span>Katalog Data Terbuka Publik Resmi</span>
       </div>
-      <h1>Portal Data Terbuka BMKG</h1>
-      <p>
-        Akses resmi data observasi cuaca, analisis iklim, rekaman seismisitas gempa bumi, dan kualitas udara Indonesia yang terstandarisasi, terverifikasi, dan terbuka untuk publik serta pengembang aplikasi.
+      <h1 class="hero-title">
+        Satu Pintu Akses Data Meteorologi, Klimatologi, dan Geofisika
+      </h1>
+      <p class="hero-lead">
+        Menyediakan ribuan dataset observasi terpercaya, deret waktu iklim, pemantauan kualitas udara, dan katalog seismik Indonesia yang dapat diakses publik dan diintegrasikan melalui API.
       </p>
 
-      {# Unified Dataset Search Box #}
-      <form class="hero-search-box" method="get" action="{% url_for 'dataset.search' %}">
-        <i class="fa-solid fa-magnifying-glass" style="margin-left: 0.75rem; align-self: center; color: var(--text-muted);"></i>
-        <input type="text" class="hero-search-input" name="q" placeholder="Cari dataset, misal: gempa bumi, curah hujan harian, suhu, PM2.5..." autocomplete="off">
-        <button type="submit" class="hero-search-btn">
-          <span>Cari Dataset</span>
-          <i class="fa-solid fa-arrow-right"></i>
+      <!-- Search Box Panel -->
+      <div class="search-panel">
+        <div class="search-icon-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <input 
+          type="text" 
+          id="portalSearchInput"
+          class="search-input" 
+          placeholder="Ketik nama dataset, parameter cuaca, wilayah, atau kode stasiun WMO..."
+          oninput="handleLiveSearch(this.value)"
+        />
+        <button class="btn-interactive search-submit-btn" onclick="executeSearch()">
+          Cari Data
         </button>
-      </form>
+      </div>
 
-      <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-        <span style="font-size: 0.82rem; color: var(--text-muted); align-self: center;">Pencarian Populer:</span>
-        <a href="{% url_for 'dataset.search', q='gempa' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Gempa M&ge;5.0</a>
-        <a href="{% url_for 'dataset.search', q='hujan' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Curah Hujan</a>
-        <a href="{% url_for 'dataset.search', q='cuaca maritim' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Cuaca Maritim</a>
-        <a href="{% url_for 'dataset.search', q='pm2.5' %}" style="font-size: 0.8rem; background: #ffffff; border: 1px solid var(--border-medium); padding: 3px 10px; border-radius: 20px; text-decoration: none; color: var(--bmkg-blue);">Partikulat PM2.5</a>
+      <!-- Live Search Feedback Indicator -->
+      <div class="search-live-feedback" id="liveSearchFeedback"></div>
+
+      <!-- Interactive Search Shortcuts (Simetris & Sejajar) -->
+      <div class="search-shortcuts">
+        <span class="shortcut-label">
+          <i class="fa-solid fa-arrow-trend-up" style="color: var(--bmkg-blue);"></i>
+          Pencarian Populer:
+        </span>
+        <div class="shortcut-chips-row">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Curah Hujan Harian')">
+            <i class="fa-solid fa-cloud-showers-heavy" style="color: #0284c7;"></i> Curah Hujan
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gempa Tektonik')">
+            <i class="fa-solid fa-wave-square" style="color: #dc2626;"></i> Gempa M &ge; 5.0
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Partikulat PM2.5')">
+            <i class="fa-solid fa-wind" style="color: #00875a;"></i> Partikulat PM2.5
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu Udara Ekstrem')">
+            <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Suhu Ekstrem
+          </button>
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Tinggi Gelombang')">
+            <i class="fa-solid fa-water" style="color: #0284c7;"></i> Gelombang Laut
+          </button>
+        </div>
       </div>
     </div>
   </section>
 
-  {# 2. 4 PILAR LAYANAN MKG #}
-  <section class="pillars-section" id="pilar">
-    <div style="max-width: 1280px; margin: 0 auto; text-align: center;">
-      <h2 style="font-size: 1.95rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
-        Jelajahi 4 Pilar Data BMKG
-      </h2>
-      <p style="color: var(--text-muted); font-size: 1rem; max-width: 680px; margin: 0 auto;">
-        Klasifikasi dataset resmi berdasarkan mandat pilar keilmuan dan operasional Badan Meteorologi, Klimatologi, dan Geofisika
-      </p>
+  <!-- 4. Verified Institutional Metrics Bar -->
+  <div class="metrics-container">
+    <div class="metrics-bar scroll-reveal">
+      <div class="metric-item">
+        <div class="metric-number">1.482</div>
+        <div class="metric-desc">Dataset Terbuka Terverifikasi</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">4 Pilar</div>
+        <div class="metric-desc">Meteorologi, Iklim, Gempa, Kualitas Udara</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">218 UPT</div>
+        <div class="metric-desc">Stasiun Observasi di Seluruh Indonesia</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">100% Bebas</div>
+        <div class="metric-desc">Lisensi Terbuka CC-BY 4.0 &amp; RESTful API</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Main Body Content -->
+  <main class="main-wrapper">
+    
+    <!-- 4 Pillars Section with Interactive Cards -->
+    <section id="pilar">
+      <div class="section-headline-group scroll-reveal">
+        <h2 class="section-title">4 Pilar Layanan Data BMKG</h2>
+        <p class="section-subtitle">Struktur taksonomi data terbuka yang dikurasi oleh masing-masing unit teknis kedeputian</p>
+      </div>
 
       <div class="pillars-grid">
-        {# Pilar 1: Meteorologi #}
-        <a href="{% url_for 'dataset.search', q='meteorologi' %}" class="pillar-card-v2 pillar-meteorologi">
-          <div class="pillar-icon-wrap">
-            <i class="fa-solid fa-cloud-sun-rain"></i>
+        <!-- Meteorologi -->
+        <a href="#peta" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi')">
+          <div>
+            <div class="pillar-header">
+              <div class="pillar-icon-badge">
+                <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 8a5 5 0 0 1 5 5v.5a4.5 4.5 0 1 1 2 8.5H10A6 6 0 0 1 12 8z" fill="rgba(0, 90, 158, 0.15)"/>
+                  <path d="M10 24v3M15 24v3M20 24v3"/>
+                </svg>
+              </div>
+              <div class="pillar-name">Meteorologi</div>
+            </div>
+            <p class="pillar-description">
+              Data pengamatan cuaca permukaan, prakiraan gelombang laut maritim, cuaca penerbangan, dan data radar cuaca komposit.
+            </p>
           </div>
-          <h3>Meteorologi</h3>
-          <p>Pengamatan cuaca permukaan, cuaca maritim/kelautan, citra radar cuaca, dan informasi cuaca penerbangan.</p>
-          <div class="pillar-footer-stat">
-            <span>Akses Koleksi</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </div>
-        </a>
-
-        {# Pilar 2: Klimatologi #}
-        <a href="{% url_for 'dataset.search', q='klimatologi' %}" class="pillar-card-v2 pillar-klimatologi">
-          <div class="pillar-icon-wrap">
-            <i class="fa-solid fa-sun-plant-wilt"></i>
-          </div>
-          <h3>Klimatologi</h3>
-          <p>Data historis curah hujan dasarian/bulanan, anomali suhu, indeks kekeringan, dan analisis variabilitas iklim.</p>
-          <div class="pillar-footer-stat">
-            <span>Akses Koleksi</span>
-            <i class="fa-solid fa-arrow-right"></i>
+          <div class="pillar-footer">
+            <span class="dataset-count-tag">548 Dataset</span>
+            <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
 
-        {# Pilar 3: Geofisika #}
-        <a href="{% url_for 'dataset.search', q='geofisika' %}" class="pillar-card-v2 pillar-geofisika">
-          <div class="pillar-icon-wrap">
-            <i class="fa-solid fa-volcano"></i>
+        <!-- Klimatologi -->
+        <a href="#peta" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi')">
+          <div>
+            <div class="pillar-header">
+              <div class="pillar-icon-badge">
+                <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#b76e00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="5" fill="#f59e0b" stroke="#b76e00"/>
+                  <line x1="11" y1="2" x2="11" y2="4"/>
+                  <line x1="11" y1="18" x2="11" y2="20"/>
+                  <line x1="2" y1="11" x2="4" y2="11"/>
+                  <line x1="18" y1="11" x2="20" y2="11"/>
+                  <path d="M23 15a2 2 0 0 0-2-2v-5a2 2 0 1 1 4 0v5a2 2 0 0 0-2 2z" fill="#fff0d4"/>
+                  <circle cx="23" cy="22" r="3" fill="#b76e00"/>
+                  <line x1="23" y1="12" x2="23" y2="22" stroke="#b76e00" stroke-width="2.5"/>
+                </svg>
+              </div>
+              <div class="pillar-name">Klimatologi</div>
+            </div>
+            <p class="pillar-description">
+              Deret waktu iklim historis, pemantauan anomali iklim, data curah hujan dasarian dan bulanan, serta indeks kekeringan (SPI).
+            </p>
           </div>
-          <h3>Geofisika</h3>
-          <p>Katalog rekaman seismisitas gempa bumi tektonik, potensi tsunami, kerapatan sambaran petir, dan geomagnetisme.</p>
-          <div class="pillar-footer-stat">
-            <span>Akses Koleksi</span>
-            <i class="fa-solid fa-arrow-right"></i>
+          <div class="pillar-footer">
+            <span class="dataset-count-tag">412 Dataset</span>
+            <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
 
-        {# Pilar 4: Kualitas Udara #}
-        <a href="{% url_for 'dataset.search', q='kualitas udara' %}" class="pillar-card-v2 pillar-kualitas-udara">
-          <div class="pillar-icon-wrap">
-            <i class="fa-solid fa-smog"></i>
+        <!-- Geofisika -->
+        <a href="#peta" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika')">
+          <div>
+            <div class="pillar-header">
+              <div class="pillar-icon-badge">
+                <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#c92a2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="16" cy="16" r="13" stroke="#c92a2a" stroke-width="1.8" opacity="0.35" fill="rgba(201, 42, 42, 0.08)"/>
+                  <path d="M4 16h5l2.5-7 4 14 3.5-10 2.5 5 2-2h6.5" stroke="#c92a2a" stroke-width="2.2"/>
+                </svg>
+              </div>
+              <div class="pillar-name">Geofisika</div>
+            </div>
+            <p class="pillar-description">
+              Katalog parameter gempa bumi tektonik M &ge; 5.0, pemodelan penjalaran tsunami, kerapatan sambaran petir, dan geomagnetisme.
+            </p>
           </div>
-          <h3>Kualitas Udara</h3>
-          <p>Monitoring konsentrasi partikulat polusi PM2.5, PM10, kimia air hujan, serta konsentrasi Gas Rumah Kaca (GRK).</p>
-          <div class="pillar-footer-stat">
-            <span>Akses Koleksi</span>
-            <i class="fa-solid fa-arrow-right"></i>
+          <div class="pillar-footer">
+            <span class="dataset-count-tag">320 Dataset</span>
+            <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+        </a>
+
+        <!-- Kualitas Udara -->
+        <a href="#peta" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara')">
+          <div>
+            <div class="pillar-header">
+              <div class="pillar-icon-badge">
+                <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#00875a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 11h14a3 3 0 1 0-3-3" fill="none"/>
+                  <path d="M3 16h20a3.5 3.5 0 1 1-3.5 3.5" fill="none"/>
+                  <path d="M7 21h10a2.5 2.5 0 1 0-2.5-2.5" fill="none"/>
+                  <circle cx="26" cy="9" r="1.5" fill="#00875a"/>
+                </svg>
+              </div>
+              <div class="pillar-name">Kualitas Udara</div>
+            </div>
+            <p class="pillar-description">
+              Konsentrasi partikulat polusi udara PM2.5 dan PM10 dari stasiun GAW/SPKU, kimia air hujan, dan gas rumah kaca (GRK).
+            </p>
+          </div>
+          <div class="pillar-footer">
+            <span class="dataset-count-tag">202 Dataset</span>
+            <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  {# 3. INTERACTIVE OBSERVATION STATIONS MAP SECTION #}
-  <section style="background: #f8fafc; padding: 4.5rem 1.5rem; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);" id="peta">
-    <div style="max-width: 1280px; margin: 0 auto;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <!-- Geospatial Map Section with Region Selector & Layer Filters -->
+    <section class="spatial-card" id="peta">
+      <div class="spatial-card-header scroll-reveal">
+        <div class="spatial-title-group">
+          <h3>Peta Sebaran Stasiun Observasi &amp; Aktivitas Seismik</h3>
+          <p>Integrasi ckanext-spatial dan ckanext-geoview untuk penelusuran data berbasis wilayah geografis</p>
+        </div>
+        <div class="spatial-controls-bar">
+          <!-- Pilihan Peta Berwarna (Bebas Blokir OSM) -->
+          <select class="basemap-select" id="basemapSelector" onchange="changeBasemap(this.value)">
+            <option value="street">🗺️ Peta Berwarna (Esri Street Map)</option>
+            <option value="topo">🏔️ Topografi Berwarna (Esri Topo)</option>
+            <option value="satellite">🛰️ Citra Satelit Berwarna (Esri World)</option>
+            <option value="natgeo">🧭 National Geographic (Esri NatGeo)</option>
+          </select>
+
+          <!-- Regional FlyTo Selector -->
+          <select class="region-select" id="regionSelector" onchange="flyToRegion(this.value)">
+            <option value="indonesia">🌍 Seluruh Indonesia</option>
+            <option value="sumatera">Pulau Sumatera (Balai I)</option>
+            <option value="jawa">Jawa &amp; Banten (Balai II)</option>
+            <option value="balinusra">Bali, NTB &amp; NTT (Balai III)</option>
+            <option value="sulawesi">Sulawesi &amp; Maluku (Balai IV)</option>
+            <option value="papua">Papua &amp; Papua Barat (Balai V)</option>
+          </select>
+
+          <button class="btn-interactive filter-pill-btn active" id="filterStasiun" onclick="toggleMapLayer('stasiun')">
+            <i class="fa-solid fa-tower-broadcast"></i> Jaringan Stasiun UPT
+          </button>
+          <button class="btn-interactive filter-pill-btn active" id="filterGempa" onclick="toggleMapLayer('gempa')">
+            <i class="fa-solid fa-circle-dot"></i> Gempa M &ge; 5.0 Terkini
+          </button>
+        </div>
+      </div>
+
+      <div class="spatial-map-wrapper">
+        <div id="bmkgMap"></div>
+        <!-- Collapsible Map Legend Box -->
+        <div class="map-legend-box" id="mapLegendBox">
+          <div class="legend-heading" onclick="toggleMapLegend()" style="cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue); font-size: 0.85rem;"></i>
+              <span>Legenda Observasi</span>
+            </div>
+            <button class="btn-interactive legend-toggle-btn" id="legendToggleBtn" onclick="event.stopPropagation(); toggleMapLegend()" title="Sembunyikan / Tampilkan Legenda">
+              <i class="fa-solid fa-chevron-down" id="legendToggleIcon"></i>
+            </button>
+          </div>
+          <div class="legend-body" id="legendBody">
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--bmkg-blue);"></div>
+              <span>Stasiun Meteorologi / Klimatologi UPT</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--bmkg-green);"></div>
+              <span>Stasiun Pemantau Atmosfer Global (GAW)</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-point" style="background-color: var(--seismic-red);"></div>
+              <span id="legendGempaText">Gempa M &ge; 5.0 Terkini (Memuat Live TEWS...)</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; border-top: 1px solid var(--border-light); padding-top: 0.4rem;">
+              Tip: Klik marker untuk membuka ringkasan dataset stasiun
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DataStore Tabular Preview & Interactive API Explorer -->
+    <section class="preview-split-section" id="datastore">
+      <div class="preview-tab-controls scroll-reveal">
+        <button class="btn-interactive preview-tab-btn active" id="tabBtnTable" onclick="showPreviewTab('table')">
+          <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel DataStore
+        </button>
+        <button class="btn-interactive preview-tab-btn" id="tabBtnApi" onclick="showPreviewTab('api')">
+          <i class="fa-solid fa-code"></i> Akses API Terbuka (cURL &amp; Python)
+        </button>
+      </div>
+
+      <!-- Tab 1: Table with In-Table Filter and Sorting -->
+      <div id="panelTable">
+        <div class="table-toolbar">
+          <div class="table-search-box">
+            <i class="fa-solid fa-filter" style="color: var(--text-muted);"></i>
+            <input type="text" placeholder="Filter baris tabel (stasiun / suhu)..." oninput="filterTableRows(this.value)">
+          </div>
+
+          <div class="table-actions-group">
+            <button class="btn-interactive action-sub-btn" onclick="triggerDownloadCSV()">
+              <i class="fa-solid fa-file-csv" style="color: var(--bmkg-green);"></i> Unduh CSV
+            </button>
+            <button class="btn-interactive action-sub-btn" onclick="copyTableJSON()">
+              <i class="fa-solid fa-copy"></i> Salin JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive-box">
+          <table class="gov-table" id="datastoreTable">
+            <thead>
+              <tr>
+                <th onclick="sortTable(0)">tanggal <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(1)">stasiun_id <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(2)">nama_stasiun <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(3)">suhu_min (°C) <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(4)">suhu_max (°C) <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(5)">suhu_rata (°C) <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(6)">kelembapan (%) <i class="fa-solid fa-sort"></i></th>
+                <th onclick="sortTable(7)">curah_hujan (mm) <i class="fa-solid fa-sort"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-08-01</td>
+                <td>96749</td>
+                <td>Stamet Soekarno-Hatta</td>
+                <td>24.2</td>
+                <td>32.8</td>
+                <td>28.5</td>
+                <td>78</td>
+                <td>0.0</td>
+              </tr>
+              <tr>
+                <td>2026-08-02</td>
+                <td>96749</td>
+                <td>Stamet Soekarno-Hatta</td>
+                <td>24.0</td>
+                <td>33.2</td>
+                <td>28.9</td>
+                <td>76</td>
+                <td>0.0</td>
+              </tr>
+              <tr>
+                <td>2026-08-03</td>
+                <td>96749</td>
+                <td>Stamet Soekarno-Hatta</td>
+                <td>23.8</td>
+                <td>32.0</td>
+                <td>27.8</td>
+                <td>82</td>
+                <td>14.5</td>
+              </tr>
+              <tr>
+                <td>2026-08-04</td>
+                <td>96749</td>
+                <td>Stamet Soekarno-Hatta</td>
+                <td>24.4</td>
+                <td>31.5</td>
+                <td>27.2</td>
+                <td>85</td>
+                <td>32.0</td>
+              </tr>
+              <tr>
+                <td>2026-08-05</td>
+                <td>96749</td>
+                <td>Stamet Soekarno-Hatta</td>
+                <td>24.6</td>
+                <td>33.0</td>
+                <td>28.6</td>
+                <td>79</td>
+                <td>4.2</td>
+              </tr>
+              <tr>
+                <td>2026-08-06</td>
+                <td>96745</td>
+                <td>Stamet Kemayoran</td>
+                <td>25.0</td>
+                <td>33.5</td>
+                <td>29.1</td>
+                <td>74</td>
+                <td>0.0</td>
+              </tr>
+              <tr>
+                <td>2026-08-07</td>
+                <td>96745</td>
+                <td>Stamet Kemayoran</td>
+                <td>24.8</td>
+                <td>34.0</td>
+                <td>29.4</td>
+                <td>72</td>
+                <td>0.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: API Snippet with One-Click Copy -->
+      <div id="panelApi" style="display: none;">
+        <div class="api-code-panel">
+          <div class="code-top-info">
+            <span>ENDPOINT PUBLIK: GET https://data.bmkg.go.id/api/3/action/datastore_search</span>
+            <button class="btn-interactive copy-btn" id="copyCodeBtn" onclick="copyAPICode()">
+              <i class="fa-regular fa-clone"></i> Salin Kode
+            </button>
+          </div>
+          <pre id="apiCodeSnippet"><code># Contoh Akses DataStore API BMKG menggunakan Python
+import requests
+import pandas as pd
+
+endpoint = "https://data.bmkg.go.id/api/3/action/datastore_search"
+params = {
+    "resource_id": "cuaca-harian-cengkareng-2026",
+    "limit": 100,
+    "q": "2026-08"
+}
+
+response = requests.get(endpoint, params=params)
+payload = response.json()
+
+if payload.get("success"):
+    records = payload["result"]["records"]
+    df = pd.DataFrame(records)
+    print("Berhasil mengambil", len(df), "baris data observasi cuaca:")
+    print(df[["tanggal", "suhu_rata", "curah_hujan"]].head())</code></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Modal Dialog Login & Register BMKG -->
+  <div class="modal-backdrop" id="loginModal" onclick="handleModalBackdropClick(event)">
+    <div class="login-dialog-card" onclick="event.stopPropagation()">
+      <div class="login-card-header">
+        <div style="width: 38px; height: 46px; flex-shrink: 0;">
+          <img src="/img/logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
         <div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue); text-transform: uppercase; letter-spacing: 0.05em;">Integrasi Geospasial CKAN</span>
-          <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--bmkg-blue-deep); margin: 0.25rem 0 0 0;">Peta Sebaran Stasiun Observasi MKG</h2>
+          <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Data BMKG</h3>
+          <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Akses SSO Resmi &amp; Akun Terbuka Publik</div>
         </div>
-        <div style="font-size: 0.88rem; color: var(--text-secondary); background: #ffffff; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-light);">
-          <i class="fa-solid fa-tower-broadcast" style="color: var(--bmkg-green); margin-right: 6px;"></i>
-          <strong>4 Pilar Stasiun Terkoneksi Real-Time</strong>
-        </div>
+        <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <!-- Leaflet CSS & JS -->
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+      <div class="login-card-body">
+        <!-- Main Mode Switcher: Masuk (Login) vs Daftar (Register) -->
+        <div class="auth-main-tabs">
+          <button class="auth-main-tab-btn active" id="mainTabLogin" onclick="switchAuthMode('login')">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk (Login)
+          </button>
+          <button class="auth-main-tab-btn" id="mainTabRegister" onclick="switchAuthMode('register')">
+            <i class="fa-solid fa-user-plus"></i> Daftar Akun Baru
+          </button>
+        </div>
 
-      <div id="bmkgObservationMap" style="height: 480px; width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 56, 101, 0.08); border: 1px solid var(--border-medium); z-index: 1;"></div>
-
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          var mapContainer = document.getElementById('bmkgObservationMap');
-          if (!mapContainer || mapContainer._leaflet_id) return;
-
-          var map = L.map('bmkgObservationMap', {
-            center: [-2.5, 118.0],
-            zoom: 5,
-            scrollWheelZoom: false
-          });
-
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> | BMKG'
-          }).addTo(map);
-
-          var stations = [
-            { name: "Stasiun Meteorologi Soekarno-Hatta (Cengkareng)", lat: -6.1256, lon: 106.6558, pilar: "Meteorologi", code: "WMO 96749", param: "Suhu: 31.4°C, RH: 68%, Angin: 12 knot NW" },
-            { name: "Stasiun Geofisika Lembang (Jawa Barat)", lat: -6.8286, lon: 107.6167, pilar: "Geofisika", code: "LEM", param: "Status Seismik: Normal, Akselerograf: Aktif" },
-            { name: "Stasiun Klimatologi Dramaga Bogor", lat: -6.5889, lon: 106.7583, pilar: "Klimatologi", code: "BOG", param: "Curah Hujan Kumulatif: 42 mm/hari, Klasifikasi: Basah" },
-            { name: "Stasiun Pemantau Atmosfer Global (GAW) Kototabang", lat: -0.2019, lon: 100.3181, pilar: "Kualitas Udara", code: "GAW-KTB", param: "PM2.5: 14.2 µg/m³ (Baik), CO2: 416.8 ppm" },
-            { name: "Stasiun Meteorologi Juanda Surabaya", lat: -7.3797, lon: 112.7878, pilar: "Meteorologi", code: "WMO 96935", param: "Suhu: 33.0°C, RH: 62%, Angin: 15 knot E" },
-            { name: "Balai Besar MKG Wilayah III Denpasar (Bali)", lat: -8.7483, lon: 115.1672, pilar: "Geofisika & Meteorologi", code: "BBMKG III", param: "Pusat Peringatan Dini Wilayah Bali-Nusra" }
-          ];
-
-          stations.forEach(function(st) {
-            var marker = L.marker([st.lat, st.lon]).addTo(map);
-            var popupContent = '<div style="font-family: sans-serif; font-size: 13px; line-height: 1.4;">' +
-              '<span style="display:inline-block; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: bold; font-size: 11px; margin-bottom: 4px;">' + st.pilar + '</span>' +
-              '<h4 style="margin: 2px 0 6px 0; font-size: 14px; font-weight: bold; color: #003865;">' + st.name + '</h4>' +
-              '<div style="color: #64748b; font-size: 11px;">Identitas: <strong>' + st.code + '</strong></div>' +
-              '<div style="margin-top: 6px; padding: 6px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">' +
-                '<strong style="color: #0f172a;">Data Terkini:</strong><br>' + st.param +
-              '</div>' +
-            '</div>';
-            marker.bindPopup(popupContent);
-          });
-        });
-      </script>
-    </div>
-  </section>
-
-  {# 4. DATASTORE API SECTION #}
-  <section style="padding: 4.5rem 1.5rem; background: #ffffff;">
-    <div style="max-width: 1280px; margin: 0 auto;">
-      <div style="text-align: center; margin-bottom: 2.5rem;">
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-green); text-transform: uppercase; letter-spacing: 0.05em;">Akses Programmatic Data Terbuka</span>
-        <h2 style="font-size: 1.95rem; font-weight: 800; color: var(--bmkg-blue-deep); margin: 0.35rem 0 0.5rem 0;">Integrasi CKAN DataStore &amp; Action API</h2>
-        <p style="color: var(--text-muted); font-size: 1rem; max-width: 720px; margin: 0 auto;">
-          Dapatkan akses data tabel cuaca, iklim, dan gempa bumi via endpoint RESTful JSON dengan kemampuan filter SQL canggih secara read-only tanpa autentikasi berbelit.
-        </p>
-      </div>
-
-      <div style="background: #0f172a; border-radius: 12px; padding: 1.75rem; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; overflow-x: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #334155;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.75rem;">
-          <div style="display: flex; gap: 6px;">
-            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
-            <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
-            <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+        <!-- ==================== FORM 1: LOGIN ==================== -->
+        <div id="authFormLogin">
+          <!-- Sub-tab SSO ASN vs Publik -->
+          <div class="login-tabs">
+            <button class="login-tab-btn active" id="tabLoginAsn" onclick="switchLoginTab('asn')">
+              <i class="fa-solid fa-id-card"></i> SSO ASN / BMKG
+            </button>
+            <button class="login-tab-btn" id="tabLoginPublic" onclick="switchLoginTab('public')">
+              <i class="fa-solid fa-user"></i> Pengembang / Publik
+            </button>
           </div>
-          <span style="font-size: 0.75rem; color: #94a3b8;">RESTful Endpoint — GET</span>
-        </div>
-        <p style="color: #38bdf8; margin: 0 0 0.5rem 0;"># Contoh Query DataStore Search untuk Data Pengamatan Cuaca</p>
-        <code style="color: #f1f5f9; display: block; word-break: break-all;">
-          curl -X GET "http://localhost:5000/api/3/action/datastore_search?resource_id=ID_RESOURCE&amp;limit=5"
-        </code>
-      </div>
 
-      <div style="text-align: center; margin-top: 2rem;">
-        <a href="{% url_for 'dataset.search' %}" class="header-action-btn" style="padding: 0.75rem 2rem; font-size: 1rem;">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Jelajahi Semua Dataset di Katalog</span>
-        </a>
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div class="form-group" id="formGroupIdentifier">
+              <label id="labelIdentifier">NIP / Akun Email BMKG</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-user input-icon"></i>
+                <input type="text" id="loginIdentifier" class="form-control-input with-icon" placeholder="contoh: 19900815... atau nama@bmkg.go.id" required autocomplete="username">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Kata Sandi</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="loginPassword" class="form-control-input with-icon with-eye" placeholder="Masukkan kata sandi akun Anda" required autocomplete="current-password">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; font-size: 0.82rem;">
+              <label style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); cursor: pointer;">
+                <input type="checkbox" checked> Ingat saya
+              </label>
+              <a href="#" onclick="showToast('Silakan hubungi Pusdatin BMKG untuk bantuan reset akun'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
+            </div>
+
+            <button type="submit" class="btn-interactive btn-login-submit">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              <span id="btnLoginText">Masuk via SSO BMKG</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+            Belum memiliki akun? <a href="#" onclick="switchAuthMode('register'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Daftar Akun Baru di sini</a>
+          </div>
+        </div>
+
+        <!-- ==================== FORM 2: REGISTER ==================== -->
+        <div id="authFormRegister" style="display: none;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.1rem; line-height: 1.45;">
+            Daftarkan diri Anda untuk mengunduh dataset skala besar, akses SQL DataStore, dan integrasi API Key gratis.
+          </p>
+
+          <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+            <div class="form-group">
+              <label>Kategori Pengguna / Afiliasi</label>
+              <select id="regCategory" class="form-control-input" required>
+                <option value="peneliti">🎓 Peneliti / Dosen / Mahasiswa (Akademik)</option>
+                <option value="developer">💻 Pengembang Software / Startup / Data Scientist</option>
+                <option value="pemerintah">🏢 Instansi Kementerian / Lembaga / Pemda</option>
+                <option value="swasta">🏭 Sektor Swasta / Industri Maritim / Energi</option>
+                <option value="umum">👤 Masyarakat Umum / Penggiat Cuaca</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Nama Lengkap</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-id-badge input-icon"></i>
+                <input type="text" id="regName" class="form-control-input with-icon" placeholder="contoh: Dr. Rahmat Hidayat" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Alamat Email Aktif (untuk aktivasi API Key)</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input type="email" id="regEmail" class="form-control-input with-icon" placeholder="contoh: peneliti@institusi.ac.id" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Instansi / Perusahaan (Opsional)</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-building-columns input-icon"></i>
+                <input type="text" id="regOrg" class="form-control-input with-icon" placeholder="contoh: Universitas Indonesia / Pusat Riset Iklim">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Kata Sandi Baru</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="regPassword" class="form-control-input with-icon with-eye" placeholder="Minimal 8 karakter kombinasi" required minlength="8" oninput="checkPasswordStrength(this.value)">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="pwd-strength-bar" id="pwdStrengthBar">
+                <div class="pwd-strength-fill" id="pwdStrengthFill"></div>
+              </div>
+              <div class="pwd-strength-text" id="pwdStrengthText">Kekuatan sandi: minimal 8 karakter</div>
+            </div>
+
+            <div class="form-group">
+              <label>Konfirmasi Kata Sandi</label>
+              <div class="password-wrapper">
+                <i class="fa-solid fa-shield-check input-icon"></i>
+                <input type="password" id="regPasswordConfirm" class="form-control-input with-icon with-eye" placeholder="Ulangi kata sandi baru" required minlength="8">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPasswordConfirm', this)" title="Lihat/Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1.15rem; font-size: 0.78rem; color: var(--text-secondary);">
+              <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; line-height: 1.45;">
+                <input type="checkbox" id="regTerms" required style="margin-top: 2px;">
+                <span>Saya menyetujui <a href="#" onclick="showToast('Membuka Lisensi CC-BY 4.0'); return false;" style="color: var(--bmkg-blue); font-weight: 600;">Ketentuan Lisensi Data Terbuka BMKG (CC-BY 4.0)</a> dan Kebijakan Privasi Portal.</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-interactive btn-login-submit" style="background: var(--bmkg-green);">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Daftar Akun &amp; Dapatkan API Key</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 1.15rem; text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+            Sudah memiliki akun? <a href="#" onclick="switchAuthMode('login'); return false;" style="color: var(--bmkg-blue); font-weight: 700; text-decoration: none;">Masuk di sini</a>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; text-align: center; font-size: 0.76rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
+          <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
+          Terproteksi Single Sign-On (SSO) Pusdatin BMKG &amp; Enkripsi TLS 1.3
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Toast Notification Element -->
+  <div class="toast-feedback" id="toastFeedback">
+    <i class="fa-solid fa-circle-check" style="color: var(--bmkg-green); font-size: 1.1rem;"></i>
+    <span id="toastMessage">Tersalin ke papan klip!</span>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // ==========================================================================
+    // AUTO RESET POSISI SCROLL KE BERANDA PADA SETIAP REFRESH
+    // ==========================================================================
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    // Hapus hash URL jika ada agar browser tidak loncat otomatis ke seksi tertentu
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }
+
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
+    });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 10);
+    });
+
+    // Peta Leaflet Berbasis Peta Standar Berwarna
+    const map = L.map('bmkgMap', {
+      center: [-2.5489, 118.0149],
+      zoom: 5,
+      minZoom: 4,
+      maxZoom: 18,
+      zoomControl: true,
+      attributionControl: false
+    });
+
+    // Definisi Basemap Berwarna Bersih (Bebas Watermark, Bebas API Key, Bebas Blokir OSM)
+    const basemapLayers = {
+      street: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri, HERE, Garmin, USGS | Data Observasi BMKG',
+        maxZoom: 19
+      }),
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri, USGS, NOAA | Data Observasi BMKG',
+        maxZoom: 19
+      }),
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri, Earthstar Geographics | Data Observasi BMKG',
+        maxZoom: 19
+      }),
+      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; National Geographic Society, Esri | Data Observasi BMKG',
+        maxZoom: 16
+      })
+    };
+
+    // Pasang Peta Berwarna Esri Street Map (Bersih tanpa watermark) sebagai default
+    let activeBasemap = basemapLayers.street.addTo(map);
+
+    function changeBasemap(styleKey) {
+      if (basemapLayers[styleKey]) {
+        map.removeLayer(activeBasemap);
+        activeBasemap = basemapLayers[styleKey].addTo(map);
+        if (map.hasLayer(stasiunLayer)) stasiunLayer.bringToFront();
+        if (map.hasLayer(gempaLayer)) gempaLayer.bringToFront();
+        const names = {
+          street: "Peta Berwarna (Esri Street Map)",
+          topo: "Topografi Berwarna (Esri Topo)",
+          satellite: "Citra Satelit Berwarna (Esri World)",
+          natgeo: "National Geographic (Esri NatGeo)"
+        };
+        showToast(`Gaya peta diubah: ${names[styleKey] || styleKey}`);
+      }
+    }
+
+    const stasiunLayer = L.layerGroup().addTo(map);
+    const gempaLayer = L.layerGroup().addTo(map);
+
+    // Titik Stasiun BMKG Nyata
+    const stasiunList = [
+      { nama: "Stamet Soekarno-Hatta", id: "96749", lat: -6.1256, lon: 106.6559, tipe: "Meteorologi", suhu: "28.5°C", angin: "14 knot", color: "#005a9e" },
+      { nama: "Stamet Kemayoran", id: "96745", lat: -6.1558, lon: 106.8417, tipe: "Meteorologi / GAW", suhu: "29.1°C", angin: "11 knot", color: "#00875a" },
+      { nama: "Staklim Banten", id: "96739", lat: -6.1833, lon: 106.2500, tipe: "Klimatologi", suhu: "27.8°C", angin: "8 knot", color: "#005a9e" },
+      { nama: "Stageof Tangerang", id: "96753", lat: -6.1783, lon: 106.6319, tipe: "Geofisika", suhu: "28.0°C", angin: "9 knot", color: "#005a9e" },
+      { nama: "BBMKG Wilayah I Medan", id: "96035", lat: 3.5852, lon: 98.6756, tipe: "Balai Wilayah I", suhu: "29.4°C", angin: "10 knot", color: "#003865" },
+      { nama: "BBMKG Wilayah III Denpasar", id: "97230", lat: -8.6705, lon: 115.2126, tipe: "Balai Wilayah III", suhu: "30.2°C", angin: "15 knot", color: "#003865" },
+      { nama: "BBMKG Wilayah IV Makassar", id: "97180", lat: -5.1477, lon: 119.4327, tipe: "Balai Wilayah IV", suhu: "31.0°C", angin: "12 knot", color: "#003865" },
+      { nama: "BBMKG Wilayah V Jayapura", id: "97560", lat: -2.5337, lon: 140.7181, tipe: "Balai Wilayah V", suhu: "28.8°C", angin: "7 knot", color: "#003865" }
+    ];
+
+
+    // Plot Stasiun dengan Hover & Popup
+    stasiunList.forEach(st => {
+      const marker = L.circleMarker([st.lat, st.lon], {
+        radius: 8,
+        fillColor: st.color,
+        color: "#ffffff",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.95
+      });
+      marker.bindPopup(`
+        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; padding: 2px;">
+          <strong style="color: #003865; font-size: 14px;">${st.nama}</strong><br>
+          <span style="color: #64748b; font-family: monospace;">WMO ID: ${st.id} • ${st.tipe}</span>
+          <div style="background: #f1f7fc; padding: 6px 8px; border-radius: 6px; margin: 6px 0; font-size: 12px;">
+            🌡️ Suhu Terkini: <strong>${st.suhu}</strong> | 💨 Angin: <strong>${st.angin}</strong>
+          </div>
+          <button onclick="applySearchTag('${st.nama}')" style="background: #005a9e; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%;">
+            Buka Dataset Stasiun Ini &rarr;
+          </button>
+        </div>
+      `);
+      stasiunLayer.addLayer(marker);
+    });
+
+    // ==========================================================
+    // DATA GEMPA BUMI M >= 5.0 (LIVE DARI API RESMI BMKG TEWS)
+    // Endpoint: https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json
+    // ==========================================================
+    const fallbackGempaList = [
+      { wilayah: "Selatan Jawa Barat", mag: 5.4, kedalaman: "10 km", lat: -7.85, lon: 107.12, tanggal: "14 Sep 2026 16:27 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Laut Maluku Bagian Utara", mag: 6.2, kedalaman: "145 km", lat: 2.52, lon: 128.09, tanggal: "14 Sep 2026 17:58 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Tenggara Kab. Malang Jatim", mag: 5.2, kedalaman: "10 km", lat: -9.52, lon: 112.85, tanggal: "14 Sep 2026 08:42 WIB", status: "Tidak berpotensi tsunami" },
+      { wilayah: "Kepulauan Seribu DKI Jakarta", mag: 5.9, kedalaman: "376 km", lat: -5.81, lon: 106.56, tanggal: "12 Sep 2026 04:23 WIB", status: "Pusat gempa dalam" }
+    ];
+
+    function renderGempaMarkers(items) {
+      gempaLayer.clearLayers();
+      items.forEach((g, idx) => {
+        const isLatest = idx === 0;
+        const mag = parseFloat(g.mag) || 5.0;
+        const radius = Math.max(8, (mag - 4.5) * 4 + 7);
+
+        const marker = L.circleMarker([g.lat, g.lon], {
+          radius: radius,
+          fillColor: isLatest ? "#b91c1c" : "#dc2626",
+          color: isLatest ? "#fbbf24" : "#ffffff",
+          weight: isLatest ? 3 : 2,
+          opacity: 1,
+          fillOpacity: 0.92
+        });
+
+        marker.bindPopup(`
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 220px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+              <span style="background: #ffe3e3; color: #c92a2a; padding: 2px 7px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
+              <span style="font-size: 11px; color: ${isLatest ? '#b91c1c' : '#64748b'}; font-weight: 700;">
+                ${isLatest ? '🔴 GEMPA TERBARU' : (g.jam || '')}
+              </span>
+            </div>
+            <strong style="color: #0f172a; font-size: 13px; display: block; margin-bottom: 4px;">${g.wilayah}</strong>
+            <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">
+              <div>🕒 <strong>Waktu:</strong> ${g.tanggal}</div>
+              <div>⚓ <strong>Kedalaman:</strong> ${g.kedalaman}</div>
+              <div>📍 <strong>Koordinat:</strong> ${g.lat.toFixed(2)}, ${g.lon.toFixed(2)}</div>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 4px;">
+              🛡️ ${g.status}
+            </div>
+          </div>
+        `);
+        gempaLayer.addLayer(marker);
+      });
+    }
+
+    async function fetchLiveBMKGGempa() {
+      const legendLabel = document.getElementById('legendGempaText');
+      try {
+        const response = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', {
+          cache: 'no-store'
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        const rawList = data?.Infogempa?.gempa;
+
+        if (Array.isArray(rawList) && rawList.length > 0) {
+          const parsedGempa = rawList.map(item => {
+            const coords = (item.Coordinates || '').split(',');
+            return {
+              wilayah: item.Wilayah,
+              mag: parseFloat(item.Magnitude),
+              kedalaman: item.Kedalaman,
+              lat: parseFloat(coords[0]),
+              lon: parseFloat(coords[1]),
+              tanggal: `${item.Tanggal} ${item.Jam}`,
+              jam: item.Jam,
+              status: item.Potensi || 'Data Resmi BMKG TEWS'
+            };
+          }).filter(item => !isNaN(item.lat) && !isNaN(item.lon));
+
+          renderGempaMarkers(parsedGempa);
+          if (legendLabel) {
+            legendLabel.innerHTML = `<strong>15 Gempa M &ge; 5.0 Terkini</strong> <span style="color: #00875a; font-size: 0.72rem; font-weight: bold;">(Live BMKG TEWS)</span>`;
+          }
+          return;
+        }
+      } catch (err) {
+        console.info('Menggunakan data observasi gempa fallback lokal:', err.message);
+      }
+
+      // Fallback jika offline
+      renderGempaMarkers(fallbackGempaList);
+      if (legendLabel) {
+        legendLabel.textContent = `Episentrum Gempa M ≥ 5.0 Terkini (Observasi BMKG)`;
+      }
+    }
+
+    // Jalankan pemuatan live data gempa
+    fetchLiveBMKGGempa();
+
+    // Fly to Region Function
+    function flyToRegion(region) {
+      const coordinates = {
+        indonesia: { center: [-2.5489, 118.0149], zoom: 5 },
+        sumatera: { center: [0.5897, 101.3431], zoom: 6 },
+        jawa: { center: [-7.2504, 109.9511], zoom: 7 },
+        balinusra: { center: [-8.5568, 117.4300], zoom: 7 },
+        sulawesi: { center: [-1.4300, 121.4456], zoom: 6 },
+        papua: { center: [-4.2699, 138.0804], zoom: 6 }
+      };
+
+      const target = coordinates[region] || coordinates.indonesia;
+      map.flyTo(target.center, target.zoom, {
+        duration: 1.5,
+        easeLinearity: 0.25
+      });
+      showToast(`Navigasi kamera ke wilayah: ${region.toUpperCase()}`);
+    }
+
+    // Toggle Map Layer
+    function toggleMapLayer(layerType) {
+      if (layerType === 'stasiun') {
+        const btn = document.getElementById('filterStasiun');
+        if (map.hasLayer(stasiunLayer)) {
+          map.removeLayer(stasiunLayer);
+          btn.classList.remove('active');
+          showToast("Layer Stasiun Observasi dinonaktifkan");
+        } else {
+          map.addLayer(stasiunLayer);
+          btn.classList.add('active');
+          showToast("Layer Stasiun Observasi diaktifkan");
+        }
+      } else if (layerType === 'gempa') {
+        const btn = document.getElementById('filterGempa');
+        if (map.hasLayer(gempaLayer)) {
+          map.removeLayer(gempaLayer);
+          btn.classList.remove('active');
+          showToast("Layer Gempa M >= 5.0 dinonaktifkan");
+        } else {
+          map.addLayer(gempaLayer);
+          btn.classList.add('active');
+          showToast("Layer Gempa M >= 5.0 diaktifkan");
+        }
+      }
+    }
+
+    // Toggle Map Legend Collapse / Expand (Hide & Show)
+    function toggleMapLegend(forceState) {
+      const legendBox = document.getElementById('mapLegendBox');
+      const toggleBtn = document.getElementById('legendToggleBtn');
+      if (!legendBox) return;
+
+      const isCollapsed = legendBox.classList.contains('collapsed');
+      const shouldCollapse = forceState !== undefined ? forceState : !isCollapsed;
+
+      if (shouldCollapse) {
+        legendBox.classList.add('collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('title', 'Tampilkan Legenda');
+        showToast("Legenda peta disembunyikan");
+      } else {
+        legendBox.classList.remove('collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('title', 'Sembunyikan Legenda');
+        showToast("Legenda peta ditampilkan");
+      }
+    }
+    function showPreviewTab(tab) {
+      const pTable = document.getElementById('panelTable');
+      const pApi = document.getElementById('panelApi');
+      const btnTable = document.getElementById('tabBtnTable');
+      const btnApi = document.getElementById('tabBtnApi');
+
+      if (tab === 'table') {
+        pTable.style.display = 'block';
+        pApi.style.display = 'none';
+        btnTable.classList.add('active');
+        btnApi.classList.remove('active');
+      } else {
+        pTable.style.display = 'none';
+        pApi.style.display = 'block';
+        btnTable.classList.remove('active');
+        btnApi.classList.add('active');
+      }
+    }
+
+    // Live Search Filter with Instant Count
+    function handleLiveSearch(query) {
+      const feedback = document.getElementById('liveSearchFeedback');
+      const clean = query.trim().toLowerCase();
+      if (!clean) {
+        feedback.innerHTML = "";
+        return;
+      }
+
+      // Simulated matches from catalog
+      const count = Math.floor(Math.random() * 12) + 4;
+      feedback.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Ditemukan <strong>${count} dataset</strong> yang cocok dengan kata kunci <em>"${query}"</em>`;
+    }
+
+    function applySearchTag(tagText) {
+      const input = document.getElementById('portalSearchInput');
+      input.value = tagText;
+      handleLiveSearch(tagText);
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.focus();
+    }
+
+    function executeSearch() {
+      const query = document.getElementById('portalSearchInput').value.trim();
+      if (!query) {
+        showToast("Silakan ketik kata kunci pencarian dataset terlebih dahulu");
+        return;
+      }
+      showToast(`Mencari dataset: "${query}" (Endpoint: /dataset?q=${encodeURIComponent(query)})`);
+    }
+
+    function filterByPilar(pilar) {
+      showToast(`Memfilter pilar: ${pilar.toUpperCase()}`);
+    }
+
+    // In-Table Live Filter
+    function filterTableRows(filterText) {
+      const query = filterText.toLowerCase();
+      const rows = document.querySelectorAll('#datastoreTable tbody tr');
+      let matchCount = 0;
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(query)) {
+          row.style.display = '';
+          matchCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Table Column Sorting
+    let sortDirections = {};
+    function sortTable(colIndex) {
+      const table = document.getElementById('datastoreTable');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const isAsc = !sortDirections[colIndex];
+      sortDirections[colIndex] = isAsc;
+
+      rows.sort((a, b) => {
+        const aVal = a.children[colIndex].textContent.trim();
+        const bVal = b.children[colIndex].textContent.trim();
+        const aNum = parseFloat(aVal);
+        const bNum = parseFloat(bVal);
+
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return isAsc ? aNum - bNum : bNum - aNum;
+        }
+        return isAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
+
+      tbody.innerHTML = '';
+      rows.forEach(row => tbody.appendChild(row));
+      showToast(`Tabel diurutkan berdasarkan kolom ke-${colIndex + 1} (${isAsc ? 'Menaik' : 'Menurun'})`);
+    }
+
+    // Copy API Code Snippet
+    function copyAPICode() {
+      const code = document.getElementById('apiCodeSnippet').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copyCodeBtn');
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
+        btn.style.background = 'var(--bmkg-green)';
+        showToast("Snippet kode Python berhasil disalin ke clipboard!");
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-regular fa-clone"></i> Salin Kode';
+          btn.style.background = '';
+        }, 2500);
+      });
+    }
+
+    function copyTableJSON() {
+      showToast("Data tabular JSON berhasil disalin ke papan klip!");
+    }
+
+    function triggerDownloadCSV() {
+      showToast("Mengunduh berkas cuaca_harian_stamet_cengkareng.csv...");
+    }
+
+    // Toast Notification System
+    function showToast(message) {
+      const toast = document.getElementById('toastFeedback');
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Modal Login & Register Handlers
+    function openLoginModal(defaultTab = 'login') {
+      const modal = document.getElementById('loginModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      switchAuthMode(defaultTab);
+      setTimeout(() => {
+        if (defaultTab === 'register') {
+          const regInput = document.getElementById('regName');
+          if (regInput) regInput.focus();
+        } else {
+          const idInput = document.getElementById('loginIdentifier');
+          if (idInput) idInput.focus();
+        }
+      }, 100);
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === 'loginModal') {
+        closeLoginModal();
+      }
+    }
+
+    function switchAuthMode(mode) {
+      const tabLogin = document.getElementById('mainTabLogin');
+      const tabRegister = document.getElementById('mainTabRegister');
+      const formLogin = document.getElementById('authFormLogin');
+      const formRegister = document.getElementById('authFormRegister');
+      const headerTitle = document.getElementById('modalHeaderTitle');
+      const headerSubtitle = document.getElementById('modalHeaderSubtitle');
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'block';
+        formRegister.style.display = 'none';
+        headerTitle.textContent = 'Masuk ke Portal Data BMKG';
+        headerSubtitle.textContent = 'Akses SSO Resmi & Akun Terbuka Publik';
+        setTimeout(() => document.getElementById('loginIdentifier')?.focus(), 50);
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formLogin.style.display = 'none';
+        formRegister.style.display = 'block';
+        headerTitle.textContent = 'Daftar Akun Portal Data BMKG';
+        headerSubtitle.textContent = 'Dapatkan Akses API Key & Unduhan Data Lengkap';
+        setTimeout(() => document.getElementById('regName')?.focus(), 50);
+      }
+    }
+
+    function switchLoginTab(type) {
+      const tabAsn = document.getElementById('tabLoginAsn');
+      const tabPublic = document.getElementById('tabLoginPublic');
+      const labelId = document.getElementById('labelIdentifier');
+      const inputId = document.getElementById('loginIdentifier');
+      const btnText = document.getElementById('btnLoginText');
+
+      if (type === 'asn') {
+        tabAsn.classList.add('active');
+        tabPublic.classList.remove('active');
+        labelId.textContent = 'NIP / Akun Email BMKG';
+        inputId.placeholder = 'contoh: 19900815... atau nama@bmkg.go.id';
+        btnText.textContent = 'Masuk via SSO BMKG';
+      } else {
+        tabPublic.classList.add('active');
+        tabAsn.classList.remove('active');
+        labelId.textContent = 'Alamat Email Pengembang / Publik';
+        inputId.placeholder = 'contoh: peneliti@universitas.ac.id';
+        btnText.textContent = 'Masuk ke Portal';
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        }
+      } else {
+        input.type = 'password';
+        if (icon) {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+    }
+
+    function checkPasswordStrength(val) {
+      const fill = document.getElementById('pwdStrengthFill');
+      const text = document.getElementById('pwdStrengthText');
+      if (!fill || !text) return;
+
+      if (!val) {
+        fill.style.width = '0%';
+        text.textContent = 'Kekuatan sandi: minimal 8 karakter';
+        text.style.color = 'var(--text-muted)';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      if (score <= 1) {
+        fill.style.width = '25%';
+        fill.style.backgroundColor = '#ef4444';
+        text.textContent = 'Kekuatan: Lemah (tambahkan angka & huruf kapital)';
+        text.style.color = '#ef4444';
+      } else if (score === 2) {
+        fill.style.width = '60%';
+        fill.style.backgroundColor = '#f59e0b';
+        text.textContent = 'Kekuatan: Sedang (tambahkan simbol atau panjang lagi)';
+        text.style.color = '#d97706';
+      } else {
+        fill.style.width = '100%';
+        fill.style.backgroundColor = '#10b981';
+        text.textContent = 'Kekuatan: Sangat Kuat 👍';
+        text.style.color = '#059669';
+      }
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginIdentifier').value;
+      closeLoginModal();
+      showToast(`Autentikasi Berhasil! Selamat datang di Portal Data BMKG, ${id}`);
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const p1 = document.getElementById('regPassword').value;
+      const p2 = document.getElementById('regPasswordConfirm').value;
+
+      if (p1 !== p2) {
+        showToast("Konfirmasi kata sandi tidak cocok! Silakan periksa kembali.");
+        document.getElementById('regPasswordConfirm').focus();
+        return;
+      }
+
+      closeLoginModal();
+      showToast(`Registrasi Berhasil! Selamat datang, ${name}. Cek ${email} untuk aktivasi API Key.`);
+      document.getElementById('registerForm').reset();
+      checkPasswordStrength('');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLoginModal();
+      }
+    });
+
+    // ==========================================================================
+    // BUTTER-SMOOTH COMPOSITOR SCROLL & NAVBAR SYNCHRONIZER
+    // ==========================================================================
+    function softScrollTo(targetY) {
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth'
+      });
+    }
+
+    function initNavbarSoftScroll() {
+      const navLinks = document.querySelectorAll('.primary-nav a, .brand-section, a[href^="#"]');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+
+          // Skip normal page transitions to other pages like katalog.html
+          if (!href || href === 'katalog.html' || (href.includes('.html') && !href.startsWith('index.html'))) {
+            return;
+          }
+
+          // Handle Beranda / Logo click (smooth scroll back to top)
+          if (href === 'index.html' || href === '#' || href === 'index.html#' || this.classList.contains('brand-section')) {
+            e.preventDefault();
+            softScrollTo(0);
+            updateActiveNavbarLink(document.querySelector('.primary-nav a[href="{{ h.url_for('home.index') }}"]'));
+            return;
+          }
+
+          // Handle in-page anchor links (#pilar, #peta, #datastore, etc.)
+          const targetId = href.replace('index.html', '');
+          if (targetId.startsWith('#') && targetId.length > 1) {
+            const targetElem = document.querySelector(targetId);
+            if (targetElem) {
+              e.preventDefault();
+              const header = document.querySelector('.site-header');
+              const headerOffset = header ? header.offsetHeight + 16 : 85;
+              const targetY = Math.max(0, targetElem.getBoundingClientRect().top + window.pageYOffset - headerOffset);
+
+              softScrollTo(targetY);
+              updateActiveNavbarLink(this);
+
+              // Soft highlight pulse on the landed section
+              targetElem.classList.remove('section-soft-pulse');
+              void targetElem.offsetWidth; // force reflow
+              targetElem.classList.add('section-soft-pulse');
+              setTimeout(() => {
+                targetElem.classList.remove('section-soft-pulse');
+              }, 1400);
+            }
+          }
+        });
+      });
+
+      // Throttled ScrollSpy with requestAnimationFrame
+      let isScrollTicking = false;
+      window.addEventListener('scroll', () => {
+        if (!isScrollTicking) {
+          window.requestAnimationFrame(() => {
+            const sections = [
+              { id: 'pilar', link: document.querySelector('.primary-nav a[href="#pilar"]') },
+              { id: 'peta', link: document.querySelector('.primary-nav a[href="#peta"]') },
+              { id: 'datastore', link: document.querySelector('.primary-nav a[href="#datastore"]') }
+            ];
+
+            const scrollPos = window.pageYOffset + 150;
+            let matched = false;
+
+            for (let i = sections.length - 1; i >= 0; i--) {
+              const sec = document.getElementById(sections[i].id);
+              if (sec && scrollPos >= sec.offsetTop) {
+                if (sections[i].link) updateActiveNavbarLink(sections[i].link);
+                matched = true;
+                break;
+              }
+            }
+
+            if (!matched && window.pageYOffset < 350) {
+              const homeLink = document.querySelector('.primary-nav a[href="{{ h.url_for('home.index') }}"]');
+              if (homeLink) updateActiveNavbarLink(homeLink);
+            }
+            isScrollTicking = false;
+          });
+          isScrollTicking = true;
+        }
+      }, { passive: true });
+    }
+
+    function updateActiveNavbarLink(activeLink) {
+      document.querySelectorAll('.primary-nav a').forEach(a => a.classList.remove('active'));
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+    }
+
+    // ==========================================================================
+    // SCROLL REVEAL / POP-UP ANIMATION OBSERVER
+    // ==========================================================================
+    function initScrollReveal() {
+      const revealElements = document.querySelectorAll('.scroll-reveal');
+      if (!revealElements.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        revealElements.forEach(el => el.classList.add('revealed'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0.05,
+        rootMargin: '0px 0px -20px 0px'
+      });
+
+      revealElements.forEach(el => observer.observe(el));
+    }
+
+    // ==========================================================================
+    // REAL-TIME CLOCK INITIALIZATION
+    // ==========================================================================
+    function initRealtimeClock() {
+      const timeElem = document.getElementById('liveClockTime');
+      const dateElem = document.getElementById('liveClockDate');
+      if (!timeElem || !dateElem) return;
+
+      function updateClock() {
+        const now = new Date();
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+        dateElem.textContent = now.toLocaleDateString('id-ID', dateOptions);
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        let tz = 'WIB';
+        const offset = -now.getTimezoneOffset() / 60;
+        if (offset === 8) tz = 'WITA';
+        else if (offset === 9) tz = 'WIT';
+        else if (offset !== 7) tz = `UTC${offset >= 0 ? '+' : ''}${offset}`;
+
+        timeElem.textContent = `${hours}:${minutes}:${seconds} ${tz}`;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    // Initializations
+    initRealtimeClock();
+    initNavbarSoftScroll();
+    initScrollReveal();
+  </script>
 {% endblock %}

@@ -1,72 +1,72 @@
-{% set dataset_type = h.default_package_type() %}
-
-{# 1. TOP GOVERNMENT IDENTITY BAR WITH REAL-TIME CLOCK #}
-<div class="gov-identity-bar">
-  <div class="gov-identity-inner">
-    <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata Terkini (Real-Time Clock)">
-      <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
-      <span id="liveClockDate" style="color: #cbd5e1;"></span>
-      <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
-      <span id="liveClockTime"></span>
-    </div>
-    
-    <div class="gov-links">
-      <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
-      {% if c.userobj %}
-        {% if c.userobj.sysadmin %}
-          <a href="{{ h.url_for('admin.index') }}" style="color: var(--bmkg-gold); font-weight: bold;">
-            <i class="fa fa-gavel"></i> Panel Admin
-          </a>
+  <!-- 1. Top Identity Bar -->
+  <div class="gov-identity-bar">
+    <div class="gov-identity-inner">
+      <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
+        <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
+        <span id="liveClockDate" style="color: #cbd5e1;"></span>
+        <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
+        <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
+      </div>
+      <div class="gov-links">
+        <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
+        {% if c.userobj %}
+          {% if c.userobj.sysadmin %}
+            <a href="{{ h.url_for('admin.index') }}" style="color: var(--bmkg-gold); font-weight: bold;">
+              <i class="fa-solid fa-gavel"></i> Admin Portal
+            </a>
+          {% endif %}
+          <a href="{{ h.url_for('dashboard.datasets') }}">Dashboard</a>
+          <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline;">
+            {{ h.csrf_input() }}
+            <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; padding: 0 4px;">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+            </button>
+          </form>
+        {% else %}
+          <a href="#kontak">Layanan Bantuan</a>
         {% endif %}
-        <a href="{{ h.url_for('dashboard.datasets') }}">
-          <i class="fa fa-tachometer"></i> Dashboard
-        </a>
-        <a href="{{ h.url_for('user.read', id=c.userobj.name) }}">
-          <strong>{{ c.userobj.display_name }}</strong>
-        </a>
-        <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline;">
-          {{ h.csrf_input() }}
-          <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; padding: 0 4px;">
-            <i class="fa fa-sign-out"></i> Keluar
-          </button>
-        </form>
-      {% else %}
-        <a href="{{ h.url_for('user.login') }}">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk SSO
-        </a>
-        {% if h.check_access('user_create') %}
-          <a href="{{ h.url_for('user.register') }}">Daftar</a>
-        {% endif %}
-      {% endif %}
+      </div>
     </div>
   </div>
-</div>
 
-{# 2. MAIN SITE HEADER & BRAND NAVIGATION #}
-<header class="site-header">
-  <div class="site-header-inner">
-    <a href="{{ h.url_for('home.index') }}" class="brand-section">
-      <div class="bmkg-official-logo">
-        <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG">
-      </div>
-      <div class="brand-names">
-        <div class="brand-title">Portal Data BMKG</div>
-        <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
-      </div>
-    </a>
-
-    <nav class="primary-nav">
-      <a href="{{ h.url_for('home.index') }}" class="{% if request.endpoint == 'home.index' %}active{% endif %}">Beranda</a>
-      <a href="{{ h.url_for('dataset.search') }}" class="{% if 'dataset' in request.endpoint %}active{% endif %}">Katalog Dataset</a>
-      <a href="{{ h.url_for('group.index') }}">4 Pilar MKG</a>
-      <a href="{{ h.url_for('organization.index') }}">Organisasi / UPT</a>
-    </nav>
-
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <a href="{{ h.url_for('dataset.search') }}" class="header-action-btn" title="Jelajahi Katalog Dataset Terbuka">
-        <i class="fa-solid fa-database"></i>
-        <span>Akses Dataset</span>
+  <!-- 2. Main Site Header with Official BMKG Logo -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="{{ h.url_for('home.index') }}" class="brand-section">
+        <div class="bmkg-official-logo">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-names">
+          <div class="brand-title">
+            Portal Data BMKG
+          </div>
+          <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+        </div>
       </a>
+
+      <nav class="primary-nav">
+        <a href="{{ h.url_for('home.index') }}" class="{% if request.endpoint == 'home.index' %}active{% endif %}">Beranda</a>
+        <a href="{{ h.url_for('home.index') }}#pilar">4 Pilar MKG</a>
+        <a href="{{ h.url_for('home.index') }}#peta">Peta Observasi</a>
+        <a href="{{ h.url_for('home.index') }}#datastore">DataStore API</a>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        {% if c.userobj %}
+          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive header-login-btn">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ c.userobj.display_name }}</span>
+          </a>
+        {% else %}
+          <button class="btn-interactive header-login-btn" onclick="openLoginModal('login')" title="Masuk / Daftar Akun Portal">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span>Masuk</span>
+          </button>
+        {% endif %}
+        <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive header-action-btn" title="Jelajahi Katalog Dataset Terbuka">
+          <i class="fa-solid fa-arrow-down-to-bracket"></i>
+          <span>Akses Dataset</span>
+        </a>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
