@@ -1174,45 +1174,52 @@ if payload.get("success"):
     }
 
     function initNavbarSoftScroll() {
-      const navLinks = document.querySelectorAll('.primary-nav a, .brand-section, a[href^="#"]');
+      const navLinks = document.querySelectorAll('.primary-nav a, .brand-section, a[href*="#"]');
 
       navLinks.forEach(link => {
         link.addEventListener('click', function (e) {
           const href = this.getAttribute('href');
+          if (!href) return;
 
-          // Skip normal page transitions to other pages like katalog.html
-          if (!href || href === 'katalog.html' || (href.includes('.html') && !href.startsWith('index.html'))) {
-            return;
-          }
+          // Skip normal page transitions to other pages
+          if (href.startsWith('http') && !href.includes(window.location.host)) return;
+          if (href.includes('/dataset') || href.includes('katalog.html')) return;
 
           // Handle Beranda / Logo click (smooth scroll back to top)
-          if (href === 'index.html' || href === '#' || href === 'index.html#' || this.classList.contains('brand-section')) {
+          const isHomeClick = this.classList.contains('brand-section') || 
+            (!href.includes('#') && (href === '/' || href === 'index.html' || href === '#' || href === 'index.html#'));
+
+          if (isHomeClick) {
             e.preventDefault();
             softScrollTo(0);
-            updateActiveNavbarLink(document.querySelector('.primary-nav a[href="{{ h.url_for('home.index') }}"]'));
+            const homeLink = document.querySelector('.primary-nav a:not([href*="#"])') || document.querySelector('.primary-nav a');
+            updateActiveNavbarLink(homeLink);
             return;
           }
 
           // Handle in-page anchor links (#pilar, #peta, #datastore, etc.)
-          const targetId = href.replace('index.html', '');
-          if (targetId.startsWith('#') && targetId.length > 1) {
-            const targetElem = document.querySelector(targetId);
-            if (targetElem) {
-              e.preventDefault();
-              const header = document.querySelector('.site-header');
-              const headerOffset = header ? header.offsetHeight + 16 : 85;
-              const targetY = Math.max(0, targetElem.getBoundingClientRect().top + window.pageYOffset - headerOffset);
+          const hashIdx = href.indexOf('#');
+          if (hashIdx !== -1) {
+            const targetId = href.substring(hashIdx);
+            if (targetId.length > 1) {
+              const targetElem = document.querySelector(targetId);
+              if (targetElem) {
+                e.preventDefault();
+                const header = document.querySelector('.site-header');
+                const headerOffset = header ? header.offsetHeight + 16 : 85;
+                const targetY = Math.max(0, targetElem.getBoundingClientRect().top + window.pageYOffset - headerOffset);
 
-              softScrollTo(targetY);
-              updateActiveNavbarLink(this);
+                softScrollTo(targetY);
+                updateActiveNavbarLink(this);
 
-              // Soft highlight pulse on the landed section
-              targetElem.classList.remove('section-soft-pulse');
-              void targetElem.offsetWidth; // force reflow
-              targetElem.classList.add('section-soft-pulse');
-              setTimeout(() => {
+                // Soft highlight pulse on the landed section
                 targetElem.classList.remove('section-soft-pulse');
-              }, 1400);
+                void targetElem.offsetWidth; // force reflow
+                targetElem.classList.add('section-soft-pulse');
+                setTimeout(() => {
+                  targetElem.classList.remove('section-soft-pulse');
+                }, 1400);
+              }
             }
           }
         });
@@ -1224,9 +1231,9 @@ if payload.get("success"):
         if (!isScrollTicking) {
           window.requestAnimationFrame(() => {
             const sections = [
-              { id: 'pilar', link: document.querySelector('.primary-nav a[href="#pilar"]') },
-              { id: 'peta', link: document.querySelector('.primary-nav a[href="#peta"]') },
-              { id: 'datastore', link: document.querySelector('.primary-nav a[href="#datastore"]') }
+              { id: 'pilar', link: document.querySelector('.primary-nav a[href$="#pilar"]') },
+              { id: 'peta', link: document.querySelector('.primary-nav a[href$="#peta"]') },
+              { id: 'datastore', link: document.querySelector('.primary-nav a[href$="#datastore"]') }
             ];
 
             const scrollPos = window.pageYOffset + 150;
@@ -1242,7 +1249,7 @@ if payload.get("success"):
             }
 
             if (!matched && window.pageYOffset < 350) {
-              const homeLink = document.querySelector('.primary-nav a[href="{{ h.url_for('home.index') }}"]');
+              const homeLink = document.querySelector('.primary-nav a:not([href*="#"])') || document.querySelector('.primary-nav a');
               if (homeLink) updateActiveNavbarLink(homeLink);
             }
             isScrollTicking = false;
@@ -1287,38 +1294,7 @@ if payload.get("success"):
       revealElements.forEach(el => observer.observe(el));
     }
 
-    // ==========================================================================
-    // REAL-TIME CLOCK INITIALIZATION
-    // ==========================================================================
-    function initRealtimeClock() {
-      const timeElem = document.getElementById('liveClockTime');
-      const dateElem = document.getElementById('liveClockDate');
-      if (!timeElem || !dateElem) return;
-
-      function updateClock() {
-        const now = new Date();
-        const dateOptions = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
-        dateElem.textContent = now.toLocaleDateString('id-ID', dateOptions);
-
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-
-        let tz = 'WIB';
-        const offset = -now.getTimezoneOffset() / 60;
-        if (offset === 8) tz = 'WITA';
-        else if (offset === 9) tz = 'WIT';
-        else if (offset !== 7) tz = `UTC${offset >= 0 ? '+' : ''}${offset}`;
-
-        timeElem.textContent = `${hours}:${minutes}:${seconds} ${tz}`;
-      }
-
-      updateClock();
-      setInterval(updateClock, 1000);
-    }
-
     // Initializations
-    initRealtimeClock();
     initNavbarSoftScroll();
     initScrollReveal();
   </script>
