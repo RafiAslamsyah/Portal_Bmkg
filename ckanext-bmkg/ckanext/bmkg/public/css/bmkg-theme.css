@@ -1464,3 +1464,16 @@
         display: none;
       }
     }
+/* Explicit Footer Visibility Guarantee */
+footer.gov-footer, .gov-footer {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+.gov-footer .footer-col {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
