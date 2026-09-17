@@ -1,6 +1,6 @@
 {% ckan_extends %}
 
-{% block custom_styles %}
+{% block styles %}
   {{ super() }}
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,10 +14,15 @@
   <link rel="stylesheet" href="/css/bmkg-theme.css">
 {% endblock %}
 
-{% block custom_scripts %}
+{% block scripts %}
   {{ super() }}
   <!-- Leaflet Map JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <!-- BMKG Real-Time Clock Module -->
+  <script src="/js/bmkg-realtime-clock.js"></script>
+{% endblock %}
+
+{% block body_extras %}
+  {{ super() }}
   <script src="/js/bmkg-realtime-clock.js"></script>
 {% endblock %}

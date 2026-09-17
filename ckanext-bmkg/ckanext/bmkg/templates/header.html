@@ -7,6 +7,31 @@
         <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
         <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
       </div>
+      <script>
+        (function() {
+          function renderBmkgClock() {
+            var tElem = document.getElementById('liveClockTime');
+            var dElem = document.getElementById('liveClockDate');
+            if (!tElem || !dElem) return;
+            var now = new Date();
+            var dOpts = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+            dElem.textContent = now.toLocaleDateString('id-ID', dOpts);
+            var hh = String(now.getHours()).padStart(2, '0');
+            var mm = String(now.getMinutes()).padStart(2, '0');
+            var ss = String(now.getSeconds()).padStart(2, '0');
+            var offset = -now.getTimezoneOffset() / 60;
+            var tz = 'WIB';
+            if (offset === 8) tz = 'WITA';
+            else if (offset === 9) tz = 'WIT';
+            else if (offset !== 7) tz = (offset >= 0 ? 'UTC+' : 'UTC') + offset;
+            tElem.textContent = hh + ':' + mm + ':' + ss + ' ' + tz;
+          }
+          renderBmkgClock();
+          if (!window._bmkgClockInterval) {
+            window._bmkgClockInterval = setInterval(renderBmkgClock, 1000);
+          }
+        })();
+      </script>
       <div class="gov-links">
         <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
         {% if c.userobj %}
