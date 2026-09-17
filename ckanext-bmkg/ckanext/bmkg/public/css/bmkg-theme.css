@@ -1527,3 +1527,53 @@ footer.gov-footer, .gov-footer {
     opacity: 0;
   }
 }
+
+/* Marker Badges for All Earthquakes */
+.gempa-m5-badge {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 12px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.5);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+.gempa-m5-badge:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.85);
+  z-index: 9999 !important;
+}
+
+.gempa-dirasakan-badge {
+  background: #d97706;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 12px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 2px 5px rgba(217, 119, 6, 0.5);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+.gempa-dirasakan-badge:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.85);
+  z-index: 9999 !important;
+}
+

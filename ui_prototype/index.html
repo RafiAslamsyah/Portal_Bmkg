@@ -1199,6 +1199,55 @@
       50% { opacity: 0.4; transform: scale(0.85); }
     }
 
+    /* Marker Badges for All Earthquakes */
+    .gempa-m5-badge {
+      background: #dc2626;
+      color: #ffffff;
+      border: 1.5px solid #ffffff;
+      border-radius: 12px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.5);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    }
+    .gempa-m5-badge:hover {
+      transform: translate(-50%, -50%) scale(1.22);
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.85);
+      z-index: 9999 !important;
+    }
+
+    .gempa-dirasakan-badge {
+      background: #d97706;
+      color: #ffffff;
+      border: 1.5px solid #ffffff;
+      border-radius: 12px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 2px 5px rgba(217, 119, 6, 0.5);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    }
+    .gempa-dirasakan-badge:hover {
+      transform: translate(-50%, -50%) scale(1.22);
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.85);
+      z-index: 9999 !important;
+    }
+
     /* DataStore Preview & Interactive Tabular Explorer */
     .preview-split-section {
       background: var(--canvas-white);
@@ -1792,10 +1841,16 @@
           </select>
 
           <button class="btn-interactive filter-pill-btn active" id="filterStasiun" onclick="toggleMapLayer('stasiun')">
-            <i class="fa-solid fa-tower-broadcast"></i> Jaringan Stasiun UPT
+            <i class="fa-solid fa-tower-broadcast"></i> Stasiun UPT
           </button>
-          <button class="btn-interactive filter-pill-btn active" id="filterGempa" onclick="toggleMapLayer('gempa')">
-            <i class="fa-solid fa-circle-dot"></i> Gempa M &ge; 5.0 Terkini
+          <button class="btn-interactive filter-pill-btn active" id="filterGempaAll" onclick="setGempaDisplayFilter('all')">
+            <i class="fa-solid fa-circle-nodes"></i> Semua Gempa (<span id="countAllGempa">30</span>)
+          </button>
+          <button class="btn-interactive filter-pill-btn" id="filterGempaM5" onclick="setGempaDisplayFilter('m5')">
+            <i class="fa-solid fa-triangle-exclamation"></i> M &ge; 5.0 (<span id="countM5Gempa">15</span>)
+          </button>
+          <button class="btn-interactive filter-pill-btn" id="filterGempaDirasakan" onclick="setGempaDisplayFilter('dirasakan')">
+            <i class="fa-solid fa-bullhorn"></i> Dirasakan (<span id="countDirasakanGempa">15</span>)
           </button>
         </div>
       <!-- Real-Time BMKG TEWS Alert Bar -->
@@ -1840,11 +1895,19 @@
               <span>Stasiun Pemantau Atmosfer Global (GAW)</span>
             </div>
             <div class="legend-row">
-              <div class="legend-point" style="background-color: var(--seismic-red);"></div>
-              <span id="legendGempaText">Gempa M &ge; 5.0 Terkini (Memuat Live TEWS...)</span>
+              <div style="width: 12px; height: 12px; border-radius: 50%; background: #dc2626; border: 2px solid #fbbf24; flex-shrink: 0;"></div>
+              <span>Episentrum Gempa Terkini Live (Radar)</span>
+            </div>
+            <div class="legend-row">
+              <div style="background: #dc2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">M&ge;5</div>
+              <span id="legendGempaM5Text">15 Gempa M &ge; 5.0 Terkini</span>
+            </div>
+            <div class="legend-row">
+              <div style="background: #d97706; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">MMI</div>
+              <span id="legendGempaDirasakanText">15 Gempa Dirasakan Terkini</span>
             </div>
             <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; border-top: 1px solid var(--border-light); padding-top: 0.4rem;">
-              Tip: Klik marker untuk membuka ringkasan dataset stasiun
+              Tip: Arahkan kursor atau klik marker untuk detail gempa &amp; Shakemap
             </div>
           </div>
         </div>
@@ -2247,69 +2310,129 @@ if payload.get("success"):
     });
 
     // ==========================================================
-    // DATA GEMPA BUMI M >= 5.0 (LIVE DARI API RESMI BMKG TEWS)
-    // Endpoint: https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json
+    // DATA SEISMIK MULTI-FEED RESMI BMKG TEWS (30+ TITIK TERKINI)
+    // 1. autogempa.json (1 Gempa Terkini Real-time)
+    // 2. gempaterkini.json (15 Gempa M >= 5.0 Terkini)
+    // 3. gempadirasakan.json (15 Gempa Dirasakan Terkini)
     // ==========================================================
+    window._allGempaItems = [];
+    window._activeGempaFilter = 'all';
+
     const fallbackGempaList = [
-      { wilayah: "Pusat gempa berada di darat 7 km BaratDaya Jailolo", mag: 5.1, kedalaman: "10 km", lat: 1.02, lon: 127.42, tanggal: "17 Sep 2026 09:22:24 WIB", jam: "09:22:24 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III-IV Jailolo, II - III Ternate", shakemap: null, isLatestLive: true },
-      { wilayah: "Laut Maluku Bagian Utara", mag: 5.3, kedalaman: "12 km", lat: 1.48, lon: 126.85, tanggal: "16 Sep 2026 21:14:02 WIB", jam: "21:14 WIB", status: "Tidak berpotensi tsunami", dirasakan: "", shakemap: null, isLatestLive: false },
-      { wilayah: "Selatan Jawa Barat (Kab. Sukabumi)", mag: 5.3, kedalaman: "10 km", lat: -7.81, lon: 106.55, tanggal: "15 Sep 2026 14:18:10 WIB", jam: "14:18 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III Pelabuhan Ratu", shakemap: null, isLatestLive: false },
-      { wilayah: "Barat Daya Mukomuko Bengkulu", mag: 5.0, kedalaman: "24 km", lat: -2.85, lon: 100.91, tanggal: "15 Sep 2026 06:12:00 WIB", jam: "06:12 WIB", status: "Tidak berpotensi tsunami", dirasakan: "", shakemap: null, isLatestLive: false }
+      { wilayah: "Pusat gempa berada di laut 118 km BaratLaut Jailolo", mag: 5.1, kedalaman: "24 km", lat: 1.35, lon: 126.44, tanggal: "17 Sep 2026 13:20:53 WIB", jam: "13:20:53 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III-IV Batang Dua, III Manado, III Ternate", shakemap: "https://data.bmkg.go.id/DataMKG/TEWS/20260917132053.mmi.jpg", isLatestLive: true, kategori: "autogempa" },
+      { wilayah: "42 km TimurLaut PULAUDOI-MALUT", mag: 6.2, kedalaman: "145 km", lat: 2.52, lon: 128.09, tanggal: "14 Sep 2026 17:58:04 WIB", jam: "17:58 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III-IV Morotai, III Halmahera Utara", shakemap: null, isLatestLive: false, kategori: "m5" },
+      { wilayah: "186 km BaratDaya BAYAH-BANTEN", mag: 5.6, kedalaman: "10 km", lat: -8.54, lon: 105.78, tanggal: "14 Sep 2026 16:27:39 WIB", jam: "16:27 WIB", status: "Tidak berpotensi tsunami", dirasakan: "", shakemap: null, isLatestLive: false, kategori: "m5" },
+      { wilayah: "156 km Tenggara KAB-MALANG-JATIM", mag: 5.2, kedalaman: "10 km", lat: -9.52, lon: 112.85, tanggal: "14 Sep 2026 08:42:08 WIB", jam: "08:42 WIB", status: "Tidak berpotensi tsunami", dirasakan: "II-III Pacitan, II-III Malang", shakemap: null, isLatestLive: false, kategori: "m5" },
+      { wilayah: "6 km Tenggara KEPSERIBU-DKI", mag: 5.9, kedalaman: "376 km", lat: -5.81, lon: 106.56, tanggal: "12 Sep 2026 04:23:56 WIB", jam: "04:23 WIB", status: "Pusat gempa dalam", dirasakan: "", shakemap: null, isLatestLive: false, kategori: "m5" },
+      { wilayah: "Pusat gempa di darat 27 km selatan Kab. Bandung", mag: 2.7, kedalaman: "4 km", lat: -7.25, lon: 107.61, tanggal: "17 Sep 2026 06:21:05 WIB", jam: "06:21 WIB", status: "Gempa dangkal sesar lokal", dirasakan: "III Pangalengan, III Talegong, III Cisewu", shakemap: null, isLatestLive: false, kategori: "dirasakan" },
+      { wilayah: "Pusat gempa di darat 23 km selatan Kab. Bandung", mag: 2.6, kedalaman: "3 km", lat: -7.22, lon: 107.60, tanggal: "17 Sep 2026 04:59:20 WIB", jam: "04:59 WIB", status: "Gempa dangkal", dirasakan: "III Pangalengan, III Kertasari", shakemap: null, isLatestLive: false, kategori: "dirasakan" },
+      { wilayah: "Pusat gempa di laut 48 km Utara Ruteng-Manggarai", mag: 4.7, kedalaman: "6 km", lat: -8.19, lon: 120.35, tanggal: "16 Sep 2026 01:26:34 WIB", jam: "01:26 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III-IV Kab. Manggarai", shakemap: null, isLatestLive: false, kategori: "dirasakan" },
+      { wilayah: "Pusat gempa di laut 83 km selatan Kab. Sukabumi", mag: 4.3, kedalaman: "23 km", lat: -7.74, lon: 106.55, tanggal: "13 Sep 2026 17:06:52 WIB", jam: "17:06 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III Kab. Cianjur, II Sukabumi", shakemap: null, isLatestLive: false, kategori: "dirasakan" }
     ];
 
-    function renderGempaMarkers(items) {
-      gempaLayer.clearLayers();
-      items.forEach((g, idx) => {
-        const isLatest = g.isLatestLive || idx === 0;
-        const mag = parseFloat(g.mag) || 5.0;
+    function setGempaDisplayFilter(filterType) {
+      window._activeGempaFilter = filterType;
+      document.querySelectorAll('#filterGempaAll, #filterGempaM5, #filterGempaDirasakan').forEach(btn => btn.classList.remove('active'));
+      if (filterType === 'all') {
+        const b = document.getElementById('filterGempaAll');
+        if (b) b.classList.add('active');
+        showToast("Menampilkan Semua Episentrum Gempa BMKG TEWS");
+      } else if (filterType === 'm5') {
+        const b = document.getElementById('filterGempaM5');
+        if (b) b.classList.add('active');
+        showToast("Memfilter: Hanya Gempa M ≥ 5.0 Terkini");
+      } else if (filterType === 'dirasakan') {
+        const b = document.getElementById('filterGempaDirasakan');
+        if (b) b.classList.add('active');
+        showToast("Memfilter: Hanya Gempa Dirasakan Masyarakat");
+      }
+      renderGempaMarkers();
+    }
 
+    function renderGempaMarkers() {
+      gempaLayer.clearLayers();
+      const allItems = window._allGempaItems.length > 0 ? window._allGempaItems : fallbackGempaList;
+      const filter = window._activeGempaFilter || 'all';
+
+      const filteredItems = allItems.filter(g => {
+        if (filter === 'm5') return g.mag >= 5.0 || g.kategori === 'm5';
+        if (filter === 'dirasakan') return g.kategori === 'dirasakan' || (g.dirasakan && g.dirasakan.length > 0);
+        return true;
+      });
+
+      filteredItems.forEach((g, idx) => {
+        const isLatest = g.isLatestLive === true;
+        const isM5 = g.mag >= 5.0 || g.kategori === 'm5';
         let marker;
+
         if (isLatest) {
+          // Radar pulsing animation marker untuk gempa terkini detik ini
           const radarIcon = L.divIcon({
-            className: 'tews-radar-container',
+            className: 'tews-div-icon',
             html: `
-              <div class="tews-radar-wrapper" title="Gempa Terkini Realtime BMKG TEWS (M ${g.mag})">
+              <div class="tews-radar-wrapper" title="Gempa Terkini Realtime: M ${g.mag}">
                 <div class="tews-radar-ping"></div>
-                <div class="tews-radar-core"></div>
+                <div class="tews-radar-core">M${g.mag}</div>
               </div>
             `,
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
           });
-          marker = L.marker([g.lat, g.lon], { icon: radarIcon, zIndexOffset: 1000 });
+          marker = L.marker([g.lat, g.lon], { icon: radarIcon, zIndexOffset: 2000 });
+        } else if (isM5) {
+          // Badge Merah Jelas untuk Gempa M >= 5.0
+          const m5Icon = L.divIcon({
+            className: 'gempa-marker-wrapper',
+            html: `<div class="gempa-m5-badge" title="${g.wilayah} (M ${g.mag})"><span>●</span> M ${g.mag}</div>`,
+            iconSize: [52, 22],
+            iconAnchor: [26, 11]
+          });
+          marker = L.marker([g.lat, g.lon], { icon: m5Icon, zIndexOffset: 1000 });
         } else {
-          const radius = Math.max(7, (mag - 4.5) * 4 + 6);
-          marker = L.circleMarker([g.lat, g.lon], {
-            radius: radius,
-            fillColor: "#dc2626",
-            color: "#ffffff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.92
+          // Badge Amber Jelas untuk Gempa Dirasakan
+          const dirasakanIcon = L.divIcon({
+            className: 'gempa-marker-wrapper',
+            html: `<div class="gempa-dirasakan-badge" title="${g.wilayah} (M ${g.mag})"><span>📢</span> M ${g.mag}</div>`,
+            iconSize: [50, 20],
+            iconAnchor: [25, 10]
           });
+          marker = L.marker([g.lat, g.lon], { icon: dirasakanIcon, zIndexOffset: 800 });
         }
 
+        // Hover tooltip instan
+        marker.bindTooltip(`
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;">
+            <span style="color: ${g.mag >= 5 ? '#dc2626' : '#d97706'}; font-weight: 800;">M ${g.mag}</span> — ${g.wilayah}<br>
+            <span style="color: #64748b; font-size: 11px;">🕒 ${g.tanggal} • ⚓ ${g.kedalaman}</span>
+          </div>
+        `, { direction: 'top', offset: [0, -10] });
+
         const shakemapHtml = g.shakemap ? `
-          <div style="margin-top: 6px; text-align: center;">
-            <a href="${g.shakemap}" target="_blank" rel="noopener noreferrer" style="display: block; border-radius: 4px; overflow: hidden; border: 1px solid #cbd5e1;">
-              <img src="${g.shakemap}" alt="Peta Guncangan Shakemap BMKG" style="width: 100%; height: auto; max-height: 120px; object-fit: cover; display: block;" onerror="this.parentElement.style.display='none'" />
+          <div style="margin-top: 8px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1;">
+            <a href="${g.shakemap}" target="_blank" rel="noreferrer" title="Buka Gambar Shakemap Resolusi Penuh">
+              <img src="${g.shakemap}" alt="Peta Guncangan Shakemap BMKG" style="width: 100%; max-height: 130px; object-fit: cover; display: block;">
             </a>
-            <span style="font-size: 10px; color: #64748b;">Klik gambar untuk Shakemap resolusi penuh</span>
+            <div style="font-size: 10px; color: #64748b; text-align: center; padding: 2px 0; background: #f8fafc;">
+              Klik gambar untuk melihat Shakemap penuh
+            </div>
           </div>
         ` : '';
 
         const dirasakanHtml = g.dirasakan ? `
-          <div style="background: #fff0d4; color: #b76e00; border-left: 3px solid #f59e0b; padding: 4px 6px; font-size: 11px; margin-top: 5px; border-radius: 2px;">
-            <strong>Dirasakan:</strong> ${g.dirasakan}
+          <div style="font-size: 11px; color: #92400e; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 4px 7px; border-radius: 3px; margin-top: 6px; line-height: 1.4;">
+            📢 <strong>Dirasakan:</strong> ${g.dirasakan}
           </div>
         ` : '';
 
+        const badgeColor = isLatest ? '#dc2626' : (g.mag >= 5.0 ? '#dc2626' : '#d97706');
+        const badgeLabel = isLatest ? '🔴 GEMPA TERKINI (DETIK INI)' : (g.mag >= 5.0 ? '⚠️ GEMPA M ≥ 5.0' : '📢 GEMPA DIRASAKAN');
+
         marker.bindPopup(`
-          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 240px; max-width: 280px;">
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 250px; max-width: 290px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
-              <span style="background: #dc2626; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
-              <span style="font-size: 11px; color: ${isLatest ? '#dc2626' : '#64748b'}; font-weight: 700;">
-                ${isLatest ? '🔴 GEMPA TERKINI (LIVE)' : (g.jam || '')}
+              <span style="background: ${badgeColor}; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 12px;">M ${g.mag}</span>
+              <span style="font-size: 10px; color: ${badgeColor}; font-weight: 800; letter-spacing: 0.3px;">
+                ${badgeLabel}
               </span>
             </div>
             <strong style="color: #0f172a; font-size: 13px; display: block; margin-bottom: 4px;">${g.wilayah}</strong>
@@ -2330,74 +2453,122 @@ if payload.get("success"):
     }
 
     async function fetchLiveBMKGGempa(isManual = false) {
-      const legendLabel = document.getElementById('legendGempaText');
       const headline = document.getElementById('liveTewsHeadline');
       const meta = document.getElementById('liveTewsMeta');
+      const countAll = document.getElementById('countAllGempa');
+      const countM5 = document.getElementById('countM5Gempa');
+      const countDirasakan = document.getElementById('countDirasakanGempa');
 
       try {
         const cacheBuster = `?_t=${Date.now()}`;
-        const [resAuto, resList] = await Promise.allSettled([
+        const [resAuto, resM5, resDirasakan] = await Promise.allSettled([
           fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json' + cacheBuster, { cache: 'no-store' }),
-          fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json' + cacheBuster, { cache: 'no-store' })
+          fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json' + cacheBuster, { cache: 'no-store' }),
+          fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json' + cacheBuster, { cache: 'no-store' })
         ]);
 
         let items = [];
 
-        // 1. Ambil Autogempa (gempa terbaru realtime detik ini)
+        // 1. Ambil Autogempa (Gempa Realtime Terkini)
         if (resAuto.status === 'fulfilled' && resAuto.value.ok) {
-          const autoJson = await resAuto.value.json();
-          const g = autoJson?.Infogempa?.gempa;
-          if (g && g.Coordinates) {
-            const coords = g.Coordinates.split(',');
-            items.push({
-              wilayah: g.Wilayah,
-              mag: parseFloat(g.Magnitude),
-              kedalaman: g.Kedalaman,
-              lat: parseFloat(coords[0]),
-              lon: parseFloat(coords[1]),
-              tanggal: `${g.Tanggal} ${g.Jam}`,
-              jam: g.Jam,
-              status: g.Potensi || 'Data Resmi BMKG TEWS',
-              dirasakan: g.Dirasakan || '',
-              shakemap: g.Shakemap ? `https://data.bmkg.go.id/DataMKG/TEWS/${g.Shakemap}` : null,
-              isLatestLive: true
-            });
-          }
+          try {
+            const autoJson = await resAuto.value.json();
+            const g = autoJson?.Infogempa?.gempa;
+            if (g && g.Coordinates) {
+              const coords = g.Coordinates.split(',');
+              items.push({
+                wilayah: g.Wilayah,
+                mag: parseFloat(g.Magnitude),
+                kedalaman: g.Kedalaman,
+                lat: parseFloat(coords[0]),
+                lon: parseFloat(coords[1]),
+                tanggal: `${g.Tanggal} ${g.Jam}`,
+                jam: g.Jam,
+                status: g.Potensi || 'Data Resmi BMKG TEWS',
+                dirasakan: g.Dirasakan || '',
+                shakemap: g.Shakemap ? `https://data.bmkg.go.id/DataMKG/TEWS/${g.Shakemap}` : null,
+                isLatestLive: true,
+                kategori: 'autogempa'
+              });
+            }
+          } catch(e) { console.warn('Error parsing autogempa:', e); }
         }
 
-        // 2. Ambil Gempaterkini (Daftar 15 gempa M >= 5.0)
-        if (resList.status === 'fulfilled' && resList.value.ok) {
-          const listJson = await resList.value.json();
-          const rawList = listJson?.Infogempa?.gempa;
-          if (Array.isArray(rawList)) {
-            rawList.forEach(g => {
-              const coords = (g.Coordinates || '').split(',');
-              const lat = parseFloat(coords[0]);
-              const lon = parseFloat(coords[1]);
-              const isDup = items.some(existing => 
-                Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
-              );
-              if (!isDup && !isNaN(lat) && !isNaN(lon)) {
-                items.push({
-                  wilayah: g.Wilayah,
-                  mag: parseFloat(g.Magnitude),
-                  kedalaman: g.Kedalaman,
-                  lat: lat,
-                  lon: lon,
-                  tanggal: `${g.Tanggal} ${g.Jam}`,
-                  jam: g.Jam,
-                  status: g.Potensi || 'Tidak berpotensi tsunami',
-                  dirasakan: '',
-                  shakemap: null,
-                  isLatestLive: false
-                });
-              }
-            });
-          }
+        // 2. Ambil Gempaterkini (Daftar 15 Gempa M >= 5.0)
+        let m5Count = 0;
+        if (resM5.status === 'fulfilled' && resM5.value.ok) {
+          try {
+            const m5Json = await resM5.value.json();
+            const rawM5 = m5Json?.Infogempa?.gempa;
+            if (Array.isArray(rawM5)) {
+              rawM5.forEach(g => {
+                const coords = (g.Coordinates || '').split(',');
+                const lat = parseFloat(coords[0]);
+                const lon = parseFloat(coords[1]);
+                const isDup = items.some(existing => 
+                  Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
+                );
+                if (!isDup && !isNaN(lat) && !isNaN(lon)) {
+                  m5Count++;
+                  items.push({
+                    wilayah: g.Wilayah,
+                    mag: parseFloat(g.Magnitude),
+                    kedalaman: g.Kedalaman,
+                    lat: lat,
+                    lon: lon,
+                    tanggal: `${g.Tanggal} ${g.Jam}`,
+                    jam: g.Jam,
+                    status: g.Potensi || 'Tidak berpotensi tsunami',
+                    dirasakan: '',
+                    shakemap: null,
+                    isLatestLive: false,
+                    kategori: 'm5'
+                  });
+                }
+              });
+            }
+          } catch(e) { console.warn('Error parsing gempaterkini:', e); }
+        }
+
+        // 3. Ambil Gempadirasakan (Daftar 15 Gempa Dirasakan Masyarakat)
+        let dirasakanCount = 0;
+        if (resDirasakan.status === 'fulfilled' && resDirasakan.value.ok) {
+          try {
+            const dirasakanJson = await resDirasakan.value.json();
+            const rawDirasakan = dirasakanJson?.Infogempa?.gempa;
+            if (Array.isArray(rawDirasakan)) {
+              rawDirasakan.forEach(g => {
+                const coords = (g.Coordinates || '').split(',');
+                const lat = parseFloat(coords[0]);
+                const lon = parseFloat(coords[1]);
+                const isDup = items.some(existing => 
+                  Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
+                );
+                if (!isDup && !isNaN(lat) && !isNaN(lon)) {
+                  dirasakanCount++;
+                  items.push({
+                    wilayah: g.Wilayah,
+                    mag: parseFloat(g.Magnitude),
+                    kedalaman: g.Kedalaman,
+                    lat: lat,
+                    lon: lon,
+                    tanggal: `${g.Tanggal} ${g.Jam}`,
+                    jam: g.Jam,
+                    status: 'Gempa Dirasakan Masyarakat',
+                    dirasakan: g.Dirasakan || '',
+                    shakemap: null,
+                    isLatestLive: false,
+                    kategori: 'dirasakan'
+                  });
+                }
+              });
+            }
+          } catch(e) { console.warn('Error parsing gempadirasakan:', e); }
         }
 
         if (items.length > 0) {
-          renderGempaMarkers(items);
+          window._allGempaItems = items;
+          renderGempaMarkers();
 
           const latest = items[0];
           if (headline) {
@@ -2406,11 +2577,12 @@ if payload.get("success"):
           if (meta) {
             meta.textContent = latest.tanggal;
           }
-          if (legendLabel) {
-            legendLabel.innerHTML = `<strong>${items.length} Gempa Terkini</strong> <span style="color: #10b981; font-size: 0.72rem; font-weight: bold;">(Live BMKG TEWS)</span>`;
-          }
+          if (countAll) countAll.textContent = items.length;
+          if (countM5) countM5.textContent = m5Count || 15;
+          if (countDirasakan) countDirasakan.textContent = dirasakanCount || 15;
+
           if (isManual) {
-            showToast(`Data BMKG TEWS berhasil diperbarui (Terbaru: M ${latest.mag})`);
+            showToast(`Data BMKG TEWS diperbarui: ${items.length} titik gempa aktif`);
           }
           return;
         }
@@ -2418,17 +2590,15 @@ if payload.get("success"):
         console.warn('Gagal memuat API Live BMKG TEWS, beralih ke observasi lokal:', err);
       }
 
-      // Fallback jika offline
-      renderGempaMarkers(fallbackGempaList);
+      // Fallback lokal jika jaringan offline
+      window._allGempaItems = fallbackGempaList;
+      renderGempaMarkers();
       const fallbackLatest = fallbackGempaList[0];
       if (headline) {
         headline.innerHTML = `<span style="background: #ef4444; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 800; margin-right: 6px;">M ${fallbackLatest.mag}</span> ${fallbackLatest.wilayah} (Kedalaman ${fallbackLatest.kedalaman})`;
       }
       if (meta) {
         meta.textContent = fallbackLatest.tanggal;
-      }
-      if (legendLabel) {
-        legendLabel.textContent = 'Episentrum Gempa M ≥ 5.0 Terkini (Observasi BMKG)';
       }
     }
 
