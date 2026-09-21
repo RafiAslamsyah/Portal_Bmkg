@@ -1,62 +1,118 @@
-{# Template Kartu Dataset BMKG (Sesuai Desain ui_prototype/katalog.html) #}
+{# Template Kartu Dataset BMKG Responsif & User-Friendly (User Publik & Admin) #}
 {% set title = package.title or package.name %}
-{% set notes = h.markdown_extract(package.notes, extract_length=220) %}
+{% set notes = h.markdown_extract(package.notes, extract_length=200) %}
 {% set pilar = h.bmkg_get_package_pilar(package) %}
 {% set pilar_badge = h.bmkg_get_pilar_badge(pilar) %}
 {% set org_title = package.organization.title if (package.organization and package.organization.title) else 'Badan Meteorologi, Klimatologi, dan Geofisika' %}
 {% set temp_range = h.bmkg_get_temporal_range(package) %}
 {% set has_ds = h.bmkg_has_datastore(package) %}
+{% set ds_id = h.bmkg_get_datastore_resource_id(package) %}
 {% set primary_res = h.bmkg_get_primary_resource(package) %}
+{% set can_edit = h.bmkg_can_edit_package(package) %}
+{% set api_url = h.bmkg_get_api_url(package) %}
 
 <article class="dataset-card" data-package-id="{{ package.id }}" data-pilar="{{ pilar }}">
+  <!-- Card Header Meta: Struktur terpisah Kiri & Kanan mencegah teks bertumpuk -->
   <div class="card-top-meta">
-    <span class="pillar-tag {{ pilar_badge.class }}">
-      <i class="{{ pilar_badge.icon }}"></i> {{ pilar_badge.label }}
-    </span>
-    <span class="org-producer-text">
-      <i class="fa-solid fa-building"></i> {{ org_title }}
-    </span>
+    <div class="card-header-left">
+      <span class="pillar-tag {{ pilar_badge.class }}">
+        <i class="{{ pilar_badge.icon }}"></i> {{ pilar_badge.label }}
+      </span>
+
+      <span class="org-producer-text" title="{{ org_title }}">
+        <i class="fa-solid fa-building"></i> {{ org_title }}
+      </span>
+    </div>
+
+    <div class="card-header-right">
+      <!-- Status Visibilitas (Publik vs Privat) -->
+      {% if package.private %}
+        <span class="visibility-badge private" title="Dataset Privat: Hanya terlihat oleh pengelola data / administrator yang sedang login.">
+          <i class="fa-solid fa-lock"></i> Privat
+        </span>
+      {% else %}
+        <span class="visibility-badge public" title="Dataset Terbuka: Bebas diakses publik.">
+          <i class="fa-solid fa-globe"></i> Publik
+        </span>
+      {% endif %}
+
+      <!-- Admin Quick Action Buttons (Edit / Kelola Berkas) -->
+      {% if c.userobj and (c.userobj.sysadmin or can_edit) %}
+        <div class="card-admin-group">
+          <a href="{{ h.url_for('dataset.edit', id=package.name) }}" class="card-admin-btn edit" title="Edit Metadata & Pengaturan">
+            <i class="fa-solid fa-pen-to-square"></i> Edit
+          </a>
+          <a href="{{ h.url_for('dataset.resources', id=package.name) }}" class="card-admin-btn resources" title="Kelola Berkas / Data">
+            <i class="fa-solid fa-folder-plus"></i> Berkas
+          </a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 
+  <!-- Title Link -->
   <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="dataset-card-title">
     {{ title }}
   </a>
 
+  <!-- Description -->
   <p class="dataset-card-description">
-    {{ notes }}
+    {{ notes if notes else 'Tidak ada deskripsi rinci untuk dataset ini.' }}
   </p>
 
+  <!-- Bottom Details & User Action Links -->
   <div class="card-bottom-row">
-    <div class="format-pills-group">
-      {% if package.resources %}
-        {% for fmt in h.dict_list_reduce(package.resources, 'format') %}
-          {% if fmt %}
-            <span class="format-badge {{ h.bmkg_get_format_class(fmt) }}">{{ fmt }}</span>
-          {% endif %}
-        {% endfor %}
-      {% else %}
-        <span class="format-badge csv">DATA</span>
-      {% endif %}
+    <div class="card-info-pills">
+      <div class="format-pills-group">
+        {% if package.resources %}
+          {% for fmt in h.dict_list_reduce(package.resources, 'format') %}
+            {% if fmt %}
+              <span class="format-badge {{ h.bmkg_get_format_class(fmt) }}">{{ fmt }}</span>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <span class="format-badge csv">DATA</span>
+        {% endif %}
 
-      {% if has_ds %}
-        <span class="datastore-active-pill">
-          <i class="fa-solid fa-database"></i> DataStore API Aktif
-        </span>
+        {% if has_ds %}
+          <span class="datastore-active-pill" title="Data tabular tersimpan di PostgreSQL DataStore dan dapat di-query via SQL API">
+            <i class="fa-solid fa-database"></i> DataStore API Aktif
+          </span>
+        {% endif %}
+      </div>
+
+      {% if temp_range %}
+        <div class="temporal-range-tag" title="Rentang Waktu Rekaman Observasi">
+          <i class="fa-regular fa-calendar"></i> {{ temp_range }}
+        </div>
       {% endif %}
     </div>
 
-    {% if temp_range %}
-      <div class="temporal-range-tag">
-        <i class="fa-regular fa-calendar"></i> {{ temp_range }}
-      </div>
-    {% endif %}
-
+    <!-- Action Buttons Group -->
     <div class="card-action-links">
-      <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="btn-interactive card-sub-btn">
-        <i class="fa-solid fa-circle-info"></i> Detail Dataset
+      <button type="button" class="btn-interactive card-sub-btn btn-trigger-preview" 
+        data-pkg-name="{{ package.name }}"
+        data-pkg-title="{{ title }}"
+        data-ds-id="{{ ds_id or '' }}"
+        data-res-url="{{ primary_res.url if (primary_res and primary_res.url) else '' }}"
+        onclick="handlePreviewClick(this)" 
+        title="Pratinjau data tabular secara cepat">
+        <i class="fa-solid fa-table-cells"></i> Pratinjau
+      </button>
+
+      <button type="button" class="btn-interactive card-sub-btn" 
+        data-api-url="{{ api_url }}"
+        onclick="copyApiEndpoint(this.getAttribute('data-api-url'))" 
+        title="Salin endpoint API dataset ke papan klip">
+        <i class="fa-solid fa-code"></i> Salin API
+      </button>
+
+      <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="btn-interactive card-sub-btn" title="Lihat detail lengkap dataset">
+        <i class="fa-solid fa-circle-info"></i> Detail
       </a>
+
       {% if primary_res and primary_res.url %}
-        <a href="{{ primary_res.url }}" class="btn-interactive card-sub-btn" target="_blank" rel="noopener noreferrer">
+        <a href="{{ primary_res.url }}" class="btn-interactive card-sub-btn download" target="_blank" rel="noopener noreferrer" title="Unduh berkas resmi">
           <i class="fa-solid fa-download"></i> Unduh
         </a>
       {% endif %}

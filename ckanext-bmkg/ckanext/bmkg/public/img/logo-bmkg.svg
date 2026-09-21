@@ -9,15 +9,15 @@
       <stop offset="0%" stop-color="#2d882d"/>
       <stop offset="100%" stop-color="#005a28"/>
     </linearGradient>
-    <linearGradient id="bmkgGoldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#d97706"/>
+    <linearGradient id="bmkgInnerRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
     </linearGradient>
   </defs>
 
   <!-- Outer Ring -->
   <circle cx="60" cy="60" r="57" fill="#ffffff" stroke="#003865" stroke-width="3"/>
-  <circle cx="60" cy="60" r="53" fill="none" stroke="url(#bmkgGoldRing)" stroke-width="2"/>
+  <circle cx="60" cy="60" r="53" fill="none" stroke="url(#bmkgInnerRing)" stroke-width="2"/>
   <circle cx="60" cy="60" r="50" fill="#003865"/>
 
   <!-- Clip Path for inner artwork -->
@@ -51,6 +51,6 @@
     <path d="M 15 94 C 32 90, 50 98, 70 92 C 90 86, 100 96, 108 92" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.6"/>
   </g>
 
-  <!-- Golden Center Star / Compass Core -->
-  <circle cx="60" cy="60" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2"/>
+  <!-- Center Compass Core -->
+  <circle cx="60" cy="60" r="4.5" fill="#ffffff" stroke="#003865" stroke-width="1.2"/>
 </svg>

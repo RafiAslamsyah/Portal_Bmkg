@@ -26,8 +26,38 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'bmkg_format_coordinates': self._format_coordinates,
             'bmkg_get_format_class': self._get_format_class,
             'bmkg_has_datastore': self._has_datastore,
+            'bmkg_get_datastore_resource_id': self._get_datastore_resource_id,
             'bmkg_get_primary_resource': self._get_primary_resource,
+            'bmkg_can_edit_package': self._can_edit_package,
+            'bmkg_get_api_url': self._get_api_url,
         }
+
+    def _can_edit_package(self, package):
+        if not package:
+            return False
+        try:
+            pkg_id = package.get('id') if isinstance(package, dict) else getattr(package, 'id', None)
+            if not pkg_id:
+                return False
+            return toolkit.check_access('package_update', {'id': pkg_id})
+        except Exception:
+            return False
+
+    def _get_datastore_resource_id(self, package):
+        resources = package.get('resources', []) if isinstance(package, dict) else getattr(package, 'resources', [])
+        for r in resources:
+            if isinstance(r, dict) and r.get('datastore_active'):
+                return r.get('id')
+            elif hasattr(r, 'datastore_active') and r.datastore_active:
+                return getattr(r, 'id', None)
+        return None
+
+    def _get_api_url(self, package):
+        ds_id = self._get_datastore_resource_id(package)
+        if ds_id:
+            return f"/api/3/action/datastore_search?resource_id={ds_id}&limit=5"
+        pkg_name = package.get('name') if isinstance(package, dict) else getattr(package, 'name', '')
+        return f"/api/3/action/package_show?id={pkg_name}"
 
     def _get_package_pilar(self, package):
         if not package:
