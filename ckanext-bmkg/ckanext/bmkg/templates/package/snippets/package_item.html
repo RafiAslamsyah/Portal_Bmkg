@@ -1,0 +1,65 @@
+{# Template Kartu Dataset BMKG (Sesuai Desain ui_prototype/katalog.html) #}
+{% set title = package.title or package.name %}
+{% set notes = h.markdown_extract(package.notes, extract_length=220) %}
+{% set pilar = h.bmkg_get_package_pilar(package) %}
+{% set pilar_badge = h.bmkg_get_pilar_badge(pilar) %}
+{% set org_title = package.organization.title if (package.organization and package.organization.title) else 'Badan Meteorologi, Klimatologi, dan Geofisika' %}
+{% set temp_range = h.bmkg_get_temporal_range(package) %}
+{% set has_ds = h.bmkg_has_datastore(package) %}
+{% set primary_res = h.bmkg_get_primary_resource(package) %}
+
+<article class="dataset-card" data-package-id="{{ package.id }}" data-pilar="{{ pilar }}">
+  <div class="card-top-meta">
+    <span class="pillar-tag {{ pilar_badge.class }}">
+      <i class="{{ pilar_badge.icon }}"></i> {{ pilar_badge.label }}
+    </span>
+    <span class="org-producer-text">
+      <i class="fa-solid fa-building"></i> {{ org_title }}
+    </span>
+  </div>
+
+  <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="dataset-card-title">
+    {{ title }}
+  </a>
+
+  <p class="dataset-card-description">
+    {{ notes }}
+  </p>
+
+  <div class="card-bottom-row">
+    <div class="format-pills-group">
+      {% if package.resources %}
+        {% for fmt in h.dict_list_reduce(package.resources, 'format') %}
+          {% if fmt %}
+            <span class="format-badge {{ h.bmkg_get_format_class(fmt) }}">{{ fmt }}</span>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <span class="format-badge csv">DATA</span>
+      {% endif %}
+
+      {% if has_ds %}
+        <span class="datastore-active-pill">
+          <i class="fa-solid fa-database"></i> DataStore API Aktif
+        </span>
+      {% endif %}
+    </div>
+
+    {% if temp_range %}
+      <div class="temporal-range-tag">
+        <i class="fa-regular fa-calendar"></i> {{ temp_range }}
+      </div>
+    {% endif %}
+
+    <div class="card-action-links">
+      <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="btn-interactive card-sub-btn">
+        <i class="fa-solid fa-circle-info"></i> Detail Dataset
+      </a>
+      {% if primary_res and primary_res.url %}
+        <a href="{{ primary_res.url }}" class="btn-interactive card-sub-btn" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-download"></i> Unduh
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,8 @@
+{
+  "name": "portal-open-data-bmkg",
+  "version": "1.0.0",
+  "description": "Portal Open Data BMKG UI Prototype",
+  "scripts": {
+    "start": "npx serve ui_prototype -p 8080"
+  }
+}
