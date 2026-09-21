@@ -57,10 +57,11 @@
 </section>
 
 <!-- 4. Verified Institutional Metrics Bar -->
+{% set stats = h.bmkg_get_dataset_stats() %}
 <div class="metrics-container">
   <div class="metrics-bar scroll-reveal">
     <div class="metric-item">
-      <div class="metric-number">1.482</div>
+      <div class="metric-number">{{ stats.total_datasets }}</div>
       <div class="metric-desc">Dataset Terbuka Terverifikasi</div>
     </div>
     <div class="metric-item">
@@ -77,6 +78,8 @@
     </div>
   </div>
 </div>
+
+
 
 <!-- 5. Main Body Content -->
 <main class="main-wrapper">
@@ -109,7 +112,7 @@
           </p>
         </div>
         <div class="pillar-footer">
-          <span class="dataset-count-tag">548 Dataset</span>
+          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('meteorologi') }} Dataset</span>
           <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </a>
@@ -139,7 +142,7 @@
           </p>
         </div>
         <div class="pillar-footer">
-          <span class="dataset-count-tag">412 Dataset</span>
+          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('klimatologi') }} Dataset</span>
           <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </a>
@@ -164,7 +167,7 @@
           </p>
         </div>
         <div class="pillar-footer">
-          <span class="dataset-count-tag">320 Dataset</span>
+          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('geofisika') }} Dataset</span>
           <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </a>
@@ -191,7 +194,7 @@
           </p>
         </div>
         <div class="pillar-footer">
-          <span class="dataset-count-tag">202 Dataset</span>
+          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('kualitas-udara') }} Dataset</span>
           <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </a>

@@ -30,7 +30,44 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'bmkg_get_primary_resource': self._get_primary_resource,
             'bmkg_can_edit_package': self._can_edit_package,
             'bmkg_get_api_url': self._get_api_url,
+            'bmkg_get_dataset_stats': self._get_dataset_stats,
+            'bmkg_get_group_dataset_count': self._get_group_dataset_count,
         }
+
+    def _get_dataset_stats(self):
+        """Return real portal statistics from the CKAN database."""
+        try:
+            result = toolkit.get_action('package_search')(
+                {'ignore_auth': True}, {'q': '*:*', 'rows': 0}
+            )
+            total = result.get('count', 0)
+        except Exception:
+            total = 0
+
+        try:
+            org_list = toolkit.get_action('organization_list')(
+                {'ignore_auth': True}, {'all_fields': False}
+            )
+            org_count = len(org_list)
+        except Exception:
+            org_count = 0
+
+        return {
+            'total_datasets': total,
+            'total_orgs': org_count,
+        }
+
+    def _get_group_dataset_count(self, group_name):
+        """Return the number of datasets in a specific CKAN group (pilar)."""
+        try:
+            result = toolkit.get_action('group_show')(
+                {'ignore_auth': True},
+                {'id': group_name, 'include_dataset_count': True}
+            )
+            return result.get('package_count', 0)
+        except Exception:
+            return 0
+
 
     def _can_edit_package(self, package):
         if not package:

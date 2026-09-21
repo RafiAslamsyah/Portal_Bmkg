@@ -1720,7 +1720,7 @@
   <div class="metrics-container">
     <div class="metrics-bar scroll-reveal">
       <div class="metric-item">
-        <div class="metric-number">1.482</div>
+        <div class="metric-number" id="totalDatasetCount">7</div>
         <div class="metric-desc">Dataset Terbuka Terverifikasi</div>
       </div>
       <div class="metric-item">
@@ -1766,7 +1766,7 @@
             </p>
           </div>
           <div class="pillar-footer">
-            <span class="dataset-count-tag">548 Dataset</span>
+            <span class="dataset-count-tag" id="countPilarMeteorologi">3 Dataset</span>
             <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
@@ -1794,7 +1794,7 @@
             </p>
           </div>
           <div class="pillar-footer">
-            <span class="dataset-count-tag">412 Dataset</span>
+            <span class="dataset-count-tag" id="countPilarKlimatologi">1 Dataset</span>
             <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
@@ -1816,7 +1816,7 @@
             </p>
           </div>
           <div class="pillar-footer">
-            <span class="dataset-count-tag">320 Dataset</span>
+            <span class="dataset-count-tag" id="countPilarGeofisika">2 Dataset</span>
             <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
@@ -1840,7 +1840,7 @@
             </p>
           </div>
           <div class="pillar-footer">
-            <span class="dataset-count-tag">202 Dataset</span>
+            <span class="dataset-count-tag" id="countPilarKualitasUdara">1 Dataset</span>
             <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
           </div>
         </a>
@@ -3048,10 +3048,98 @@ if payload.get("success"):
       setInterval(updateClock, 1000);
     }
 
+    // ==========================================================================
+    // DYNAMIC REAL-TIME LANDING PAGE STATS (CKAN API & LOCALSTORAGE SYNC)
+    // ==========================================================================
+    async function initDynamicLandingStats() {
+      const elTotal = document.getElementById('totalDatasetCount');
+      const elOrg = document.getElementById('totalOrgCount');
+      const elMet = document.getElementById('countPilarMeteorologi');
+      const elKlim = document.getElementById('countPilarKlimatologi');
+      const elGeof = document.getElementById('countPilarGeofisika');
+      const elKu = document.getElementById('countPilarKualitasUdara');
+
+      // 1. Try fetching from live CKAN API
+      try {
+        const res = await fetch('http://localhost:8080/api/3/action/package_search?facet.field=["groups"]&facet.limit=10&rows=0', { cache: 'no-cache' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success) {
+            const total = data.result.count || 0;
+            if (elTotal) elTotal.textContent = total;
+
+            const groupFacets = data.result.facets && data.result.facets.groups ? data.result.facets.groups : {};
+            if (elMet) elMet.textContent = `${groupFacets['meteorologi'] || 0} Dataset`;
+            if (elKlim) elKlim.textContent = `${groupFacets['klimatologi'] || 0} Dataset`;
+            if (elGeof) elGeof.textContent = `${groupFacets['geofisika'] || 0} Dataset`;
+            if (elKu) elKu.textContent = `${groupFacets['kualitas-udara'] || 0} Dataset`;
+
+            // Try getting org count
+            try {
+              const resOrg = await fetch('http://localhost:8080/api/3/action/organization_list', { cache: 'no-cache' });
+              if (resOrg.ok) {
+                const dataOrg = await resOrg.json();
+                if (dataOrg.success && elOrg) {
+                  elOrg.textContent = `${dataOrg.result.length} Unit`;
+                }
+              }
+            } catch (_) {}
+            return;
+          }
+        }
+      } catch (_) {
+        // Fallback to localStorage
+      }
+
+      // 2. Fallback to localStorage if API is not reached directly
+      try {
+        const stored = localStorage.getItem('portal_bmkg_datasets');
+        let datasets = [];
+        if (stored) {
+          datasets = JSON.parse(stored);
+        }
+        if (!datasets || datasets.length === 0) {
+          // Default single presentation dataset
+          if (elTotal) elTotal.textContent = '1';
+          if (elMet) elMet.textContent = '1 Dataset';
+          if (elKlim) elKlim.textContent = '0 Dataset';
+          if (elGeof) elGeof.textContent = '0 Dataset';
+          if (elKu) elKu.textContent = '0 Dataset';
+          if (elOrg) elOrg.textContent = '2 Unit';
+          return;
+        }
+
+        const counts = { meteorologi: 0, klimatologi: 0, geofisika: 0, 'kualitas-udara': 0 };
+        const orgs = new Set();
+
+        datasets.forEach(d => {
+          const p = (d.pilar || d.pilar_mkg || '').toLowerCase();
+          if (counts[p] !== undefined) counts[p]++;
+          if (d.owner_org || d.organisasi) orgs.add(d.owner_org || d.organisasi);
+        });
+
+        if (elTotal) elTotal.textContent = datasets.length;
+        if (elMet) elMet.textContent = `${counts.meteorologi} Dataset`;
+        if (elKlim) elKlim.textContent = `${counts.klimatologi} Dataset`;
+        if (elGeof) elGeof.textContent = `${counts.geofisika} Dataset`;
+        if (elKu) elKu.textContent = `${counts['kualitas-udara']} Dataset`;
+        if (elOrg) elOrg.textContent = `${Math.max(orgs.size, 1)} Unit`;
+      } catch (e) {
+        console.warn('Error reading local datasets:', e);
+      }
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'portal_bmkg_datasets') {
+        initDynamicLandingStats();
+      }
+    });
+
     // Initializations
     initRealtimeClock();
     initNavbarSoftScroll();
     initScrollReveal();
+    initDynamicLandingStats();
   </script>
 </body>
 </html>
