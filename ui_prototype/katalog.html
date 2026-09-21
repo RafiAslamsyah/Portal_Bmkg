@@ -1281,7 +1281,7 @@
                 <input type="checkbox" value="meteorologi" class="facet-pilar" onchange="applyFilterAndSearch()">
                 <span>Meteorologi</span>
               </span>
-              <span class="filter-count-badge">548</span>
+              <span class="filter-count-badge" id="count-pilar-meteorologi">0</span>
             </label>
           </li>
           <li>
@@ -1290,7 +1290,7 @@
                 <input type="checkbox" value="klimatologi" class="facet-pilar" onchange="applyFilterAndSearch()">
                 <span>Klimatologi</span>
               </span>
-              <span class="filter-count-badge">412</span>
+              <span class="filter-count-badge" id="count-pilar-klimatologi">0</span>
             </label>
           </li>
           <li>
@@ -1299,7 +1299,7 @@
                 <input type="checkbox" value="geofisika" class="facet-pilar" onchange="applyFilterAndSearch()">
                 <span>Geofisika</span>
               </span>
-              <span class="filter-count-badge">320</span>
+              <span class="filter-count-badge" id="count-pilar-geofisika">0</span>
             </label>
           </li>
           <li>
@@ -1308,7 +1308,7 @@
                 <input type="checkbox" value="kualitas-udara" class="facet-pilar" onchange="applyFilterAndSearch()">
                 <span>Kualitas Udara</span>
               </span>
-              <span class="filter-count-badge">202</span>
+              <span class="filter-count-badge" id="count-pilar-kualitas-udara">0</span>
             </label>
           </li>
         </ul>
@@ -1327,7 +1327,7 @@
                 <input type="checkbox" value="csv" class="facet-format" onchange="applyFilterAndSearch()">
                 <span>CSV (DataStore API)</span>
               </span>
-              <span class="filter-count-badge">1.120</span>
+              <span class="filter-count-badge" id="count-format-csv">0</span>
             </label>
           </li>
           <li>
@@ -1336,7 +1336,7 @@
                 <input type="checkbox" value="geojson" class="facet-format" onchange="applyFilterAndSearch()">
                 <span>GeoJSON (Geospasial)</span>
               </span>
-              <span class="filter-count-badge">384</span>
+              <span class="filter-count-badge" id="count-format-geojson">0</span>
             </label>
           </li>
           <li>
@@ -1345,7 +1345,7 @@
                 <input type="checkbox" value="netcdf" class="facet-format" onchange="applyFilterAndSearch()">
                 <span>NetCDF / GRIB2 (Model)</span>
               </span>
-              <span class="filter-count-badge">145</span>
+              <span class="filter-count-badge" id="count-format-netcdf">0</span>
             </label>
           </li>
           <li>
@@ -1354,7 +1354,7 @@
                 <input type="checkbox" value="kml" class="facet-format" onchange="applyFilterAndSearch()">
                 <span>KML / KMZ</span>
               </span>
-              <span class="filter-count-badge">89</span>
+              <span class="filter-count-badge" id="count-format-kml">0</span>
             </label>
           </li>
         </ul>
@@ -1373,7 +1373,7 @@
                 <input type="checkbox" value="pusat" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>Kedeputian Teknis Pusat</span>
               </span>
-              <span class="filter-count-badge">620</span>
+              <span class="filter-count-badge" id="count-org-pusat">0</span>
             </label>
           </li>
           <li>
@@ -1382,7 +1382,7 @@
                 <input type="checkbox" value="balai2" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>BBMKG Wilayah II (Jawa)</span>
               </span>
-              <span class="filter-count-badge">240</span>
+              <span class="filter-count-badge" id="count-org-balai2">0</span>
             </label>
           </li>
           <li>
@@ -1391,7 +1391,7 @@
                 <input type="checkbox" value="balai1" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>BBMKG Wilayah I (Sumatera)</span>
               </span>
-              <span class="filter-count-badge">195</span>
+              <span class="filter-count-badge" id="count-org-balai1">0</span>
             </label>
           </li>
           <li>
@@ -1400,7 +1400,7 @@
                 <input type="checkbox" value="balai3" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>BBMKG Wilayah III (Bali/NT)</span>
               </span>
-              <span class="filter-count-badge">160</span>
+              <span class="filter-count-badge" id="count-org-balai3">0</span>
             </label>
           </li>
           <li>
@@ -1409,7 +1409,7 @@
                 <input type="checkbox" value="balai4" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>BBMKG Wilayah IV (Sulawesi)</span>
               </span>
-              <span class="filter-count-badge">142</span>
+              <span class="filter-count-badge" id="count-org-balai4">0</span>
             </label>
           </li>
           <li>
@@ -1418,7 +1418,7 @@
                 <input type="checkbox" value="balai5" class="facet-org" onchange="applyFilterAndSearch()">
                 <span>BBMKG Wilayah V (Papua)</span>
               </span>
-              <span class="filter-count-badge">125</span>
+              <span class="filter-count-badge" id="count-org-balai5">0</span>
             </label>
           </li>
         </ul>
@@ -1437,7 +1437,7 @@
                 <input type="checkbox" value="harian" class="facet-time" onchange="applyFilterAndSearch()">
                 <span>Data Harian (Daily)</span>
               </span>
-              <span class="filter-count-badge">840</span>
+              <span class="filter-count-badge" id="count-time-harian">0</span>
             </label>
           </li>
           <li>
@@ -1446,7 +1446,7 @@
                 <input type="checkbox" value="jam" class="facet-time" onchange="applyFilterAndSearch()">
                 <span>Per Jam (Hourly)</span>
               </span>
-              <span class="filter-count-badge">310</span>
+              <span class="filter-count-badge" id="count-time-jam">0</span>
             </label>
           </li>
           <li>
@@ -1455,7 +1455,7 @@
                 <input type="checkbox" value="dasarian" class="facet-time" onchange="applyFilterAndSearch()">
                 <span>Dasarian (10 Harian)</span>
               </span>
-              <span class="filter-count-badge">180</span>
+              <span class="filter-count-badge" id="count-time-dasarian">0</span>
             </label>
           </li>
           <li>
@@ -1464,7 +1464,7 @@
                 <input type="checkbox" value="bulanan" class="facet-time" onchange="applyFilterAndSearch()">
                 <span>Bulanan (Monthly)</span>
               </span>
-              <span class="filter-count-badge">152</span>
+              <span class="filter-count-badge" id="count-time-bulanan">0</span>
             </label>
           </li>
         </ul>
@@ -1894,8 +1894,49 @@
     // INIT — render cards on page load
     // ==========================================================================
     renderDatasetCards();
+    updateFacetCounts();
 
     // ==========================================================================
+    // UPDATE FACET COUNTS — hitung dari data localStorage
+    // ==========================================================================
+    function updateFacetCounts() {
+      const datasets = getDatasets();
+
+      // Helper: count datasets matching a field value
+      function countBy(field, value) {
+        return datasets.filter(ds => {
+          if (field === 'formats') {
+            return (ds.formats || []).map(f => f.toLowerCase()).includes(value);
+          }
+          return (ds[field] || '') === value;
+        }).length;
+      }
+
+      // Pilar counts
+      ['meteorologi', 'klimatologi', 'geofisika', 'kualitas-udara'].forEach(v => {
+        const el = document.getElementById(`count-pilar-${v}`);
+        if (el) el.textContent = countBy('pilar', v);
+      });
+
+      // Format counts
+      ['csv', 'geojson', 'netcdf', 'kml'].forEach(v => {
+        const el = document.getElementById(`count-format-${v}`);
+        if (el) el.textContent = countBy('formats', v);
+      });
+
+      // Org counts
+      ['pusat', 'balai1', 'balai2', 'balai3', 'balai4', 'balai5'].forEach(v => {
+        const el = document.getElementById(`count-org-${v}`);
+        if (el) el.textContent = countBy('org', v);
+      });
+
+      // Time counts
+      ['harian', 'jam', 'dasarian', 'bulanan'].forEach(v => {
+        const el = document.getElementById(`count-time-${v}`);
+        if (el) el.textContent = countBy('time', v);
+      });
+    }
+
     // Modal Login & Register Handlers
     // ==========================================================================
     function openLoginModal(defaultTab = 'login') {
@@ -2205,6 +2246,7 @@
     window.addEventListener('storage', (e) => {
       if (e.key === STORAGE_KEY) {
         renderDatasetCards();
+        updateFacetCounts();
         applyFilterAndSearch();
       }
     });
