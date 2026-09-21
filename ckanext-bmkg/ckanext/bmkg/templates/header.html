@@ -36,7 +36,7 @@
         <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
         {% if c.userobj %}
           {% if c.userobj.sysadmin %}
-            <a href="{{ h.url_for('admin.index') }}" style="color: var(--bmkg-gold); font-weight: bold;">
+            <a href="{{ h.url_for('admin.index') }}" style="color: #38bdf8; font-weight: 700;">
               <i class="fa-solid fa-gavel"></i> Admin Portal
             </a>
           {% endif %}
@@ -71,38 +71,44 @@
 
       <nav class="primary-nav">
         <a href="{{ h.url_for('home.index') }}" class="{% if request.endpoint == 'home.index' %}active{% endif %}">Beranda</a>
+        <a href="{{ h.url_for('dataset.search') }}" class="{% if request.endpoint == 'dataset.search' %}active{% endif %}">Katalog Data</a>
         <a href="{{ h.url_for('home.index') }}#pilar">4 Pilar MKG</a>
         <a href="{{ h.url_for('home.index') }}#peta">Peta Observasi</a>
         <a href="{{ h.url_for('home.index') }}#datastore">DataStore API</a>
       </nav>
 
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="header-right-actions">
         {% if c.userobj %}
-          <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive" title="Tambah Dataset Baru (Akses CRUD Admin)" style="background: var(--bmkg-gold); color: #0f172a; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: 6px; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-circle-plus"></i>
-            <span>+ Tambah Data</span>
+          <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive btn-header-add" title="Tambah Dataset Baru">
+            <i class="fa-solid fa-plus"></i>
+            <span>Tambah Data</span>
           </a>
-          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive header-login-btn" title="Dashboard Admin: Kelola Dataset & Hak Akses CRUD">
-            <i class="fa-solid fa-user-shield"></i>
-            <span>{{ c.userobj.display_name }} (Admin)</span>
+          <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive btn-header-catalog" title="Jelajahi Katalog Data">
+            <i class="fa-solid fa-database"></i>
+            <span>Akses Data</span>
           </a>
+          <div class="header-user-badge" title="Pengguna Terautentikasi: {{ c.userobj.display_name }}">
+            <i class="fa-solid fa-circle-user"></i>
+            <span>{{ c.userobj.display_name }}</span>
+            <span class="badge-admin-tag">Admin</span>
+          </div>
           <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline; margin: 0;">
             {{ h.csrf_input() }}
-            <button type="submit" class="btn-interactive" title="Keluar dari Sesi Admin (Kembali ke Mode User Publik Bebas)" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <button type="submit" class="btn-interactive btn-header-logout" title="Keluar">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
               <span>Keluar</span>
             </button>
           </form>
         {% else %}
-          <button class="btn-interactive header-login-btn" onclick="openLoginModal()" title="Login Administrator / Pengelola Data BMKG">
+          <button class="btn-interactive btn-header-login" onclick="openLoginModal()" title="Login Administrator / Pengelola Data BMKG">
             <i class="fa-solid fa-lock"></i>
             <span>Login</span>
           </button>
+          <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive btn-header-catalog" title="Jelajahi Katalog Data">
+            <i class="fa-solid fa-database"></i>
+            <span>Akses Data</span>
+          </a>
         {% endif %}
-        <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive header-action-btn" title="Jelajahi & Unduh Katalog Dataset Terbuka Bebas Tanpa Login">
-          <i class="fa-solid fa-database"></i>
-          <span>Akses Data Publik</span>
-        </a>
       </div>
     </div>
   </header>

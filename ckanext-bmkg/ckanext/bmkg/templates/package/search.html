@@ -6,7 +6,7 @@
   <!-- Flash Messages -->
   {% block flash %}
     {% if h.get_flashed_messages() %}
-      <div class="flash-messages" style="max-width: 1280px; margin: 1rem auto 0 auto; padding: 0 2rem;">
+      <div class="flash-messages" style="max-width: 1240px; margin: 0.75rem auto 0 auto; padding: 0 1.25rem;">
         {% for category, message in h.get_flashed_messages(with_categories=true) %}
           <div class="alert alert-dismissible fade show {{ category }}">
             {{ h.literal(message) }}
@@ -53,6 +53,17 @@
           <i class="fa-solid fa-filter"></i> Saring Data
         </button>
       </form>
+
+      <!-- Quick Search / Topik Populer -->
+      <div class="quick-tags-container">
+        <span class="quick-tags-label"><i class="fa-solid fa-fire" style="color: var(--bmkg-blue);"></i> Topik Populer:</span>
+        <a href="{{ h.url_for('dataset.search', q='cuaca') }}" class="quick-tag-chip">Cuaca Permukaan</a>
+        <a href="{{ h.url_for('dataset.search', q='gempa') }}" class="quick-tag-chip">Gempa Tektonik M5+</a>
+        <a href="{{ h.url_for('dataset.search', q='curah hujan') }}" class="quick-tag-chip">Curah Hujan Dasarian</a>
+        <a href="{{ h.url_for('dataset.search', q='pm2.5') }}" class="quick-tag-chip">Partikulat PM2.5</a>
+        <a href="{{ h.url_for('dataset.search', q='gelombang') }}" class="quick-tag-chip">Tinggi Gelombang Laut</a>
+        <a href="{{ h.url_for('dataset.search', q='petir') }}" class="quick-tag-chip">Kerapatan Petir</a>
+      </div>
     </div>
   </section>
 
@@ -140,7 +151,7 @@
         {% if q %}
           <span class="chip-badge">
             <span>Kata Kunci: "<strong>{{ q }}</strong>"</span>
-            <a href="{{ h.remove_url_param('q') }}" style="color: inherit; text-decoration: none; margin-left: 4px;">
+            <a href="{{ h.remove_url_param('q') }}" style="color: inherit; text-decoration: none; margin-left: 4px;" title="Hapus filter kata kunci">
               <i class="fa-solid fa-circle-xmark"></i>
             </a>
           </span>
@@ -152,7 +163,7 @@
             {% if item.active %}
               <span class="chip-badge">
                 <span>{{ facet_title }}: <strong>{{ item.display_name }}</strong></span>
-                <a href="{{ h.remove_url_param(facet_name, item.name) }}" style="color: inherit; text-decoration: none; margin-left: 4px;">
+                <a href="{{ h.remove_url_param(facet_name, item.name) }}" style="color: inherit; text-decoration: none; margin-left: 4px;" title="Hapus filter {{ item.display_name }}">
                   <i class="fa-solid fa-circle-xmark"></i>
                 </a>
               </span>
@@ -190,5 +201,179 @@
 
     </main>
   </div>
+
+  <!-- Interactive Quick Data Preview Modal (User & Admin) -->
+  <div class="preview-modal-backdrop" id="dataPreviewModal" onclick="handlePreviewBackdropClick(event)">
+    <div class="preview-modal-card" onclick="event.stopPropagation()">
+      <div class="preview-modal-header">
+        <h3 id="previewModalTitle">
+          <i class="fa-solid fa-table-cells"></i> Pratinjau Data Observasi
+        </h3>
+        <button class="preview-close-btn" onclick="closeDataPreviewModal()" title="Tutup Pratinjau">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="preview-modal-body" id="previewModalBody">
+        <div style="text-align: center; padding: 2.5rem;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--bmkg-blue);"></i>
+          <p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Mengambil sampel data dari CKAN DataStore...</p>
+        </div>
+      </div>
+      <div class="preview-modal-footer">
+        <span id="previewMetaText"><i class="fa-solid fa-database"></i> Terhubung langsung ke PostgreSQL DataStore API</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn-interactive card-sub-btn" onclick="closeDataPreviewModal()">Tutup</button>
+          <a id="previewFullLink" href="#" class="btn-interactive card-sub-btn" style="background: var(--bmkg-blue-deep); color: #ffffff; border-color: var(--bmkg-blue-deep);">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Halaman Dataset
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Feedback -->
+  <div class="toast-feedback" id="catalogToastFeedback">
+    <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+    <span id="catalogToastMessage">Tautan API berhasil disalin ke papan klip!</span>
+  </div>
+
+  <script>
+    // Toast Notification
+    function showToast(message) {
+      var toast = document.getElementById('catalogToastFeedback');
+      var msgElem = document.getElementById('catalogToastMessage');
+      if (!toast || !msgElem) return;
+      msgElem.textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // Copy API Endpoint
+    function copyApiEndpoint(apiUrl) {
+      var fullUrl = window.location.origin + apiUrl;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(fullUrl).then(function() {
+          showToast('Endpoint API berhasil disalin: ' + fullUrl);
+        }).catch(function() {
+          fallbackCopyText(fullUrl);
+        });
+      } else {
+        fallbackCopyText(fullUrl);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      var textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Endpoint API disalin ke papan klip!');
+      } catch (err) {
+        prompt('Salin tautan API berikut:', text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function handlePreviewClick(btn) {
+      var pkgName = btn.getAttribute('data-pkg-name');
+      var pkgTitle = btn.getAttribute('data-pkg-title');
+      var dsId = btn.getAttribute('data-ds-id');
+      var resUrl = btn.getAttribute('data-res-url');
+      openDataPreview(pkgName, pkgTitle, dsId, resUrl);
+    }
+
+    // Modal Data Preview
+    function openDataPreview(pkgName, pkgTitle, dsId, downloadUrl) {
+      var modal = document.getElementById('dataPreviewModal');
+      var titleElem = document.getElementById('previewModalTitle');
+      var bodyElem = document.getElementById('previewModalBody');
+      var fullLink = document.getElementById('previewFullLink');
+      var metaText = document.getElementById('previewMetaText');
+      if (!modal || !bodyElem) return;
+
+      titleElem.innerHTML = '<i class="fa-solid fa-table-cells" style="color: #38bdf8;"></i> ' + pkgTitle;
+      fullLink.href = '/dataset/' + pkgName;
+      bodyElem.innerHTML = '<div style="text-align: center; padding: 2.5rem;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--bmkg-blue);"></i><p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Memuat sampel data...</p></div>';
+      
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      if (dsId) {
+        metaText.innerHTML = '<i class="fa-solid fa-database" style="color: #10b981;"></i> DataStore Resource ID: <code>' + dsId.substring(0, 8) + '...</code>';
+        fetch('/api/3/action/datastore_search?resource_id=' + dsId + '&limit=6')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data.success && data.result && data.result.records && data.result.records.length > 0) {
+              var records = data.result.records;
+              var fields = data.result.fields || Object.keys(records[0]).map(function(k) { return { id: k }; });
+              
+              var html = '<div style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">';
+              html += '<span>Menampilkan <strong>' + records.length + '</strong> baris sampel dari PostgreSQL DataStore:</span>';
+              html += '<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Format SQL Aktif</span>';
+              html += '</div>';
+              html += '<div class="preview-table-container"><table class="preview-data-table preview-table"><thead><tr>';
+              fields.forEach(function(f) {
+                html += '<th>' + f.id + '</th>';
+              });
+              html += '</tr></thead><tbody>';
+              records.forEach(function(r) {
+                html += '<tr>';
+                fields.forEach(function(f) {
+                  var val = r[f.id];
+                  if (val === null || val === undefined) val = '-';
+                  html += '<td>' + val + '</td>';
+                });
+                html += '</tr>';
+              });
+              html += '</tbody></table></div>';
+              bodyElem.innerHTML = html;
+            } else {
+              renderOverviewFallback(pkgTitle, downloadUrl, 'Tabel DataStore belum memiliki baris data.');
+            }
+          })
+          .catch(function(err) {
+            renderOverviewFallback(pkgTitle, downloadUrl, 'Gagal memuat DataStore via API.');
+          });
+      } else {
+        renderOverviewFallback(pkgTitle, downloadUrl, 'Dataset ini belum terhubung ke DataStore SQL tabular.');
+      }
+    }
+
+    function renderOverviewFallback(pkgTitle, downloadUrl, note) {
+      var bodyElem = document.getElementById('previewModalBody');
+      var metaText = document.getElementById('previewMetaText');
+      metaText.innerHTML = '<i class="fa-solid fa-file-circle-check" style="color: var(--bmkg-blue);"></i> Berkas Data Terbuka BMKG';
+      
+      var html = '<div style="background: var(--canvas-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem; text-align: center;">';
+      html += '<i class="fa-solid fa-file-lines" style="font-size: 2.5rem; color: var(--bmkg-blue); margin-bottom: 0.8rem;"></i>';
+      html += '<h4 style="color: var(--bmkg-blue-deep); margin-bottom: 0.5rem; font-size: 1.05rem;">' + pkgTitle + '</h4>';
+      html += '<p style="font-size: 0.86rem; color: var(--text-muted); max-width: 500px; margin: 0 auto 1.25rem auto;">' + note + ' Anda dapat mengunduh berkas lengkap atau melihat detail metadata pada tautan di bawah ini.</p>';
+      if (downloadUrl) {
+        html += '<a href="' + downloadUrl + '" class="btn-interactive" target="_blank" rel="noopener noreferrer" style="background: var(--bmkg-blue-deep); color: #ffffff; padding: 0.55rem 1.25rem; border-radius: 6px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;"><i class="fa-solid fa-download"></i> Unduh Berkas Sekarang</a>';
+      }
+      html += '</div>';
+      bodyElem.innerHTML = html;
+    }
+
+    function closeDataPreviewModal() {
+      var modal = document.getElementById('dataPreviewModal');
+      if (!modal) return;
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function handlePreviewBackdropClick(e) {
+      if (e.target.id === 'dataPreviewModal') {
+        closeDataPreviewModal();
+      }
+    }
+  </script>
 
 {% endblock %}

@@ -46,7 +46,7 @@
           <i class="fa-solid fa-wind" style="color: #00875a;"></i> Partikulat PM2.5
         </button>
         <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu Udara Ekstrem')">
-          <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Suhu Ekstrem
+          <i class="fa-solid fa-temperature-half" style="color: #ef4444;"></i> Suhu Ekstrem
         </button>
         <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Tinggi Gelombang')">
           <i class="fa-solid fa-water" style="color: #0284c7;"></i> Gelombang Laut
@@ -119,16 +119,16 @@
         <div>
           <div class="pillar-header">
             <div class="pillar-icon-badge">
-              <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#b76e00" stroke-width="2"
+              <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#047857" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="5" fill="#f59e0b" stroke="#b76e00" />
+                <circle cx="11" cy="11" r="5" fill="#10b981" stroke="#047857" />
                 <line x1="11" y1="2" x2="11" y2="4" />
                 <line x1="11" y1="18" x2="11" y2="20" />
                 <line x1="2" y1="11" x2="4" y2="11" />
                 <line x1="18" y1="11" x2="20" y2="11" />
-                <path d="M23 15a2 2 0 0 0-2-2v-5a2 2 0 1 1 4 0v5a2 2 0 0 0-2 2z" fill="#fff0d4" />
-                <circle cx="23" cy="22" r="3" fill="#b76e00" />
-                <line x1="23" y1="12" x2="23" y2="22" stroke="#b76e00" stroke-width="2.5" />
+                <path d="M23 15a2 2 0 0 0-2-2v-5a2 2 0 1 1 4 0v5a2 2 0 0 0-2 2z" fill="#d1fae5" />
+                <circle cx="23" cy="22" r="3" fill="#047857" />
+                <line x1="23" y1="12" x2="23" y2="22" stroke="#047857" stroke-width="2.5" />
               </svg>
             </div>
             <div class="pillar-name">Klimatologi</div>
@@ -289,7 +289,7 @@
           </div>
           <div class="legend-row">
             <div
-              style="width: 12px; height: 12px; border-radius: 50%; background: #dc2626; border: 2px solid #fbbf24; flex-shrink: 0;">
+              style="width: 12px; height: 12px; border-radius: 50%; background: #dc2626; border: 2px solid #ffffff; box-shadow: 0 0 0 1.5px #dc2626; flex-shrink: 0;">
             </div>
             <span>Episentrum Gempa Terkini Live (Radar)</span>
           </div>
@@ -301,7 +301,7 @@
           </div>
           <div class="legend-row">
             <div
-              style="background: #d97706; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">
+              style="background: #0284c7; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">
               MMI</div>
             <span id="legendGempaDirasakanText">15 Gempa Dirasakan Terkini</span>
           </div>
@@ -466,92 +466,6 @@ if payload.get("success"):
   </section>
 
 </main>
-
-
-<!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
-<div class="modal-backdrop" id="loginModal" onclick="handleModalBackdropClick(event)">
-  <div class="login-dialog-card" onclick="event.stopPropagation()">
-    <div class="login-card-header">
-      <div style="width: 38px; height: 46px; flex-shrink: 0;">
-        <img src="/img/logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
-      </div>
-      <div>
-        <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Data
-          BMKG</h3>
-        <div style="font-size: 0.76rem; color: #cbd5e1;" id="modalHeaderSubtitle">Login Khusus Administrator &amp;
-          Pengelola Data (CRUD)</div>
-      </div>
-      <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup Dialog">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div class="login-card-body">
-      <!-- Banner Informasi Hak Akses Publik vs Admin -->
-      <div
-        style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.3rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; display: flex; gap: 0.75rem; align-items: flex-start;">
-        <i class="fa-solid fa-circle-info"
-          style="color: #0284c7; font-size: 1.15rem; margin-top: 2px; flex-shrink: 0;"></i>
-        <div>
-          <strong style="color: var(--text-primary); display: block; margin-bottom: 2px;">Data Terbuka untuk Publik
-            (Bebas Akses):</strong>
-          Masyarakat, akademisi, dan pengembang <strong>tidak perlu login</strong> untuk mengunduh dataset, melihat
-          tabel, atau mengambil data lewat API. Form ini <strong>hanya untuk Administrator / Petugas BMKG</strong> guna
-          melakukan manajemen data (Create, Read, Update, Delete / CRUD).
-        </div>
-      </div>
-
-      <form id="loginForm" action="{{ h.url_for('user.login') }}" method="post" onsubmit="handleLoginSubmit(event)">
-        {{ h.csrf_input() }}
-
-        <div class="form-group" id="formGroupIdentifier">
-          <label id="labelIdentifier">NIP Pegawai / Username Admin BMKG</label>
-          <div class="input-with-icon">
-            <i class="fa-solid fa-user-shield input-icon"></i>
-            <input type="text" name="login" id="loginIdentifier" class="form-control-input with-icon"
-              placeholder="contoh: 19900815... atau admin.mkg" required autocomplete="username">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Kata Sandi Administrator</label>
-          <div class="password-wrapper">
-            <i class="fa-solid fa-lock input-icon"></i>
-            <input type="password" name="password" id="loginPassword" class="form-control-input with-icon with-eye"
-              placeholder="Masukkan kata sandi pengelola data" required autocomplete="current-password">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)"
-              title="Lihat/Sembunyikan Sandi">
-              <i class="fa-solid fa-eye"></i>
-            </button>
-          </div>
-        </div>
-
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.35rem; font-size: 0.82rem;">
-          <label
-            style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); cursor: pointer;">
-            <input type="checkbox" name="remember" checked> Ingat sesi login
-          </label>
-          <a href="#"
-            onclick="showToast('Silakan hubungi Pusdatin BMKG untuk bantuan akun Administrator'); return false;"
-            style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi Admin?</a>
-        </div>
-
-        <button type="submit" class="btn-interactive btn-login-submit"
-          style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span id="btnLoginText">Masuk sebagai Administrator (CRUD)</span>
-        </button>
-      </form>
-
-      <div
-        style="margin-top: 1.25rem; text-align: center; font-size: 0.76rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
-        <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
-        Terproteksi Single Sign-On (SSO) Pusdatin BMKG &amp; Enkripsi TLS 1.3
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Toast Notification Element -->
 <div class="toast-feedback" id="toastFeedback">
@@ -769,7 +683,7 @@ if payload.get("success"):
       // Hover tooltip instan
       marker.bindTooltip(`
           <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;">
-            <span style="color: ${g.mag >= 5 ? '#dc2626' : '#d97706'}; font-weight: 800;">M ${g.mag}</span> — ${g.wilayah}<br>
+            <span style="color: ${g.mag >= 5 ? '#dc2626' : '#0284c7'}; font-weight: 800;">M ${g.mag}</span> — ${g.wilayah}<br>
             <span style="color: #64748b; font-size: 11px;">🕒 ${g.tanggal} • ⚓ ${g.kedalaman}</span>
           </div>
         `, { direction: 'top', offset: [0, -10] });
@@ -786,12 +700,12 @@ if payload.get("success"):
         ` : '';
 
       const dirasakanHtml = g.dirasakan ? `
-          <div style="font-size: 11px; color: #92400e; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 4px 7px; border-radius: 3px; margin-top: 6px; line-height: 1.4;">
+          <div style="font-size: 11px; color: #003865; background: #e8f1f8; border-left: 3px solid #005a9e; padding: 4px 7px; border-radius: 3px; margin-top: 6px; line-height: 1.4;">
             📢 <strong>Dirasakan:</strong> ${g.dirasakan}
           </div>
         ` : '';
 
-      const badgeColor = isLatest ? '#dc2626' : (g.mag >= 5.0 ? '#dc2626' : '#d97706');
+      const badgeColor = isLatest ? '#dc2626' : (g.mag >= 5.0 ? '#dc2626' : '#0284c7');
       const badgeLabel = isLatest ? '🔴 GEMPA TERKINI (DETIK INI)' : (g.mag >= 5.0 ? '⚠️ GEMPA M ≥ 5.0' : '📢 GEMPA DIRASAKAN');
 
       marker.bindPopup(`
@@ -1166,70 +1080,6 @@ if payload.get("success"):
       toast.classList.remove('show');
     }, 3000);
   }
-
-  // ==========================================================================
-  // MODAL LOGIN ADMINISTRATOR (CRUD HANDLERS)
-  // ==========================================================================
-  function openLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (!modal) return;
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-      const idInput = document.getElementById('loginIdentifier');
-      if (idInput) idInput.focus();
-    }, 100);
-  }
-
-  function closeLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (!modal) return;
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  function handleModalBackdropClick(e) {
-    if (e.target.id === 'loginModal') {
-      closeLoginModal();
-    }
-  }
-
-  function togglePasswordVisibility(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    const icon = btn.querySelector('i');
-    if (input.type === 'password') {
-      input.type = 'text';
-      if (icon) {
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      }
-    } else {
-      input.type = 'password';
-      if (icon) {
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
-    }
-  }
-
-  function handleLoginSubmit(e) {
-    const form = document.getElementById('loginForm');
-    // If running inside live CKAN backend (http/https), allow standard form POST
-    if (window.location.protocol.startsWith('http') && form && form.action) {
-      return true;
-    }
-    e.preventDefault();
-    const id = document.getElementById('loginIdentifier')?.value || 'Admin';
-    closeLoginModal();
-    showToast(`Login Administrator Berhasil! Hak akses CRUD aktif untuk akun: ${id}`);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeLoginModal();
-    }
-  });
 
   // ==========================================================================
   // BUTTER-SMOOTH COMPOSITOR SCROLL & NAVBAR SYNCHRONIZER

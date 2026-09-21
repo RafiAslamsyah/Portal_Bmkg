@@ -1,0 +1,712 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ pkg_dict.title or pkg_dict.name }}{% endblock %}
+
+{% block content %}
+  {% set pkg = pkg_dict or pkg %}
+  {% set title = pkg.title or pkg.name %}
+  {% set pilar = h.bmkg_get_package_pilar(pkg) %}
+  {% set pilar_badge = h.bmkg_get_pilar_badge(pilar) %}
+  {% set org_title = pkg.organization.title if (pkg.organization and pkg.organization.title) else 'Badan Meteorologi, Klimatologi, dan Geofisika' %}
+  {% set temp_range = h.bmkg_get_temporal_range(pkg) %}
+  {% set has_ds = h.bmkg_has_datastore(pkg) %}
+  {% set ds_id = h.bmkg_get_datastore_resource_id(pkg) %}
+  {% set primary_res = h.bmkg_get_primary_resource(pkg) %}
+  {% set can_edit = h.bmkg_can_edit_package(pkg) %}
+  {% set api_url = h.bmkg_get_api_url(pkg) %}
+  <!-- Flash Messages -->
+  {% if h.get_flashed_messages() %}
+    <div class="flash-messages" style="max-width: 1240px; margin: 0.75rem auto 0 auto; padding: 0 1.25rem;">
+      {% for category, message in h.get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-dismissible fade show {{ category }}">
+          {{ h.literal(message) }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- 1. Hero Detail Dataset Section -->
+  <section class="dataset-detail-hero">
+    <div class="dataset-detail-inner">
+      
+      <!-- Breadcrumb Nav -->
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <a href="{{ h.url_for('dataset.search') }}">Katalog Dataset Terbuka</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span>{{ title|truncate(45) }}</span>
+      </div>
+
+      <!-- Top Meta Badges -->
+      <div class="dataset-top-meta-row">
+        <span class="pillar-tag {{ pilar_badge.class }}" style="font-size: 0.8rem; padding: 0.25rem 0.75rem;">
+          <i class="{{ pilar_badge.icon }}"></i> {{ pilar_badge.label }}
+        </span>
+
+        <span class="org-producer-text" style="font-weight: 600;">
+          <i class="fa-solid fa-building"></i> {{ org_title }}
+        </span>
+
+        <!-- Status Visibilitas (Publik vs Privat) -->
+        {% if pkg.private %}
+          <span class="visibility-badge private" title="Dataset Privat: Hanya terlihat oleh administrator BMKG">
+            <i class="fa-solid fa-lock"></i> Privat (Hanya Admin)
+          </span>
+        {% else %}
+          <span class="visibility-badge public" title="Dataset Terbuka: Dapat diakses bebas oleh seluruh publik">
+            <i class="fa-solid fa-globe"></i> Publik
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- H1 Dataset Title -->
+      <h1 class="dataset-title-main">
+        {{ title }}
+      </h1>
+
+      <!-- Notes / Deskripsi Singkat -->
+      <div class="dataset-notes-lead">
+        {{ h.render_markdown(pkg.notes) if pkg.notes else 'Data observasi resmi terverifikasi Badan Meteorologi, Klimatologi, dan Geofisika.' }}
+      </div>
+
+      <!-- Quick Metadata Chips -->
+      <div class="dataset-quick-chips-bar">
+        <span class="quick-chip-item">
+          <i class="fa-solid fa-scale-balanced"></i> {{ pkg.license_title if pkg.license_title else 'Creative Commons Attribution (CC-BY 4.0)' }}
+        </span>
+
+        {% if pkg.metadata_modified %}
+          <span class="quick-chip-item">
+            <i class="fa-regular fa-clock"></i> Diperbarui {{ pkg.metadata_modified[:10] }}
+          </span>
+        {% endif %}
+
+        {% if temp_range %}
+          <span class="quick-chip-item">
+            <i class="fa-regular fa-calendar"></i> {{ temp_range }}
+          </span>
+        {% endif %}
+
+        {% if has_ds %}
+          <span class="quick-chip-item" style="color: #047857; border-color: #86efac; background: #ecfdf5;">
+            <i class="fa-solid fa-database" style="color: #059669;"></i> DataStore SQL API Aktif
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- Hero Action Buttons -->
+      <div class="dataset-hero-actions-row">
+        {% if primary_res and primary_res.url %}
+          <a href="{{ primary_res.url }}" class="btn-hero-primary" target="_blank" rel="noopener noreferrer" download>
+            <i class="fa-solid fa-download"></i> Unduh Berkas Utama ({{ primary_res.format }})
+          </a>
+        {% endif %}
+
+        <button type="button" class="btn-interactive" onclick="switchDatasetTab('tab-preview')" style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--bmkg-blue-deep); padding: 0.72rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <i class="fa-solid fa-table-cells" style="color: var(--bmkg-blue);"></i> Lihat Pratinjau Tabel
+        </button>
+
+        <button type="button" class="btn-interactive" onclick="copyApiEndpoint('{{ api_url }}')" style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--text-secondary); padding: 0.72rem 1.15rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <i class="fa-solid fa-code"></i> Salin API Endpoint
+        </button>
+
+        {% if c.userobj and (c.userobj.sysadmin or can_edit) %}
+          <a href="{{ h.url_for('dataset.edit', id=pkg.name) }}" class="btn-hero-admin" title="Edit Metadata & Status Visibilitas">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Data (Admin)
+          </a>
+          <a href="{{ h.url_for('dataset.resources', id=pkg.name) }}" class="btn-hero-admin" style="background: #fdf4ff; border-color: #f5d0fe; color: #86198f !important;" title="Kelola / Unggah Berkas Baru">
+            <i class="fa-solid fa-folder-plus"></i> Kelola Berkas
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2. Two-Column Layout Grid (Main Tabs + Right Sidebar) -->
+  <div class="dataset-detail-layout">
+    
+    <!-- Left Main Column (Tabs & Content) -->
+    <main class="detail-main-content">
+      
+      <!-- Modern Navigation Tabs -->
+      <nav class="dataset-tab-nav-bar" role="tablist">
+        <button type="button" class="dataset-tab-btn active" id="btn-tab-preview" onclick="switchDatasetTab('tab-preview')">
+          <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel Data (CSV)
+        </button>
+        <button type="button" class="dataset-tab-btn" id="btn-tab-resources" onclick="switchDatasetTab('tab-resources')">
+          <i class="fa-solid fa-file-lines"></i> Berkas Sumber ({{ pkg.resources|length }})
+        </button>
+        <button type="button" class="dataset-tab-btn" id="btn-tab-api" onclick="switchDatasetTab('tab-api')">
+          <i class="fa-solid fa-code"></i> DataStore &amp; REST API
+        </button>
+        <button type="button" class="dataset-tab-btn" id="btn-tab-metadata" onclick="switchDatasetTab('tab-metadata')">
+          <i class="fa-solid fa-circle-info"></i> Metadata Teknis (SDI)
+        </button>
+      </nav>
+
+      <!-- Tab Pane 1: LIVE INTERACTIVE CSV TABLE PREVIEW -->
+      <section class="dataset-tab-pane active" id="pane-tab-preview">
+        <div class="live-table-card">
+          <!-- Toolbar -->
+          <div class="live-table-toolbar">
+            <div class="table-search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="liveTableSearchInput" placeholder="Cari data dalam tabel (suhu, tanggal, nilai)..." oninput="filterLiveTableRows()">
+            </div>
+            <div class="table-toolbar-actions">
+              <span id="liveTableRowCountBadge" style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; background: var(--canvas-white); border: 1px solid var(--border-medium); padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 700; color: var(--bmkg-blue-deep);">
+                Memuat data...
+              </span>
+              <button type="button" class="btn-interactive card-sub-btn" onclick="copyTableAsCSV()">
+                <i class="fa-solid fa-copy"></i> Salin CSV
+              </button>
+              <button type="button" class="btn-interactive card-sub-btn" onclick="copyTableAsJSON()">
+                <i class="fa-solid fa-code"></i> Salin JSON
+              </button>
+              {% if primary_res and primary_res.url %}
+                <a href="{{ primary_res.url }}" class="btn-interactive card-sub-btn" target="_blank" rel="noopener noreferrer" download style="background: var(--bmkg-blue-deep); color: #ffffff; border-color: var(--bmkg-blue-deep);">
+                  <i class="fa-solid fa-download"></i> Unduh
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="live-table-wrapper" id="liveTableScrollWrapper">
+            <div id="liveTableLoadingState" style="text-align: center; padding: 3.5rem 2rem;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.8rem; color: var(--bmkg-blue);"></i>
+              <p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600; font-size: 0.95rem;">
+                Memuat pratinjau tabel observasi BMKG...
+              </p>
+            </div>
+            <table class="live-table-data" id="liveInteractiveTable" style="display: none;">
+              <thead id="liveTableHeader"></thead>
+              <tbody id="liveTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer -->
+          <div class="live-table-footer">
+            <span id="liveTableSourceInfo">
+              <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i> Data Terkalibrasi Standar BMKG &amp; WMO
+            </span>
+            <span style="font-size: 0.78rem;">
+              Menampilkan data langsung dari <strong id="liveSourceTypeLabel">DataStore API</strong>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Pane 2: RESOURCES LIST -->
+      <section class="dataset-tab-pane" id="pane-tab-resources">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--bmkg-blue-deep); margin-bottom: 1rem;">
+          Daftar Berkas Terbuka Resmi BMKG
+        </h3>
+        
+        {% if pkg.resources %}
+          <div class="resource-list-modern">
+            {% for res in pkg.resources %}
+              {% set res_fmt = res.format or 'DATA' %}
+              {% set res_fmt_class = h.bmkg_get_format_class(res_fmt) %}
+              <div class="resource-item-card">
+                <div class="resource-info-block">
+                  <div class="resource-format-icon {{ res_fmt_class }}">
+                    {{ res_fmt[:6] }}
+                  </div>
+                  <div>
+                    <a href="{{ res.url }}" class="resource-title-link" target="_blank" rel="noopener noreferrer">
+                      {{ res.name if res.name else (res.description if res.description else 'Berkas ' ~ res_fmt) }}
+                    </a>
+                    <div class="resource-meta-text">
+                      <span><i class="fa-regular fa-file"></i> Format: <strong>{{ res_fmt }}</strong></span>
+                      {% if res.size %}
+                        <span><i class="fa-solid fa-hard-drive"></i> {{ res.size }} bytes</span>
+                      {% endif %}
+                      {% if res.datastore_active %}
+                        <span style="color: var(--bmkg-green-dark); font-weight: 700;"><i class="fa-solid fa-database"></i> DataStore Aktif</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  {% if res_fmt|lower == 'csv' %}
+                    <button type="button" class="btn-interactive card-sub-btn" onclick="switchDatasetTab('tab-preview')">
+                      <i class="fa-solid fa-table-cells"></i> Pratinjau
+                    </button>
+                  {% endif %}
+                  <a href="{{ res.url }}" class="btn-interactive card-sub-btn" target="_blank" rel="noopener noreferrer" download style="background: var(--bmkg-blue-deep); color: #ffffff; border-color: var(--bmkg-blue-deep);">
+                    <i class="fa-solid fa-download"></i> Unduh Berkas
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: var(--text-muted); font-style: italic;">Belum ada berkas yang diunggah pada dataset ini.</p>
+        {% endif %}
+      </section>
+
+      <!-- Tab Pane 3: DEVELOPER API INTEGRATION -->
+      <section class="dataset-tab-pane" id="pane-tab-api">
+        <div class="api-integration-card">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
+            Akses DataStore &amp; Action API Pengembang
+          </h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            Aplikasi pihak ketiga, sistem cerdas, dan peneliti dapat mengambil data secara terprogram menggunakan protokol HTTP REST API standar CKAN 2.10+.
+          </p>
+
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem;">
+            ENDPOINT API RESMI:
+          </label>
+          <div class="api-endpoint-box">
+            <span id="apiEndpointText">{{ api_url }}</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copyApiEndpoint('{{ api_url }}')" style="background: rgba(255, 255, 255, 0.15); border: none; color: #ffffff;">
+              <i class="fa-solid fa-copy"></i> Salin URL
+            </button>
+          </div>
+
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--bmkg-blue-deep); margin-bottom: 0.6rem;">
+            Contoh Script Pemanggilan API:
+          </h4>
+
+          <div style="margin-bottom: 1rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">1. cURL (Terminal / Command Line):</span>
+            <pre class="code-snippet-box">curl -X GET "http://localhost:5000{{ api_url }}"</pre>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">2. Python (Requests Library):</span>
+            <pre class="code-snippet-box">import requests
+
+url = "http://localhost:5000{{ api_url }}"
+response = requests.get(url)
+data = response.json()
+
+if data.get("success"):
+    records = data["result"].get("records", [])
+    print(f"Berhasil mengambil {len(records)} baris data BMKG.")
+    for r in records[:5]:
+        print(r)</pre>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">3. JavaScript (Fetch API / Node.js):</span>
+            <pre class="code-snippet-box">fetch("http://localhost:5000{{ api_url }}")
+  .then(response => response.json())
+  .then(data => {
+    console.log("Status API BMKG:", data.success);
+    console.log("Records:", data.result);
+  })
+  .catch(error => console.error("Error fetching data:", error));</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Pane 4: METADATA SDI -->
+      <section class="dataset-tab-pane" id="pane-tab-metadata">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 1rem;">
+          Metadata Teknis &amp; Standar Satu Data Indonesia (SDI)
+        </h3>
+
+        <table class="metadata-sdi-table">
+          <tbody>
+            <tr>
+              <th>Identitas Dataset (ID)</th>
+              <td><code>{{ pkg.id }}</code></td>
+            </tr>
+            <tr>
+              <th>Nama Sistem (Slug URL)</th>
+              <td><code>{{ pkg.name }}</code></td>
+            </tr>
+            <tr>
+              <th>Pilar Layanan MKG</th>
+              <td><strong>{{ pilar_badge.label }}</strong> (Kedeputian Teknis BMKG)</td>
+            </tr>
+            <tr>
+              <th>Unit Kerja Produsen Data</th>
+              <td>{{ org_title }}</td>
+            </tr>
+            <tr>
+              <th>Status Visibilitas</th>
+              <td>
+                {% if pkg.private %}
+                  <span class="visibility-badge private"><i class="fa-solid fa-lock"></i> Privat (Hanya Akses Internal Admin)</span>
+                {% else %}
+                  <span class="visibility-badge public"><i class="fa-solid fa-globe"></i> Publik (Terbuka untuk Umum Bebas Akses)</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>Lisensi Data Terbuka</th>
+              <td>{{ pkg.license_title if pkg.license_title else 'Creative Commons Attribution (CC-BY 4.0)' }}</td>
+            </tr>
+            <tr>
+              <th>Cakupan Waktu (Temporal)</th>
+              <td>{{ temp_range if temp_range else 'Deret Waktu Observasi Berkelanjutan' }}</td>
+            </tr>
+            <tr>
+              <th>Format Distribusi</th>
+              <td>
+                {% for fmt in h.dict_list_reduce(pkg.resources, 'format') %}
+                  <span class="format-badge {{ h.bmkg_get_format_class(fmt) }}">{{ fmt }}</span>
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th>Integrasi DataStore PostgreSQL</th>
+              <td>{{ 'Aktif (Dukungan SQL Query API)' if has_ds else 'Tersedia Berkas CSV Langsung' }}</td>
+            </tr>
+            <tr>
+              <th>Standar Kepatuhan Regulasi</th>
+              <td>Peraturan Presiden Republik Indonesia No. 39 Tahun 2019 tentang Satu Data Indonesia (SDI) &amp; WMO Open Data Policy Resolution 1</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+
+    <!-- Right Sidebar Detail Column -->
+    <aside class="detail-sidebar">
+      
+      <!-- Card 1: Produsen Data BMKG -->
+      <div class="sidebar-info-card">
+        <h4 class="sidebar-card-title">
+          <i class="fa-solid fa-building"></i> Produsen / Wali Data
+        </h4>
+        <div class="sidebar-org-profile">
+          <img src="/img/logo-bmkg.png" alt="Logo BMKG" class="sidebar-org-logo">
+          <div>
+            <div class="sidebar-org-name">{{ org_title }}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+          </div>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.85rem;">
+          {{ pkg.organization.description if (pkg.organization and pkg.organization.description) else 'Unit penanggung jawab akuisisi, quality control, dan pemeliharaan rekaman data observasi resmi nasional.' }}
+        </p>
+        <div class="sidebar-contact-item">
+          <i class="fa-solid fa-location-dot" style="color: var(--bmkg-blue);"></i>
+          <span>Jl. Angkasa I No. 2 Kemayoran, Jakarta Pusat</span>
+        </div>
+        <div class="sidebar-contact-item">
+          <i class="fa-solid fa-envelope" style="color: var(--bmkg-blue);"></i>
+          <span>portaldata@bmkg.go.id</span>
+        </div>
+        <div class="sidebar-contact-item">
+          <i class="fa-solid fa-phone" style="color: var(--bmkg-blue);"></i>
+          <span>Call Center BMKG: 196</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Lisensi & Hak Penggunaan -->
+      <div class="sidebar-info-card">
+        <h4 class="sidebar-card-title">
+          <i class="fa-solid fa-scale-balanced"></i> Hak Penggunaan &amp; Lisensi
+        </h4>
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem;">
+          <i class="fa-brands fa-creative-commons" style="font-size: 1.6rem; color: var(--bmkg-blue);"></i>
+          <span style="font-weight: 700; font-size: 0.88rem; color: var(--bmkg-blue-deep);">Creative Commons (CC-BY 4.0)</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0;">
+          Anda bebas mengunduh, menyalin, menganalisis, dan mempublikasikan ulang data ini untuk keperluan penelitian, komersial, maupun kebijakan dengan mencantumkan atribusi resmi: <strong>BMKG</strong>.
+        </p>
+      </div>
+
+      <!-- Card 3: Pintasan Kembali -->
+      <div class="sidebar-info-card" style="background: var(--bmkg-blue-subtle); border-color: rgba(0, 90, 158, 0.2);">
+        <h4 class="sidebar-card-title" style="border-bottom-color: rgba(0, 90, 158, 0.2);">
+          <i class="fa-solid fa-arrow-left"></i> Eksplorasi Lainnya
+        </h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Jelajahi dataset observasi meteorologi, iklim, geofisika, dan kualitas udara lainnya di katalog.
+        </p>
+        <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive" style="width: 100%; background: var(--bmkg-blue-deep); color: #ffffff; padding: 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">
+          <i class="fa-solid fa-database"></i> Kembali ke Akses Data Publik
+        </a>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-feedback" id="detailToastFeedback">
+    <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+    <span id="detailToastMessage">Tautan API berhasil disalin ke papan klip!</span>
+  </div>
+
+  <!-- Interactive JavaScript Engine: Tabs & Automatic CSV Table Renderer -->
+  <script>
+    // Tab Switching Engine
+    function switchDatasetTab(tabId) {
+      document.querySelectorAll('.dataset-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.dataset-tab-pane').forEach(function(p) { p.classList.remove('active'); });
+      
+      var targetBtn = document.getElementById('btn-' + tabId);
+      var targetPane = document.getElementById('pane-' + tabId);
+      if (targetBtn && targetPane) {
+        targetBtn.classList.add('active');
+        targetPane.classList.add('active');
+      }
+    }
+
+    // Toast Notification Engine
+    function showDetailToast(message) {
+      var toast = document.getElementById('detailToastFeedback');
+      var msgElem = document.getElementById('detailToastMessage');
+      if (!toast || !msgElem) return;
+      msgElem.textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // Copy API Endpoint
+    function copyApiEndpoint(apiUrl) {
+      var fullUrl = window.location.origin + apiUrl;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(fullUrl).then(function() {
+          showDetailToast('Endpoint API berhasil disalin: ' + fullUrl);
+        }).catch(function() {
+          fallbackCopyText(fullUrl);
+        });
+      } else {
+        fallbackCopyText(fullUrl);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      var textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showDetailToast('Teks berhasil disalin ke papan klip!');
+      } catch (err) {
+        prompt('Salin tautan berikut:', text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Global Dataset Table Records Cache
+    var _cachedTableRecords = [];
+    var _cachedTableFields = [];
+
+    // Table Row Filtering (Search inside Table)
+    function filterLiveTableRows() {
+      var query = document.getElementById('liveTableSearchInput').value.toLowerCase().trim();
+      var rows = document.querySelectorAll('#liveTableBody tr');
+      var visibleCount = 0;
+
+      rows.forEach(function(r) {
+        var text = r.textContent.toLowerCase();
+        if (text.indexOf(query) !== -1) {
+          r.style.display = '';
+          visibleCount++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+
+      var badge = document.getElementById('liveTableRowCountBadge');
+      if (badge) {
+        badge.textContent = visibleCount + ' baris ditemukan';
+      }
+    }
+
+    // Copy Table Data as CSV
+    function copyTableAsCSV() {
+      if (!_cachedTableRecords || _cachedTableRecords.length === 0) {
+        showDetailToast('Tidak ada data tabel untuk disalin.');
+        return;
+      }
+      var headers = _cachedTableFields.map(function(f) { return f.id; });
+      var lines = [headers.join(',')];
+      _cachedTableRecords.forEach(function(r) {
+        var rowVals = headers.map(function(h) {
+          var val = r[h] !== undefined && r[h] !== null ? String(r[h]) : '';
+          if (val.indexOf(',') !== -1 || val.indexOf('"') !== -1) {
+            val = '"' + val.replace(/"/g, '""') + '"';
+          }
+          return val;
+        });
+        lines.push(rowVals.join(','));
+      });
+      fallbackCopyText(lines.join('\n'));
+      showDetailToast('Seluruh data tabel (' + _cachedTableRecords.length + ' baris) disalin sebagai CSV!');
+    }
+
+    // Copy Table Data as JSON
+    function copyTableAsJSON() {
+      if (!_cachedTableRecords || _cachedTableRecords.length === 0) {
+        showDetailToast('Tidak ada data tabel untuk disalin.');
+        return;
+      }
+      fallbackCopyText(JSON.stringify(_cachedTableRecords, null, 2));
+      showDetailToast('Data tabel (' + _cachedTableRecords.length + ' baris) disalin sebagai JSON!');
+    }
+
+    // Render Data into Table DOM
+    function renderTableDOM(fields, records, sourceLabel) {
+      _cachedTableFields = fields;
+      _cachedTableRecords = records;
+
+      var tableElem = document.getElementById('liveInteractiveTable');
+      var headerElem = document.getElementById('liveTableHeader');
+      var bodyElem = document.getElementById('liveTableBody');
+      var loadingElem = document.getElementById('liveTableLoadingState');
+      var badgeElem = document.getElementById('liveTableRowCountBadge');
+      var sourceLabelElem = document.getElementById('liveSourceTypeLabel');
+
+      if (!tableElem || !headerElem || !bodyElem) return;
+
+      if (sourceLabelElem && sourceLabel) {
+        sourceLabelElem.textContent = sourceLabel;
+      }
+
+      // Render Headers
+      var hHtml = '<tr>';
+      fields.forEach(function(f) {
+        hHtml += '<th>' + f.id + '</th>';
+      });
+      hHtml += '</tr>';
+      headerElem.innerHTML = hHtml;
+
+      // Render Rows
+      var bHtml = '';
+      records.forEach(function(r) {
+        bHtml += '<tr>';
+        fields.forEach(function(f) {
+          var val = r[f.id];
+          if (val === null || val === undefined) val = '-';
+          bHtml += '<td>' + val + '</td>';
+        });
+        bHtml += '</tr>';
+      });
+      bodyElem.innerHTML = bHtml;
+
+      if (badgeElem) {
+        badgeElem.textContent = records.length + ' baris data';
+      }
+
+      if (loadingElem) loadingElem.style.display = 'none';
+      tableElem.style.display = '';
+    }
+
+    // Simple robust CSV Text Parser
+    function parseCSVText(text) {
+      var lines = text.trim().split(/\r\n|\n/);
+      if (lines.length < 1) return { fields: [], records: [] };
+      
+      var parseLine = function(line) {
+        var values = [];
+        var inQuotes = false;
+        var curVal = '';
+        for (var i = 0; i < line.length; i++) {
+          var c = line[i];
+          if (c === '"') {
+            if (inQuotes && i + 1 < line.length && line[i+1] === '"') {
+              curVal += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (c === ',' && !inQuotes) {
+            values.push(curVal.trim());
+            curVal = '';
+          } else {
+            curVal += c;
+          }
+        }
+        values.push(curVal.trim());
+        return values;
+      };
+
+      var headerNames = parseLine(lines[0]);
+      var fields = headerNames.map(function(h) { return { id: h }; });
+      var records = [];
+
+      for (var j = 1; j < lines.length; j++) {
+        if (!lines[j].trim()) continue;
+        var rowVals = parseLine(lines[j]);
+        var rowObj = {};
+        for (var k = 0; k < headerNames.length; k++) {
+          rowObj[headerNames[k]] = rowVals[k] !== undefined ? rowVals[k] : '';
+        }
+        records.push(rowObj);
+      }
+
+      return { fields: fields, records: records };
+    }
+
+    // Automatic Bootstrapper on Page Load
+    document.addEventListener('DOMContentLoaded', function() {
+      var dsId = "{{ ds_id or '' }}";
+      var primaryUrl = "{{ primary_res.url if (primary_res and primary_res.url) else '' }}";
+      var primaryFormat = "{{ primary_res.format|lower if primary_res else '' }}";
+
+      if (dsId) {
+        // Mode 1: Fetch via CKAN DataStore API
+        fetch('/api/3/action/datastore_search?resource_id=' + dsId + '&limit=100')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data.success && data.result && data.result.records && data.result.records.length > 0) {
+              var records = data.result.records;
+              var fields = data.result.fields || Object.keys(records[0]).map(function(k) { return { id: k }; });
+              renderTableDOM(fields, records, 'DataStore PostgreSQL API');
+            } else if (primaryUrl && primaryFormat === 'csv') {
+              fetchCSVFallback(primaryUrl);
+            } else {
+              renderEmptyFallback('Tabel DataStore belum memiliki baris data.');
+            }
+          })
+          .catch(function(err) {
+            if (primaryUrl && primaryFormat === 'csv') {
+              fetchCSVFallback(primaryUrl);
+            } else {
+              renderEmptyFallback('Gagal memuat DataStore PostgreSQL.');
+            }
+          });
+      } else if (primaryUrl && primaryFormat === 'csv') {
+        // Mode 2: Fetch and parse CSV directly from download URL
+        fetchCSVFallback(primaryUrl);
+      } else {
+        renderEmptyFallback('Dataset ini menggunakan format ' + (primaryFormat ? primaryFormat.toUpperCase() : 'Non-CSV') + '. Silakan unduh berkas pada tab Berkas Sumber.');
+      }
+    });
+
+    function fetchCSVFallback(csvUrl) {
+      fetch(csvUrl)
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var parsed = parseCSVText(text);
+          if (parsed.records && parsed.records.length > 0) {
+            renderTableDOM(parsed.fields, parsed.records, 'Berkas CSV Langsung');
+          } else {
+            renderEmptyFallback('Berkas CSV tidak memiliki baris data.');
+          }
+        })
+        .catch(function(err) {
+          renderEmptyFallback('Tidak dapat mengurai berkas CSV secara langsung.');
+        });
+    }
+
+    function renderEmptyFallback(message) {
+      var loadingElem = document.getElementById('liveTableLoadingState');
+      var badgeElem = document.getElementById('liveTableRowCountBadge');
+      if (badgeElem) badgeElem.textContent = '0 baris';
+      if (loadingElem) {
+        loadingElem.innerHTML = '<div style="padding: 2.5rem 1.5rem; text-align: center;"><i class="fa-solid fa-file-circle-exclamation" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.75rem;"></i><h4 style="color: var(--bmkg-blue-deep); margin-bottom: 0.35rem;">Pratinjau Tabel Tidak Tersedia</h4><p style="color: var(--text-muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem auto;">' + message + '</p><button class="btn-interactive card-sub-btn" onclick="switchDatasetTab(\'tab-resources\')"><i class="fa-solid fa-folder-open"></i> Buka Tab Berkas Sumber</button></div>';
+      }
+    }
+  </script>
+{% endblock %}
