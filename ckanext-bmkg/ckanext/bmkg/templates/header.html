@@ -106,3 +106,7 @@
       </div>
     </div>
   </header>
+
+  {% if not c.userobj %}
+    {% snippet 'snippets/login_modal.html' %}
+  {% endif %}

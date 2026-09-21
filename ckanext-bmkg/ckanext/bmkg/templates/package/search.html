@@ -1,0 +1,194 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Katalog Dataset Terbuka BMKG') }}{% endblock %}
+
+{% block content %}
+  <!-- Flash Messages -->
+  {% block flash %}
+    {% if h.get_flashed_messages() %}
+      <div class="flash-messages" style="max-width: 1280px; margin: 1rem auto 0 auto; padding: 0 2rem;">
+        {% for category, message in h.get_flashed_messages(with_categories=true) %}
+          <div class="alert alert-dismissible fade show {{ category }}">
+            {{ h.literal(message) }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  <!-- 3. Top Banner & Catalog Search -->
+  <section class="catalog-top-banner">
+    <div class="catalog-top-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span>Katalog Dataset Terbuka</span>
+      </div>
+
+      <h1 class="catalog-header-title">Katalog Dataset Terbuka BMKG</h1>
+      <p class="catalog-header-desc">
+        Temukan data observasi meteorologi, deret waktu iklim, katalog seismik gempa bumi, dan pemantauan kualitas udara di seluruh Indonesia dengan filter multi-pilar.
+      </p>
+
+      <form class="catalog-search-row" method="get" action="{{ h.url_for('dataset.search') }}">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            name="q" 
+            id="catalogSearchInput" 
+            value="{{ q or '' }}" 
+            class="catalog-search-input" 
+            placeholder="Cari kata kunci dataset, kode WMO, stasiun UPT, atau parameter cuaca..."
+          />
+        </div>
+        {% for key in request.args %}
+          {% if key not in ['q', 'page'] %}
+            {% for val in request.args.getlist(key) %}
+              <input type="hidden" name="{{ key }}" value="{{ val }}">
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn-interactive btn-search-catalog">
+          <i class="fa-solid fa-filter"></i> Saring Data
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 4. Main Two-Column Layout (Facet Sidebar + Results) -->
+  <div class="catalog-layout-container">
+    
+    <!-- Left Column: Facet Filters -->
+    <aside class="facet-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-sliders"></i> Filter Pencarian
+        </div>
+        <a href="{{ h.url_for('dataset.search') }}" class="btn-reset-filters">Reset Saring</a>
+      </div>
+
+      <!-- Spatial Filter Callout -->
+      <div class="spatial-filter-box">
+        <h5><i class="fa-solid fa-map-location-dot"></i> Filter Wilayah Spasial</h5>
+        <p>Saring dataset observasi berdasarkan Bounding Box peta (ckanext-spatial).</p>
+        <a href="{{ h.url_for('home.index') }}#peta" class="btn-interactive btn-spatial-toggle" style="text-decoration: none; text-align: center; display: block;">
+          <i class="fa-solid fa-draw-polygon"></i> Buka Peta Observasi
+        </a>
+      </div>
+
+      <!-- Dynamic Facets from CKAN / Solr -->
+      {% for facet_name, facet_title in facet_titles.items() %}
+        {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
+        {% if items %}
+          <div class="filter-group">
+            <div class="filter-group-title">
+              <span>{{ facet_title }}</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+            </div>
+            <ul class="filter-items-list">
+              {% for item in items %}
+                {% set href = h.remove_url_param(facet_name, item.name) if item.active else h.add_url_param(new_params={facet_name: item.name}) %}
+                <li>
+                  <a href="{{ href }}" class="filter-item-label" style="text-decoration: none; {% if item.active %}background: var(--bmkg-blue-subtle);{% endif %}">
+                    <span class="filter-checkbox-wrap">
+                      <input type="checkbox" {% if item.active %}checked{% endif %} style="pointer-events: none;">
+                      <span style="{% if item.active %}font-weight: 700; color: var(--bmkg-blue-deep);{% endif %}">
+                        {{ item.display_name }}
+                      </span>
+                    </span>
+                    <span class="filter-count-badge">{{ item.count }}</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </aside>
+
+    <!-- Right Column: Result Status Bar & Cards -->
+    <main class="catalog-main-content">
+      
+      <!-- Top Control Bar (Item Count & Sorting) -->
+      <div class="filter-status-bar">
+        <div class="result-count-text">
+          Ditemukan <strong id="datasetResultCount">{{ page.item_count }}</strong> dataset terbuka
+          {% if q %} untuk pencarian "<strong>{{ q }}</strong>"{% endif %}
+        </div>
+
+        <div class="sort-control-group">
+          <label for="sortSelector">Urutkan:</label>
+          <select id="sortSelector" class="sort-select" onchange="window.location.href = this.value;">
+            {% set sort_options = [
+              ('Paling Relevan', 'score desc, metadata_modified desc'),
+              ('Terbaru Diperbarui', 'metadata_modified desc'),
+              ('Judul (A - Z)', 'title_string asc'),
+              ('Judul (Z - A)', 'title_string desc')
+            ] %}
+            {% for label, sort_val in sort_options %}
+              <option value="{{ h.add_url_param(new_params={'sort': sort_val}) }}" {% if sort_by_selected == sort_val %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filter Chips Row -->
+      <div class="active-chips-row" id="activeChipsContainer">
+        {% if q %}
+          <span class="chip-badge">
+            <span>Kata Kunci: "<strong>{{ q }}</strong>"</span>
+            <a href="{{ h.remove_url_param('q') }}" style="color: inherit; text-decoration: none; margin-left: 4px;">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </a>
+          </span>
+        {% endif %}
+
+        {% for facet_name, facet_title in facet_titles.items() %}
+          {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
+          {% for item in items %}
+            {% if item.active %}
+              <span class="chip-badge">
+                <span>{{ facet_title }}: <strong>{{ item.display_name }}</strong></span>
+                <a href="{{ h.remove_url_param(facet_name, item.name) }}" style="color: inherit; text-decoration: none; margin-left: 4px;">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                </a>
+              </span>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+
+      <!-- Dataset Cards List -->
+      <div class="dataset-list" id="datasetListContainer">
+        {% if page.items %}
+          {% for package in page.items %}
+            {% snippet 'package/snippets/package_item.html', package=package %}
+          {% endfor %}
+        {% else %}
+          <div style="background: var(--canvas-white); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3.5rem 2rem; text-align: center;">
+            <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--bmkg-blue-deep); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Tidak Ada Dataset Ditemukan</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.5rem auto;">
+              Tidak ada dataset yang cocok dengan kombinasi kata kunci atau filter pencarian yang Anda pilih.
+            </p>
+            <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive btn-search-catalog" style="text-decoration: none; display: inline-flex;">
+              <i class="fa-solid fa-rotate-left"></i> Reset Semua Filter
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if page.item_count > page.items_per_page %}
+        <div style="margin-top: 2rem; display: flex; justify-content: center;">
+          {{ page.pager(q=q) }}
+        </div>
+      {% endif %}
+
+    </main>
+  </div>
+
+{% endblock %}
