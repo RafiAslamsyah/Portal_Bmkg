@@ -1477,7 +1477,7 @@
       <!-- Top Control Bar (Item Count & Sorting) -->
       <div class="filter-status-bar">
         <div class="result-count-text">
-          Ditemukan <strong id="datasetResultCount">6</strong> dari <strong>1.482</strong> dataset terbuka
+          Ditemukan <strong id="datasetResultCount">0</strong> dari <strong id="datasetTotalCount">0</strong> dataset terbuka
         </div>
 
         <div class="sort-control-group">
@@ -1494,229 +1494,9 @@
       <!-- Active Filter Chips Row -->
       <div class="active-chips-row" id="activeChipsContainer"></div>
 
-      <!-- Dataset Cards List -->
+      <!-- Dataset Cards List (rendered dynamically from localStorage) -->
       <div class="dataset-list" id="datasetListContainer">
-        
-        <!-- Card 1: Cuaca Harian Cengkareng -->
-        <article class="dataset-card" data-pilar="meteorologi" data-format="csv" data-org="balai2" data-time="harian">
-          <div class="card-top-meta">
-            <span class="pillar-tag met"><i class="fa-solid fa-cloud-sun"></i> Meteorologi</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Stasiun Meteorologi Kelas I Soekarno-Hatta (BBMKG Wilayah II)</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('cuaca-harian-cengkareng')">
-            Data Observasi Cuaca Harian Permukaan Stasiun Soekarno-Hatta (WMO: 96749) Tahun 2026
-          </a>
-
-          <p class="dataset-card-description">
-            Dataset time-series rekaman harian parameter atmosfer permukaan meliputi suhu minimum, suhu maksimum, suhu rata-rata, kelembapan nisbi udara, kecepatan angin maksimum, dan curah hujan harian terkalibrasi.
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge csv">CSV</span>
-              <span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
-                <i class="fa-solid fa-database"></i> DataStore API Aktif
-              </span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-calendar"></i> 01 Agu 2026 – 31 Agu 2026
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel DataStore...')">
-                <i class="fa-solid fa-table-cells"></i> Pratinjau
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas CSV resmi...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 2: Gempa Bumi Tektonik M5+ -->
-        <article class="dataset-card" data-pilar="geofisika" data-format="geojson kml" data-org="pusat" data-time="harian">
-          <div class="card-top-meta">
-            <span class="pillar-tag geo"><i class="fa-solid fa-volcano"></i> Geofisika</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Gempa Bumi dan Tsunami (Kedeputian Bidang Geofisika)</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('katalog-gempa-m5')">
-            Katalog Riwayat Gempa Bumi Tektonik Magnitudo &ge; 5.0 Wilayah Indonesia Bulan Agustus 2026
-          </a>
-
-          <p class="dataset-card-description">
-            Data geospasial titik episentrum, kedalaman sumber gempa, magnitudo, estimasi waktu penjalaran gelombang, dan status potensi ancaman tsunami di seluruh zona seismogenik dan subduksi lempeng nusantara.
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge geojson">GeoJSON</span>
-              <span class="format-badge kml">KML</span>
-              <span class="format-badge csv">CSV</span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-calendar"></i> 01 Agu 2026 – 15 Agu 2026
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Peta Geoview Leaflet...')">
-                <i class="fa-solid fa-map"></i> Peta Geoview
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh GeoJSON...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 3: Curah Hujan Dasarian Iklim -->
-        <article class="dataset-card" data-pilar="klimatologi" data-format="csv netcdf" data-org="pusat" data-time="dasarian">
-          <div class="card-top-meta">
-            <span class="pillar-tag klim"><i class="fa-solid fa-temperature-half"></i> Klimatologi</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Layanan Informasi Iklim Terapan (Kedeputian Bidang Klimatologi)</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('curah-hujan-dasarian')">
-            Distribusi Curah Hujan Dasarian dan Analisis Sifat Hujan Nasional Periode 2026
-          </a>
-
-          <p class="dataset-card-description">
-            Informasi akumulasi curah hujan per periode 10-harian (Dasarian I, II, III) dari seluruh jaringan pos hujan dan stasiun klimatologi BMKG, dilengkapi klasifikasi sifat hujan Atas Normal (AN), Normal (N), dan Bawah Normal (BN).
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge csv">CSV</span>
-              <span class="format-badge netcdf">NetCDF</span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-calendar"></i> Januari 2026 – Agustus 2026
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel...')">
-                <i class="fa-solid fa-table-cells"></i> Pratinjau
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 4: Kualitas Udara Partikulat PM2.5 -->
-        <article class="dataset-card" data-pilar="kualitas-udara" data-format="csv" data-org="balai2" data-time="jam">
-          <div class="card-top-meta">
-            <span class="pillar-tag ku"><i class="fa-solid fa-wind"></i> Kualitas Udara</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Stasiun Pemantau Atmosfer Global (GAW) Kemayoran</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('kualitas-udara-pm25')">
-            Konsentrasi Partikulat Atmosfer PM2.5 Per Jam Stasiun Kemayoran Jakarta Pusat 2026
-          </a>
-
-          <p class="dataset-card-description">
-            Pemantauan instan konsentrasi partikel udara berukuran diameter &le; 2.5 mikrometer (&mu;g/m&sup3;) yang diukur menggunakan alat ukur otomatis Beta Attenuation Monitor (BAM-1020) sesuai standar World Meteorological Organization (WMO).
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge csv">CSV</span>
-              <span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
-                <i class="fa-solid fa-bolt"></i> Realtime Stream
-              </span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-clock"></i> Observasi Per Jam
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel...')">
-                <i class="fa-solid fa-table-cells"></i> Pratinjau
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas CSV...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 5: Prakiraan Gelombang Maritim -->
-        <article class="dataset-card" data-pilar="meteorologi" data-format="geojson netcdf" data-org="pusat" data-time="harian">
-          <div class="card-top-meta">
-            <span class="pillar-tag met"><i class="fa-solid fa-cloud-sun"></i> Meteorologi</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Pusat Meteorologi Maritim (Kedeputian Bidang Meteorologi)</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('gelombang-maritim')">
-            Prakiraan Tinggi Gelombang Signifikan dan Angin Permukaan Wilayah Perairan Indonesia
-          </a>
-
-          <p class="dataset-card-description">
-            Hasil pemodelan numerik gelombang laut (WaveWatch III) beresolusi tinggi yang memetakan potensi tinggi gelombang kategori tenang, sedang, tinggi (2.5 - 4.0 m), hingga sangat tinggi di jalur pelayaran nusantara.
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge geojson">GeoJSON</span>
-              <span class="format-badge netcdf">NetCDF</span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-calendar"></i> Prakiraan Harian 7 Hari
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Geoview...')">
-                <i class="fa-solid fa-map"></i> Peta Gelombang
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 6: Kerapatan Sambaran Petir -->
-        <article class="dataset-card" data-pilar="geofisika" data-format="csv geojson" data-org="balai1" data-time="harian">
-          <div class="card-top-meta">
-            <span class="pillar-tag geo"><i class="fa-solid fa-volcano"></i> Geofisika</span>
-            <span class="org-producer-text"><i class="fa-solid fa-building"></i> Balai Besar MKG Wilayah I Medan</span>
-          </div>
-
-          <a href="#" class="dataset-card-title" onclick="openDatasetDetail('petir-sumatera')">
-            Peta Kerapatan Sambaran Petir (Lightning Detector CG/IC) Wilayah Sumatera Bagian Utara
-          </a>
-
-          <p class="dataset-card-description">
-            Data deteksi sambaran petir Cloud-to-Ground (CG) dan Intra-Cloud (IC) dari sensor Lightning Detector jaringan BMKG Wilayah I untuk analisis kerentanan infrastruktur ketenagalistrikan dan telekomunikasi.
-          </p>
-
-          <div class="card-bottom-row">
-            <div class="format-pills-group">
-              <span class="format-badge csv">CSV</span>
-              <span class="format-badge geojson">GeoJSON</span>
-            </div>
-
-            <div class="temporal-range-tag">
-              <i class="fa-regular fa-calendar"></i> Juli 2026 – Agustus 2026
-            </div>
-
-            <div class="card-action-links">
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Pratinjau Tabel...')">
-                <i class="fa-solid fa-table-cells"></i> Pratinjau
-              </button>
-              <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh data...')">
-                <i class="fa-solid fa-download"></i> Unduh
-              </button>
-            </div>
-          </div>
-        </article>
+        <!-- Cards are rendered by JavaScript -->
 
       </div>
 
@@ -1981,7 +1761,143 @@
       }, 10);
     });
 
+    // ==========================================================================
+    // SEED DATA — 1 dataset default untuk presentasi
+    // ==========================================================================
+    const SEED_DATASETS = [
+      {
+        id: 'cuaca-harian-cengkareng',
+        pilar: 'meteorologi',
+        formats: ['csv'],
+        org: 'balai2',
+        time: 'harian',
+        title: 'Data Observasi Cuaca Harian Permukaan Stasiun Soekarno-Hatta (WMO: 96749) Tahun 2026',
+        description: 'Dataset time-series rekaman harian parameter atmosfer permukaan meliputi suhu minimum, suhu maksimum, suhu rata-rata, kelembapan nisbi udara, kecepatan angin maksimum, dan curah hujan harian terkalibrasi.',
+        producer: 'Stasiun Meteorologi Kelas I Soekarno-Hatta (BBMKG Wilayah II)',
+        temporalRange: '01 Agu 2026 – 31 Agu 2026',
+        datastoreActive: true
+      }
+    ];
+
+    // ==========================================================================
+    // PILAR CONFIG — mapping pilar ke tag class, icon, dan label
+    // ==========================================================================
+    const PILAR_CONFIG = {
+      'meteorologi':    { cls: 'met',  icon: 'fa-cloud-sun',        label: 'Meteorologi' },
+      'klimatologi':    { cls: 'klim', icon: 'fa-temperature-half', label: 'Klimatologi' },
+      'geofisika':      { cls: 'geo',  icon: 'fa-volcano',          label: 'Geofisika' },
+      'kualitas-udara': { cls: 'ku',   icon: 'fa-wind',             label: 'Kualitas Udara' }
+    };
+
+    // ==========================================================================
+    // LOCALSTORAGE HELPERS
+    // ==========================================================================
+    const STORAGE_KEY = 'bmkg_datasets';
+
+    function getDatasets() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        // Pertama kali: simpan seed data
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATASETS));
+        return [...SEED_DATASETS];
+      }
+      return JSON.parse(raw);
+    }
+
+    function saveDatasets(datasets) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(datasets));
+    }
+
+    // ==========================================================================
+    // RENDER DATASET CARDS
+    // ==========================================================================
+    function renderDatasetCards() {
+      const container = document.getElementById('datasetListContainer');
+      const datasets = getDatasets();
+
+      container.innerHTML = '';
+
+      if (datasets.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; color: var(--border-medium);"></i>
+            <p style="font-size: 1.05rem; font-weight: 600;">Belum ada dataset tersedia</p>
+            <p style="font-size: 0.85rem;">Dataset akan muncul setelah admin menginput data melalui panel admin.</p>
+          </div>
+        `;
+        document.getElementById('datasetResultCount').textContent = '0';
+        document.getElementById('datasetTotalCount').textContent = '0';
+        return;
+      }
+
+      datasets.forEach(ds => {
+        const pilarInfo = PILAR_CONFIG[ds.pilar] || { cls: 'met', icon: 'fa-database', label: ds.pilar };
+
+        // Format badges
+        const formatBadges = (ds.formats || []).map(f =>
+          `<span class="format-badge ${f.toLowerCase()}">${f.toUpperCase()}</span>`
+        ).join('');
+
+        // DataStore badge
+        const datastoreBadge = ds.datastoreActive
+          ? `<span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
+               <i class="fa-solid fa-database"></i> DataStore API Aktif
+             </span>`
+          : '';
+
+        const cardHTML = `
+          <article class="dataset-card" data-pilar="${ds.pilar}" data-format="${(ds.formats || []).join(' ')}" data-org="${ds.org || ''}" data-time="${ds.time || ''}">
+            <div class="card-top-meta">
+              <span class="pillar-tag ${pilarInfo.cls}"><i class="fa-solid ${pilarInfo.icon}"></i> ${pilarInfo.label}</span>
+              <span class="org-producer-text"><i class="fa-solid fa-building"></i> ${ds.producer || '-'}</span>
+            </div>
+
+            <a href="#" class="dataset-card-title" onclick="openDatasetDetail('${ds.id}')">
+              ${ds.title}
+            </a>
+
+            <p class="dataset-card-description">
+              ${ds.description}
+            </p>
+
+            <div class="card-bottom-row">
+              <div class="format-pills-group">
+                ${formatBadges}
+                ${datastoreBadge}
+              </div>
+
+              <div class="temporal-range-tag">
+                <i class="fa-regular fa-calendar"></i> ${ds.temporalRange || '-'}
+              </div>
+
+              <div class="card-action-links">
+                <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel DataStore...')">
+                  <i class="fa-solid fa-table-cells"></i> Pratinjau
+                </button>
+                <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas...')">
+                  <i class="fa-solid fa-download"></i> Unduh
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+
+        container.innerHTML += cardHTML;
+      });
+
+      // Update counters
+      document.getElementById('datasetTotalCount').textContent = datasets.length;
+      document.getElementById('datasetResultCount').textContent = datasets.length;
+    }
+
+    // ==========================================================================
+    // INIT — render cards on page load
+    // ==========================================================================
+    renderDatasetCards();
+
+    // ==========================================================================
     // Modal Login & Register Handlers
+    // ==========================================================================
     function openLoginModal(defaultTab = 'login') {
       const modal = document.getElementById('loginModal');
       modal.classList.add('active');
@@ -2146,7 +2062,9 @@
       }
     });
 
-    // Live Filter & Search Logic
+    // ==========================================================================
+    // Live Filter & Search Logic (works with dynamic cards)
+    // ==========================================================================
     function applyFilterAndSearch() {
       const searchInput = document.getElementById('catalogSearchInput').value.trim().toLowerCase();
       
@@ -2159,8 +2077,10 @@
       let visibleCount = 0;
 
       cards.forEach(card => {
-        const title = card.querySelector('.dataset-card-title').textContent.toLowerCase();
-        const desc = card.querySelector('.dataset-card-description').textContent.toLowerCase();
+        const titleEl = card.querySelector('.dataset-card-title');
+        const descEl = card.querySelector('.dataset-card-description');
+        const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+        const desc = descEl ? descEl.textContent.toLowerCase() : '';
         const pilar = card.getAttribute('data-pilar') || '';
         const formats = (card.getAttribute('data-format') || '').split(' ');
         const org = card.getAttribute('data-org') || '';
@@ -2278,6 +2198,16 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
+
+    // ==========================================================================
+    // LISTEN FOR STORAGE CHANGES (from admin panel in another tab)
+    // ==========================================================================
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        renderDatasetCards();
+        applyFilterAndSearch();
+      }
+    });
 
     // ==========================================================================
     // REAL-TIME CLOCK INITIALIZATION
