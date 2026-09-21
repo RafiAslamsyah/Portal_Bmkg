@@ -952,33 +952,41 @@
     }
 
     .spatial-card-header {
-      padding: 1.25rem 1.75rem;
+      padding: 0.85rem 1.25rem;
       background: var(--canvas-subtle);
       border-bottom: 1px solid var(--border-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.65rem;
     }
 
     .spatial-title-group h3 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--bmkg-blue-deep);
     }
 
     .spatial-title-group p {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .spatial-controls-bar {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 0.75rem;
+      flex-wrap: nowrap;
+      gap: 0.35rem;
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .spatial-controls-bar::-webkit-scrollbar {
+      display: none;
     }
 
     /* Map & Regional Selector Dropdowns */
@@ -987,15 +995,17 @@
       background: var(--canvas-white);
       border: 1px solid var(--border-medium);
       color: var(--bmkg-blue-deep);
-      padding: 0.45rem 0.85rem;
+      padding: 0.32rem 0.55rem;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 600;
       font-family: inherit;
       outline: none;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
       transition: border-color 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .basemap-select:hover,
@@ -1013,18 +1023,23 @@
       background: var(--canvas-white);
       border: 1px solid var(--border-medium);
       color: var(--text-secondary);
-      padding: 0.45rem 1rem;
+      padding: 0.32rem 0.6rem;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
     .filter-pill-btn:hover {
       border-color: var(--bmkg-blue);
       color: var(--bmkg-blue);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
 
     .filter-pill-btn.active {
@@ -1032,6 +1047,18 @@
       border-color: var(--bmkg-blue-deep);
       color: #ffffff;
       box-shadow: 0 2px 8px rgba(0, 56, 101, 0.25);
+    }
+
+    @media (max-width: 1280px) {
+      .spatial-card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+      }
+      .spatial-controls-bar {
+        width: 100%;
+        justify-content: flex-start;
+      }
     }
 
     .spatial-map-wrapper {
@@ -1625,10 +1652,6 @@
   <!-- 3. Hero Section with Live Search Filter -->
   <section class="hero-banner">
     <div class="hero-content">
-      <div class="hero-meta-tag">
-        <i class="fa-solid fa-unlock-keyhole"></i>
-        <span>Data Terbuka Publik Resmi — Bebas Akses, Unduh &amp; API Tanpa Perlu Login</span>
-      </div>
       <h1 class="hero-title">
         Satu Pintu Akses Data Meteorologi, Klimatologi, dan Geofisika
       </h1>
@@ -1824,27 +1847,27 @@
         <div class="spatial-controls-bar">
           <!-- Pilihan Peta Berwarna (Bebas Blokir OSM) -->
           <select class="basemap-select" id="basemapSelector" onchange="changeBasemap(this.value)">
-            <option value="street">🗺️ Peta Berwarna (Esri Street Map)</option>
-            <option value="topo">🏔️ Topografi Berwarna (Esri Topo)</option>
-            <option value="satellite">🛰️ Citra Satelit Berwarna (Esri World)</option>
-            <option value="natgeo">🧭 National Geographic (Esri NatGeo)</option>
+            <option value="street">🗺️ Street Map</option>
+            <option value="topo">🏔️ Topografi</option>
+            <option value="satellite">🛰️ Citra Satelit</option>
+            <option value="natgeo">🧭 NatGeo</option>
           </select>
 
           <!-- Regional FlyTo Selector -->
           <select class="region-select" id="regionSelector" onchange="flyToRegion(this.value)">
-            <option value="indonesia">🌍 Seluruh Indonesia</option>
-            <option value="sumatera">Pulau Sumatera (Balai I)</option>
+            <option value="indonesia">🌍 Indonesia</option>
+            <option value="sumatera">Sumatera (Balai I)</option>
             <option value="jawa">Jawa &amp; Banten (Balai II)</option>
-            <option value="balinusra">Bali, NTB &amp; NTT (Balai III)</option>
-            <option value="sulawesi">Sulawesi &amp; Maluku (Balai IV)</option>
-            <option value="papua">Papua &amp; Papua Barat (Balai V)</option>
+            <option value="balinusra">Bali-Nusra (Balai III)</option>
+            <option value="sulawesi">Sulawesi (Balai IV)</option>
+            <option value="papua">Papua (Balai V)</option>
           </select>
 
           <button class="btn-interactive filter-pill-btn active" id="filterStasiun" onclick="toggleMapLayer('stasiun')">
             <i class="fa-solid fa-tower-broadcast"></i> Stasiun UPT
           </button>
           <button class="btn-interactive filter-pill-btn active" id="filterGempaAll" onclick="setGempaDisplayFilter('all')">
-            <i class="fa-solid fa-circle-nodes"></i> Semua Gempa (<span id="countAllGempa">30</span>)
+            <i class="fa-solid fa-circle-nodes"></i> Semua (<span id="countAllGempa">30</span>)
           </button>
           <button class="btn-interactive filter-pill-btn" id="filterGempaM5" onclick="setGempaDisplayFilter('m5')">
             <i class="fa-solid fa-triangle-exclamation"></i> M &ge; 5.0 (<span id="countM5Gempa">15</span>)
@@ -1853,6 +1876,8 @@
             <i class="fa-solid fa-bullhorn"></i> Dirasakan (<span id="countDirasakanGempa">15</span>)
           </button>
         </div>
+      </div>
+
       <!-- Real-Time BMKG TEWS Alert Bar -->
       <div class="live-tews-alert-bar" id="liveTewsBar" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.96) 100%); border: 1px solid rgba(239, 68, 68, 0.45); border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);">
         <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">

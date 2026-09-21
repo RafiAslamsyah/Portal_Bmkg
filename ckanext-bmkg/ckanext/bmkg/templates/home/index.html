@@ -4,10 +4,6 @@
 <!-- 3. Hero Section with Live Search Filter -->
 <section class="hero-banner">
   <div class="hero-content">
-    <div class="hero-meta-tag">
-      <i class="fa-solid fa-unlock-keyhole"></i>
-      <span>Data Terbuka Publik Resmi — Bebas Akses, Unduh &amp; API Tanpa Perlu Login</span>
-    </div>
     <h1 class="hero-title">
       Satu Pintu Akses Data Meteorologi, Klimatologi, dan Geofisika
     </h1>
@@ -212,20 +208,20 @@
       <div class="spatial-controls-bar">
         <!-- Pilihan Peta Berwarna (Bebas Blokir OSM) -->
         <select class="basemap-select" id="basemapSelector" onchange="changeBasemap(this.value)">
-          <option value="street">🗺️ Peta Berwarna (Esri Street Map)</option>
-          <option value="topo">🏔️ Topografi Berwarna (Esri Topo)</option>
-          <option value="satellite">🛰️ Citra Satelit Berwarna (Esri World)</option>
-          <option value="natgeo">🧭 National Geographic (Esri NatGeo)</option>
+          <option value="street">🗺️ Street Map</option>
+          <option value="topo">🏔️ Topografi</option>
+          <option value="satellite">🛰️ Citra Satelit</option>
+          <option value="natgeo">🧭 NatGeo</option>
         </select>
 
         <!-- Regional FlyTo Selector -->
         <select class="region-select" id="regionSelector" onchange="flyToRegion(this.value)">
-          <option value="indonesia">🌍 Seluruh Indonesia</option>
-          <option value="sumatera">Pulau Sumatera (Balai I)</option>
+          <option value="indonesia">🌍 Indonesia</option>
+          <option value="sumatera">Sumatera (Balai I)</option>
           <option value="jawa">Jawa &amp; Banten (Balai II)</option>
-          <option value="balinusra">Bali, NTB &amp; NTT (Balai III)</option>
-          <option value="sulawesi">Sulawesi &amp; Maluku (Balai IV)</option>
-          <option value="papua">Papua &amp; Papua Barat (Balai V)</option>
+          <option value="balinusra">Bali-Nusra (Balai III)</option>
+          <option value="sulawesi">Sulawesi (Balai IV)</option>
+          <option value="papua">Papua (Balai V)</option>
         </select>
 
         <button class="btn-interactive filter-pill-btn active" id="filterStasiun" onclick="toggleMapLayer('stasiun')">
@@ -233,7 +229,7 @@
         </button>
         <button class="btn-interactive filter-pill-btn active" id="filterGempaAll"
           onclick="setGempaDisplayFilter('all')">
-          <i class="fa-solid fa-circle-nodes"></i> Semua Gempa (<span id="countAllGempa">30</span>)
+          <i class="fa-solid fa-circle-nodes"></i> Semua (<span id="countAllGempa">30</span>)
         </button>
         <button class="btn-interactive filter-pill-btn" id="filterGempaM5" onclick="setGempaDisplayFilter('m5')">
           <i class="fa-solid fa-triangle-exclamation"></i> M &ge; 5.0 (<span id="countM5Gempa">15</span>)
