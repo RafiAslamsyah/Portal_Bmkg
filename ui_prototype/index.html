@@ -1680,6 +1680,7 @@
           class="search-input" 
           placeholder="Ketik nama dataset, parameter cuaca, wilayah, atau kode stasiun WMO..."
           oninput="handleLiveSearch(this.value)"
+          onkeydown="if(event.key === 'Enter') executeSearch()"
         />
         <button class="btn-interactive search-submit-btn" onclick="executeSearch()">
           Cari Data
@@ -1697,18 +1698,23 @@
         </span>
         <div class="shortcut-chips-row">
           <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Curah Hujan Harian')">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Curah Hujan')">
             <i class="fa-solid fa-cloud-showers-heavy" style="color: #0284c7;"></i> Curah Hujan
           </button>
           <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gempa Tektonik')">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gempa')">
             <i class="fa-solid fa-wave-square" style="color: #dc2626;"></i> Gempa M &ge; 5.0
           </button>
           <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Partikulat PM2.5')">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('PM2.5')">
             <i class="fa-solid fa-wind" style="color: #00875a;"></i> Partikulat PM2.5
           </button>
           <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu Udara Ekstrem')">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Suhu')">
             <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Suhu Ekstrem
           </button>
           <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Tinggi Gelombang')">
+          <button class="btn-interactive shortcut-chip" onclick="applySearchTag('Gelombang')">
             <i class="fa-solid fa-water" style="color: #0284c7;"></i> Gelombang Laut
           </button>
         </div>
@@ -1751,6 +1757,7 @@
       <div class="pillars-grid">
         <!-- Meteorologi -->
         <a href="#peta" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi')">
+        <a href="katalog.html?pilar=meteorologi" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi', event)">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1773,6 +1780,7 @@
 
         <!-- Klimatologi -->
         <a href="#peta" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi')">
+        <a href="katalog.html?pilar=klimatologi" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi', event)">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1801,6 +1809,7 @@
 
         <!-- Geofisika -->
         <a href="#peta" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika')">
+        <a href="katalog.html?pilar=geofisika" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika', event)">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -1823,6 +1832,7 @@
 
         <!-- Kualitas Udara -->
         <a href="#peta" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara')">
+        <a href="katalog.html?pilar=kualitas-udara" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara', event)">
           <div>
             <div class="pillar-header">
               <div class="pillar-icon-badge">
@@ -2726,17 +2736,53 @@ if payload.get("success"):
     }
 
     // Live Search Filter with Instant Count
+    // Live Search Filter with Real CKAN package_search API Debounced
+    let liveSearchTimer = null;
     function handleLiveSearch(query) {
       const feedback = document.getElementById('liveSearchFeedback');
       const clean = query.trim().toLowerCase();
+      if (!feedback) return;
+      const clean = query ? query.trim() : '';
       if (!clean) {
         feedback.innerHTML = "";
+        if (liveSearchTimer) clearTimeout(liveSearchTimer);
         return;
       }
 
       // Simulated matches from catalog
       const count = Math.floor(Math.random() * 12) + 4;
       feedback.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Ditemukan <strong>${count} dataset</strong> yang cocok dengan kata kunci <em>"${query}"</em>`;
+      if (liveSearchTimer) clearTimeout(liveSearchTimer);
+      feedback.innerHTML = '<span style="color: #64748b; font-weight: 500;"><i class="fa-solid fa-spinner fa-spin"></i> Mencari dataset...</span>';
+
+      liveSearchTimer = setTimeout(() => {
+        fetch('/api/3/action/package_search?q=' + encodeURIComponent(clean) + '&rows=5')
+          .then(response => {
+            if (!response.ok) throw new Error('API unavailable');
+            return response.json();
+          })
+          .then(data => {
+            if (data && data.success && data.result) {
+              const count = data.result.count;
+              const cleanSafe = clean.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+              const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+              const targetUrl = isStandalone ? `katalog.html?q=${encodeURIComponent(clean)}` : `/dataset/?q=${encodeURIComponent(clean)}`;
+              if (count > 0) {
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Ditemukan <strong>${count} dataset</strong> untuk "<em>${cleanSafe}</em>" &mdash; <a href="${targetUrl}" style="color: var(--bmkg-blue); text-decoration: underline; font-weight: 700; margin-left: 4px;">Lihat semua hasil &rarr;</a>`;
+              } else {
+                feedback.innerHTML = `<i class="fa-solid fa-circle-info" style="color: #64748b;"></i> Tidak ditemukan dataset untuk kata kunci "<em>${cleanSafe}</em>". <a href="${isStandalone ? 'katalog.html' : '/dataset/'}" style="color: var(--bmkg-blue); text-decoration: underline; font-weight: 600; margin-left: 4px;">Lihat semua dataset</a>`;
+              }
+            } else {
+              feedback.innerHTML = "";
+            }
+          })
+          .catch(err => {
+            const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+            const cleanSafe = clean.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const targetUrl = isStandalone ? `katalog.html?q=${encodeURIComponent(clean)}` : `/dataset/?q=${encodeURIComponent(clean)}`;
+            feedback.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Cari dataset "<em>${cleanSafe}</em>" &mdash; <a href="${targetUrl}" style="color: var(--bmkg-blue); text-decoration: underline; font-weight: 700; margin-left: 4px;">Buka Hasil &rarr;</a>`;
+          });
+      }, 300);
     }
 
     function applySearchTag(tagText) {
@@ -2745,6 +2791,12 @@ if payload.get("success"):
       handleLiveSearch(tagText);
       input.scrollIntoView({ behavior: 'smooth', block: 'center' });
       input.focus();
+      if (input) {
+        input.value = tagText;
+      }
+      const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+      const targetUrl = isStandalone ? `katalog.html?q=${encodeURIComponent(tagText)}` : `/dataset/?q=${encodeURIComponent(tagText)}`;
+      window.location.href = targetUrl;
     }
 
     function executeSearch() {
@@ -2754,10 +2806,23 @@ if payload.get("success"):
         return;
       }
       showToast(`Mencari dataset: "${query}" (Endpoint: /dataset?q=${encodeURIComponent(query)})`);
+      const input = document.getElementById('portalSearchInput');
+      const query = input ? input.value.trim() : '';
+      const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+      const targetUrl = isStandalone ? (query ? `katalog.html?q=${encodeURIComponent(query)}` : 'katalog.html') : (query ? `/dataset/?q=${encodeURIComponent(query)}` : '/dataset/');
+      window.location.href = targetUrl;
     }
 
     function filterByPilar(pilar) {
       showToast(`Memfilter pilar: ${pilar.toUpperCase()}`);
+    function filterByPilar(pilar, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+      const targetUrl = isStandalone ? `katalog.html?pilar=${encodeURIComponent(pilar)}` : `/dataset/?groups=${encodeURIComponent(pilar)}`;
+      window.location.href = targetUrl;
     }
 
     // In-Table Live Filter
