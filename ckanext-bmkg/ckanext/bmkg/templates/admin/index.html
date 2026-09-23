@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+
+{% block primary_content_inner %}
+  <!-- CARD 1: Tabel Sysadmin Terdaftar -->
+  <div class="bmkg-admin-card">
+    <div class="admin-card-header flex-between">
+      <div class="header-left">
+        <div class="icon-circle" style="background: rgba(0, 56, 101, 0.08); color: var(--bmkg-blue-deep);">
+          <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <div>
+          <h3 class="admin-card-title">Daftar Administrator Sistem Aktif (Sysadmins)</h3>
+          <p class="admin-card-desc">Pengguna berikut memiliki hak akses penuh pengelolaan data dan konfigurasi sistem.</p>
+        </div>
+      </div>
+      <span class="admin-count-badge">
+        <i class="fa-solid fa-user-check"></i> {{ sysadmins|length }} Sysadmin Aktif
+      </span>
+    </div>
+
+    <div class="admin-card-body no-padding">
+      <div class="admin-table-wrapper">
+        <table class="bmkg-admin-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;" class="text-center">No</th>
+              <th>Nama Pengguna (Username)</th>
+              <th>Tingkat Otoritas</th>
+              <th>Status</th>
+              <th style="text-align: right; width: 150px;">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in sysadmins %}
+              <tr>
+                <td class="text-center font-mono" style="color: #64748b; font-weight: 600;">{{ loop.index }}</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-circle">
+                      <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                      <div class="user-link-name">{{ user }}</div>
+                      <span class="user-subtext">Akun Pengelola Resmi BMKG</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge-role-sysadmin">
+                    <i class="fa-solid fa-shield"></i> Sysadmin
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-status-active">
+                    <span class="pulse-dot"></span> Aktif
+                  </span>
+                </td>
+                <td style="text-align: right;">
+                  <form method="POST" action="{% url_for 'user.sysadmin' %}" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin mencabut hak akses Sysadmin untuk akun {{ user }}?');">
+                    {{ h.csrf_input() }}
+                    <input type="hidden" value="{{ user }}" name="username" />
+                    <input type="hidden" value="0" name="status" />
+                    <button type="submit" class="btn-revoke-sysadmin" title="Cabut Akses Sysadmin: {{ user }}">
+                      <i class="fa-solid fa-user-slash"></i>
+                      <span>Cabut Akses</span>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Form Promosikan Pengguna Baru Menjadi Sysadmin -->
+  <div class="bmkg-admin-card" style="margin-top: 1.5rem;">
+    <div class="admin-card-header">
+      <div class="icon-circle" style="background: rgba(0, 135, 90, 0.1); color: var(--bmkg-green);">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div>
+        <h3 class="admin-card-title">Promosikan Pengguna Menjadi Sysadmin</h3>
+        <p class="admin-card-desc">Cari akun pengguna terdaftar di portal ini untuk diberikan hak akses administrator penuh.</p>
+      </div>
+    </div>
+
+    <div class="admin-card-body">
+      <form method="POST" action="{% url_for 'user.sysadmin' %}" class="promote-form">
+        {{ h.csrf_input() }}
+        <input type="hidden" value="1" name="status" />
+
+        <div class="promote-input-row">
+          <div class="promote-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass input-lead-icon"></i>
+            <input
+              id="promote-username"
+              type="text"
+              name="username"
+              placeholder="Ketik username akun pengguna BMKG..."
+              value=""
+              class="promote-input"
+              data-module="autocomplete"
+              data-module-source="/api/2/util/user/autocomplete?ignore_self=true&q=?"
+              required
+            >
+          </div>
+          <button type="submit" class="btn-promote-submit">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Promosikan Akun</span>
+          </button>
+        </div>
+        <span class="field-hint">
+          <i class="fa-solid fa-circle-info"></i> Pengguna yang dipromosikan akan langsung memperoleh akses ke modul konfigurasi dan seluruh dataset.
+        </span>
+      </form>
+    </div>
+  </div>
+{% endblock %}

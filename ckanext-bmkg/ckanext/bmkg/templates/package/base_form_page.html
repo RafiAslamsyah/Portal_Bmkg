@@ -1,0 +1,109 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ h.humanize_entity_type('package', dataset_type, 'create title') or 'Tambah Dataset Baru' }}{% endblock %}
+
+{% block content %}
+<div class="dataset-form-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="dataset-form-hero">
+    <div class="dataset-form-hero-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <a href="{{ h.url_for('dataset.search') }}">Katalog Dataset Terbuka</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>{{ 'Edit Dataset' if form_style == 'edit' else 'Tambah Dataset Baru' }}</span>
+      </div>
+
+      <div class="dataset-form-hero-content">
+        <div class="dataset-form-hero-badge">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Portal Administrasi Data BMKG</span>
+        </div>
+        <h1 class="dataset-form-hero-title">
+          {{ 'Edit Metadata &amp; Sumber Data' if form_style == 'edit' else 'Kurasi &amp; Publikasi Dataset Baru' }}
+        </h1>
+        <p class="dataset-form-hero-lead">
+          Lengkapi metadata sesuai standar data geospasial dan observasi BMKG. Dataset yang dipublikasikan akan melalui validasi sistem dan terindeks di Katalog Satu Pintu BMKG.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Main Content Grid (Form + Guidance Sidebar) -->
+  <div class="dataset-form-layout-container">
+    <div class="dataset-form-main-col">
+      {% block form %}
+        {{- h.snippet(form_snippet, pkg_dict=pkg_dict, **form_vars) -}}
+      {% endblock %}
+    </div>
+
+    <!-- Sidebar Guidance & Information -->
+    <aside class="dataset-form-sidebar-col">
+      <!-- Card: Pedoman Kurasi BMKG -->
+      <div class="bmkg-guide-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-book-bookmark" style="color: var(--bmkg-blue);"></i>
+          <span>Pedoman Standar Metadata</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <div class="guide-item">
+            <i class="fa-solid fa-circle-check guide-icon"></i>
+            <div>
+              <strong>Judul Jelas &amp; Spesifik</strong>
+              <p>Gunakan nama pengamatan, wilayah cakupan, dan frekuensi data (contoh: <em>Data Curah Hujan Harian Stasiun Meteorologi Cengkareng</em>).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-layer-group guide-icon"></i>
+            <div>
+              <strong>Pilih 4 Pilar MKG</strong>
+              <p>Kelompokkan data secara tepat pada Meteorologi, Klimatologi, Geofisika, atau Kualitas Udara.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-file-csv guide-icon"></i>
+            <div>
+              <strong>Tahap Berikutnya: File Data</strong>
+              <p>Setelah menyimpan informasi dasar, Anda akan diarahkan untuk mengunggah berkas CSV, GeoJSON, atau NetCDF.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Hak Akses Publik -->
+      <div class="bmkg-guide-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
+          <span>Ketentuan Hak Akses</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.65rem 0;">
+            Dataset yang disetel <strong>Publik</strong> dapat diakses bebas tanpa login oleh masyarakat dan peneliti melalui web katalog dan REST API DataStore.
+          </p>
+          <div style="background: var(--bmkg-blue-subtle); border-radius: 6px; padding: 0.6rem 0.8rem; font-size: 0.8rem; color: var(--bmkg-blue-deep); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>Gunakan <strong>Privat</strong> jika data masih dalam tahap penelaahan internal.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Kontak CS Pusdatin -->
+      <div class="bmkg-guide-card help-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-headset" style="color: var(--bmkg-blue-deep);"></i>
+          <span>Bantuan Pengelola</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;">
+            Mengalami kendala saat input data atau format file khusus?
+          </p>
+          <div style="font-size: 0.82rem; font-weight: 700; color: var(--bmkg-blue-deep);">
+            <i class="fa-solid fa-envelope" style="color: var(--bmkg-blue); margin-right: 4px;"></i> pusdatin@bmkg.go.id
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

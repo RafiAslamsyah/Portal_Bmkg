@@ -1,0 +1,364 @@
+{% import 'macros/form.html' as form %}
+{% set action = g.form_action or '' %}
+
+{# Form Modern Tambah / Edit Dataset Bertema Portal Open Data BMKG #}
+<form id="dataset-edit" class="bmkg-dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
+  {{ h.csrf_input() }}
+
+  <!-- 1. Stepper Wizard Stages (Tahap 1 vs Tahap 2) -->
+  {% block stages %}
+    {% if form_style != 'edit' %}
+      {% snippet 'package/snippets/stages.html', stages=stage, dataset_type=dataset_type %}
+    {% endif %}
+  {% endblock %}
+
+  <input type="hidden" name="_ckan_phase" value="dataset_new_1" />
+  <input type="hidden" name="pkg_name" value="{{ data.id }}" />
+
+  <!-- Ringkasan Galat (Error Summary) jika ada validasi yang gagal -->
+  {% block errors %}
+    {% if error_summary %}
+      <div class="bmkg-alert-banner alert-danger">
+        <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="alert-content">
+          <strong>Perhatian: Mohon perbaiki beberapa isian berikut:</strong>
+          <ul>
+            {% for key, error in error_summary.items() %}
+              <li><strong>{{ key }}:</strong> {{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  <!-- CARD 1: Identitas & Deskripsi Utama Dataset -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: var(--bmkg-blue-subtle); color: var(--bmkg-blue-deep);">
+        <i class="fa-solid fa-file-pen"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">1. Identitas &amp; Deskripsi Dataset</h3>
+        <p class="section-subheading">Informasi nama resmi, slug tautan permanen, serta ringkasan metodologi pengamatan data.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <!-- Judul Dataset -->
+      <div class="bmkg-form-group">
+        <label for="field-title" class="bmkg-label required">
+          Judul Dataset Resmi BMKG
+          <span class="required-star">*</span>
+        </label>
+        <div class="input-container">
+          <input id="field-title" type="text" name="title" value="{{ data.title or '' }}"
+            placeholder="Contoh: Pengamatan Cuaca Harian Stasiun Meteorologi Cengkareng 2026"
+            data-module="slug-preview-target" class="bmkg-input form-control {% if errors.title %}has-error{% endif %}" required />
+        </div>
+        {% if errors.title %}
+          <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.title }}</div>
+        {% endif %}
+        <span class="field-helper-text">Gunakan judul yang jelas, mencantumkan parameter pengamatan, unit lokasi, dan tahun.</span>
+      </div>
+
+      <!-- URL Slug Preview -->
+      <div class="bmkg-form-group">
+        {% set prefix = h.url_for('dataset.read', id='') %}
+        {% set domain = h.url_for('dataset.read', id='', qualified=true)|replace("http://", "")|replace("https://", "") %}
+        <label for="field-name" class="bmkg-label required">
+          Tautan URL Permanen (Slug)
+          <span class="required-star">*</span>
+        </label>
+        <div class="bmkg-slug-input-wrapper">
+          <span class="slug-prefix">{{ prefix }}</span>
+          <input id="field-name" type="text" name="name" value="{{ data.name or '' }}"
+            placeholder="pengamatan-cuaca-harian"
+            data-module="slug-preview-slug" data-module-prefix="{{ domain }}" data-module-placeholder="&lt;nama-dataset&gt;"
+            class="bmkg-input slug-input form-control {% if errors.name %}has-error{% endif %}" required />
+        </div>
+        {% if errors.name %}
+          <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.name }}</div>
+        {% endif %}
+        <span class="field-helper-text">URL ramah mesin pencari. Hanya gunakan huruf kecil, angka, dan tanda hubung (-). Dihasilkan otomatis dari judul.</span>
+      </div>
+
+      <!-- Deskripsi / Catatan Metodologi -->
+      <div class="bmkg-form-group">
+        <label for="field-notes" class="bmkg-label">
+          Deskripsi &amp; Ringkasan Metodologi
+        </label>
+        <div class="textarea-container">
+          <textarea id="field-notes" name="notes" class="bmkg-textarea form-control" rows="5"
+            placeholder="Tuliskan gambaran umum dataset, metode observasi/instrumen sensor, standar satuan data, dan tata cara sitasi...">{{ data.notes or '' }}</textarea>
+        </div>
+        <span class="field-helper-text">Mendukung format Markdown untuk penataan teks, poin, tabel, dan tautan dokumen spesifikasi.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Klasifikasi 4 Pilar Layanan MKG -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(0, 135, 90, 0.1); color: var(--bmkg-green);">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">2. Klasifikasi 4 Pilar Data BMKG</h3>
+        <p class="section-subheading">Pilih pilar tematik utama BMKG agar dataset terkelompok pada katalog dan peta spasial yang sesuai.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      {% set current_pilar = 'meteorologi' %}
+      {% if data.get('groups') and data.groups[0] %}
+        {% set current_pilar = data.groups[0].name or data.groups[0] %}
+      {% elif data.get('groups__0__name') %}
+        {% set current_pilar = data.groups__0__name %}
+      {% elif data.get('pilar_mkg') %}
+        {% set current_pilar = data.pilar_mkg %}
+      {% endif %}
+
+      <!-- Hidden inputs for CKAN group membership & metadata schema -->
+      <input type="hidden" name="groups__0__name" id="bmkgSelectedPilarGroup" value="{{ current_pilar }}" />
+      <input type="hidden" name="extras__0__key" value="pilar_mkg" />
+      <input type="hidden" name="extras__0__value" id="bmkgSelectedPilarExtra" value="{{ current_pilar }}" />
+
+      <!-- Interactive 4-Pillar Visual Selection Cards -->
+      <div class="pilar-selector-grid">
+        <!-- Pilar 1: Meteorologi -->
+        <div class="pilar-card {% if current_pilar == 'meteorologi' %}is-selected{% endif %}" data-pilar="meteorologi" onclick="selectBmkgPilar('meteorologi', this)">
+          <div class="pilar-badge-icon met"><i class="fa-solid fa-cloud-sun"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Meteorologi</h4>
+            <p class="pilar-desc">Cuaca permukaan, angin maritim, radar, citra satelit, dan penerbangan.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+        <!-- Pilar 2: Klimatologi -->
+        <div class="pilar-card {% if current_pilar == 'klimatologi' %}is-selected{% endif %}" data-pilar="klimatologi" onclick="selectBmkgPilar('klimatologi', this)">
+          <div class="pilar-badge-icon klim"><i class="fa-solid fa-temperature-half"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Klimatologi</h4>
+            <p class="pilar-desc">Curah hujan dasarian, anomali iklim, kekeringan, dan tren suhu global.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+        <!-- Pilar 3: Geofisika -->
+        <div class="pilar-card {% if current_pilar == 'geofisika' %}is-selected{% endif %}" data-pilar="geofisika" onclick="selectBmkgPilar('geofisika', this)">
+          <div class="pilar-badge-icon geo"><i class="fa-solid fa-volcano"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Geofisika</h4>
+            <p class="pilar-desc">Seismik gempa bumi, tsunami WRS, gravitasi, magnet bumi, dan petir.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+        <!-- Pilar 4: Kualitas Udara -->
+        <div class="pilar-card {% if current_pilar == 'kualitas-udara' or current_pilar == 'kualitas_udara' %}is-selected{% endif %}" data-pilar="kualitas-udara" onclick="selectBmkgPilar('kualitas-udara', this)">
+          <div class="pilar-badge-icon ku"><i class="fa-solid fa-wind"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Kualitas Udara</h4>
+            <p class="pilar-desc">Konsentrasi partikulat PM2.5, PM10, gas rumah kaca, dan stasiun GAW.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3: Organisasi Produsen Data & Status Visibilitas -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">
+        <i class="fa-solid fa-building-columns"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">3. Produsen Data &amp; Hak Akses</h3>
+        <p class="section-subheading">Tentukan unit kerja BMKG yang memproduksi data serta ketersediaan akses bagi publik.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <div class="form-row-2col">
+        <!-- Organisasi / Unit Kerja BMKG -->
+        <div class="bmkg-form-group">
+          {% set organizations_available = h.organizations_available('create_dataset') %}
+          {% set existing_org = data.owner_org or data.group_id %}
+          <label for="field-organizations" class="bmkg-label required">
+            Unit Kerja / Produsen Data BMKG
+            <span class="required-star">*</span>
+          </label>
+          <div class="select-container">
+            <select id="field-organizations" name="owner_org" class="bmkg-select form-control" data-module="autocomplete">
+              {% if h.check_config_permission('create_unowned_dataset') %}
+                <option value="" {% if not existing_org %}selected="selected"{% endif %}>Tanpa Organisasi (Umum)</option>
+              {% endif %}
+              {% for org in organizations_available %}
+                {% set is_selected = (existing_org and existing_org == org.id) or (not existing_org and loop.first) %}
+                <option value="{{ org.id }}" {% if is_selected %}selected="selected"{% endif %}>
+                  {{ org.display_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <span class="field-helper-text">Balai Besar, Stasiun Pengamatan, atau Kedeputian teknis penanggung jawab data.</span>
+        </div>
+
+        <!-- Visibilitas (Publik Bebas vs Draf Privat) -->
+        <div class="bmkg-form-group">
+          <label for="field-private" class="bmkg-label required">
+            Visibilitas Publik
+            <span class="required-star">*</span>
+          </label>
+          <div class="select-container">
+            <select id="field-private" name="private" class="bmkg-select form-control">
+              <option value="False" {% if data.private == False or data.private == 'False' or not data.private %}selected="selected"{% endif %}>
+                🌐 Publik (Terbuka untuk Umum Bebas Akses)
+              </option>
+              <option value="True" {% if data.private == True or data.private == 'True' %}selected="selected"{% endif %}>
+                🔒 Privat (Khusus Penelaahan Internal Admin BMKG)
+              </option>
+            </select>
+          </div>
+          <span class="field-helper-text">Dataset publik akan tampil di katalog pencarian dan dapat diakses tanpa login.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4: Tag Kata Kunci & Lisensi Terbuka -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(217, 119, 6, 0.1); color: #d97706;">
+        <i class="fa-solid fa-tags"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">4. Kata Kunci (Tags) &amp; Lisensi</h3>
+        <p class="section-subheading">Memudahkan penemuan dataset melalui mesin pencari serta kepastian hak guna pakai data.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <div class="form-row-2col">
+        <!-- Tag / Kata Kunci -->
+        <div class="bmkg-form-group">
+          {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
+          <label for="field-tags" class="bmkg-label">Kata Kunci (Tags)</label>
+          <div class="input-container">
+            <input id="field-tags" type="text" name="tag_string" value="{{ data.tag_string or '' }}"
+              placeholder="Contoh: hujan, cuaca, radar, gempa, pm25"
+              class="bmkg-input form-control" data-module="autocomplete" data-module-tags data-module-source="/api/2/util/tag/autocomplete?incomplete=?" />
+          </div>
+          <span class="field-helper-text">Pisahkan antar kata kunci menggunakan tanda koma (,).</span>
+        </div>
+
+        <!-- Lisensi Data -->
+        <div class="bmkg-form-group">
+          {% set existing_license_id = data.get('license_id') %}
+          <label for="field-license" class="bmkg-label required">Lisensi Data Terbuka</label>
+          <div class="select-container">
+            <select id="field-license" name="license_id" class="bmkg-select form-control" data-module="autocomplete">
+              {% for license_id, license_desc in h.license_options(existing_license_id) %}
+                <option value="{{ license_id }}" {% if existing_license_id == license_id or (not existing_license_id and 'odc-odbl' in license_id) %}selected="selected"{% endif %}>
+                  {{ license_desc }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <span class="field-helper-text">Rekomendasi default: <em>Open Data Commons Open Database License (ODbL)</em>.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 5: Kontak Wali Data & Metadata Spasial/Temporal -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+        <i class="fa-solid fa-address-card"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">5. Penanggung Jawab &amp; Resolusi Waktu</h3>
+        <p class="section-subheading">Informasi penanggung jawab teknis dan frekuensi pembaharuan data berkala BMKG.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <div class="form-row-3col">
+        <!-- Nama Wali Data -->
+        <div class="bmkg-form-group">
+          <label for="field-author" class="bmkg-label">Nama Wali Data / PIC Teknis</label>
+          <input id="field-author" type="text" name="author" value="{{ data.author or '' }}"
+            placeholder="Contoh: Subbidang Analisis Cuaca Ekstrem" class="bmkg-input form-control" />
+        </div>
+
+        <!-- Email Kontak -->
+        <div class="bmkg-form-group">
+          <label for="field-author-email" class="bmkg-label">Email Dinas Resmi</label>
+          <input id="field-author-email" type="email" name="author_email" value="{{ data.author_email or '' }}"
+            placeholder="Contoh: info.cuaca@bmkg.go.id" class="bmkg-input form-control" />
+        </div>
+
+        <!-- Resolusi Waktu (Extras) -->
+        <div class="bmkg-form-group">
+          <label for="field-resolusi" class="bmkg-label">Resolusi Temporal</label>
+          <input type="hidden" name="extras__1__key" value="resolusi_temporal" />
+          <select id="field-resolusi" name="extras__1__value" class="bmkg-select form-control">
+            <option value="Harian (Daily)">Harian (Daily)</option>
+            <option value="Per Jam (Hourly)">Per Jam (Hourly)</option>
+            <option value="Real-Time / 10 Menit">Real-Time / 10 Menit</option>
+            <option value="Dasarian (10 Harian)">Dasarian (10 Harian)</option>
+            <option value="Bulanan (Monthly)">Bulanan (Monthly)</option>
+            <option value="Tahunan (Annual)">Tahunan (Annual)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 6: Tombol Aksi Formulir (Lanjut / Simpan) -->
+  <div class="bmkg-form-actions-bar">
+    <div class="actions-left">
+      <a href="{{ h.url_for('dataset.search') }}" class="btn-action-cancel">
+        <i class="fa-solid fa-arrow-left"></i> Batal &amp; Kembali
+      </a>
+      {% if form_style == 'edit' and h.check_access('package_delete', {'id': data.id}) and not data.state == 'deleted' %}
+        <a class="btn-action-delete" href="{% url_for dataset_type ~ '.delete', id=data.id %}" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin menghapus dataset ini?">
+          <i class="fa-solid fa-trash"></i> Hapus Dataset
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="actions-right">
+      <button class="btn-action-submit" type="submit" name="save">
+        {% if form_style == 'edit' %}
+          <i class="fa-solid fa-floppy-disk"></i> Perbarui Metadata Dataset
+        {% else %}
+          <span>Simpan &amp; Lanjut: Unggah Berkas</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        {% endif %}
+      </button>
+    </div>
+  </div>
+</form>
+
+<script>
+  function selectBmkgPilar(pilarName, cardEl) {
+    var pilarInput = document.getElementById('bmkgSelectedPilarGroup');
+    var extraInput = document.getElementById('bmkgSelectedPilarExtra');
+    if (pilarInput) pilarInput.value = pilarName;
+    if (extraInput) extraInput.value = pilarName;
+
+    // Toggle active class on cards
+    var allCards = document.querySelectorAll('.pilar-card');
+    allCards.forEach(function(card) {
+      card.classList.remove('is-selected');
+    });
+    if (cardEl) {
+      cardEl.classList.add('is-selected');
+    }
+  }
+</script>

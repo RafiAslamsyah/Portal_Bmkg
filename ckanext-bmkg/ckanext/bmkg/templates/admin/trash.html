@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block primary_content_inner %}
+  <div class="bmkg-admin-card">
+    <div class="admin-card-header flex-between">
+      <div class="header-left">
+        <div class="icon-circle" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <div>
+          <h3 class="admin-card-title">Tempat Sampah &amp; Pemulihan Entitas (Trash)</h3>
+          <p class="admin-card-desc">Entitas yang telah dihapus (dataset, organisasi, grup) ditampung di sini sebelum dibersihkan secara permanen.</p>
+        </div>
+      </div>
+      <form method="POST" action="{{ h.url_for('admin.trash') }}" id="form-purge-all">
+        {{ h.csrf_input() }} 
+        <input type="hidden" name="action" value="all">
+        <button
+          type="submit"
+          class="btn-purge-all"
+          data-module="confirm-action"
+          data-module-with-data="true"
+          data-module-content="PERINGATAN: Tindakan ini akan menghapus seluruh data di tempat sampah secara permanen dan tidak dapat dibatalkan. Lanjutkan?">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Bersihkan Semua (Purge All)</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="admin-card-body">
+      {% for ent_type, entities in data.items() %}
+        {% snippet "admin/snippets/data_type.html", ent_type=ent_type, entities=entities, messages=messages %}
+      {% else %}
+        <div class="empty-trash-state">
+          <div class="empty-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <h4 style="margin: 0.5rem 0 0.25rem 0; font-weight: 700; color: #1e293b;">Tempat Sampah Kosong</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Tidak ada dataset, organisasi, atau grup yang menunggu pembersihan permanen.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

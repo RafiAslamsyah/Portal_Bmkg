@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block primary_content_inner %}
+  <div class="bmkg-admin-card">
+    <div class="admin-card-header">
+      <div class="icon-circle" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">
+        <i class="fa-solid fa-sliders"></i>
+      </div>
+      <div>
+        <h3 class="admin-card-title">Konfigurasi Pengaturan Portal BMKG</h3>
+        <p class="admin-card-desc">Pengaturan judul portal, logo resmi, deskripsi instansi, dan kustomisasi visual.</p>
+      </div>
+    </div>
+
+    <div class="admin-card-body">
+      {% if error_summary %}
+        <div class="bmkg-alert-banner alert-danger">
+          <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="alert-content">
+            <strong>Mohon perbaiki galat konfigurasi berikut:</strong>
+            <ul>
+              {% for key, error in error_summary.items() %}
+                <li><strong>{{ key }}:</strong> {{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="post" action="" id="admin-config-form" class="admin-settings-form" enctype="multipart/form-data">
+        {{ h.csrf_input() }}
+
+        <div class="bmkg-form-group">
+          <label class="bmkg-label" for="field-ckan-site-title">Nama / Judul Situs Portal</label>
+          <input type="text" id="field-ckan-site-title" name="ckan.site_title" value="{{ data['ckan.site_title'] or '' }}" class="bmkg-input" placeholder="Portal Open Data BMKG" />
+          <span class="field-helper-text">Nama utama portal yang tampil pada header dan tab browser.</span>
+        </div>
+
+        <div class="bmkg-form-group">
+          <label class="bmkg-label" for="field-ckan-site-description">Tagline / Deskripsi Singkat</label>
+          <input type="text" id="field-ckan-site-description" name="ckan.site_description" value="{{ data['ckan.site_description'] or '' }}" class="bmkg-input" placeholder="Satu Pintu Data Meteorologi, Klimatologi, dan Geofisika" />
+          <span class="field-helper-text">Slogan resmi instansi yang tampil di bawah judul portal.</span>
+        </div>
+
+        <div class="bmkg-form-group">
+          <label class="bmkg-label" for="field-ckan-site-about">Tentang Portal Data (Halaman About)</label>
+          <textarea id="field-ckan-site-about" name="ckan.site_about" class="bmkg-textarea" rows="4" placeholder="Deskripsi peran Portal Data BMKG dalam ekosistem Satu Data Indonesia...">{{ data['ckan.site_about'] or '' }}</textarea>
+          <span class="field-helper-text">Mendukung format Markdown untuk penataan teks.</span>
+        </div>
+
+        <div class="bmkg-form-actions-bar" style="margin-top: 2rem; padding: 1rem 0 0 0; border: none; box-shadow: none;">
+          <div class="actions-left">
+            <a href="{% url_for 'admin.reset_config' %}" class="btn-action-cancel" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin mereset konfigurasi ke pengaturan awal?">
+              <i class="fa-solid fa-rotate-left"></i> Reset ke Standar
+            </a>
+          </div>
+          <div class="actions-right">
+            <button type="submit" class="btn-action-submit" name="save">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Konfigurasi
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "page.html" %}
+
+{% block subtitle %}Administrasi Portal — Portal Data BMKG{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="admin-hero">
+    <div class="admin-hero-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>Pusat Administrasi Portal BMKG</span>
+      </div>
+
+      <div class="admin-hero-content">
+        <div class="admin-hero-badge">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Konsol Kendali Utama Pusdatin BMKG</span>
+        </div>
+        <h1 class="admin-hero-title">
+          Pusat Administrasi &amp; Tata Kelola Portal
+        </h1>
+        <p class="admin-hero-lead">
+          Kelola otoritas pengguna tingkat Sysadmin, konfigurasi identitas visual portal data, serta pemeliharaan entitas basis data secara terpusat dan aman.
+        </p>
+      </div>
+
+      <!-- Modern Segmented Navigation Tabs -->
+      <nav class="admin-nav-tabs">
+        <a href="{{ h.url_for('admin.index') }}" class="admin-tab-item {% if request.endpoint == 'admin.index' %}active{% endif %}">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Sysadmins &amp; Otoritas</span>
+        </a>
+        <a href="{{ h.url_for('admin.config') }}" class="admin-tab-item {% if request.endpoint == 'admin.config' %}active{% endif %}">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Konfigurasi Portal</span>
+        </a>
+        <a href="{{ h.url_for('admin.trash') }}" class="admin-tab-item {% if request.endpoint == 'admin.trash' %}active{% endif %}">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>Pemulihan &amp; Sampah (Trash)</span>
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 2. Content Layout Grid -->
+  <div class="admin-layout-container">
+    <div class="admin-main-col">
+      {% block primary_content_inner %}{% endblock %}
+    </div>
+
+    <!-- Sidebar Guidance & Security Notes -->
+    <aside class="admin-sidebar-col">
+      {% block secondary_content %}
+      <div class="bmkg-admin-card security-alert-card">
+        <div class="admin-card-header">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #d97706;"></i>
+          <span>Peringatan Keamanan</span>
+        </div>
+        <div class="admin-card-body">
+          <p style="font-size: 0.85rem; color: #1e293b; line-height: 1.5; margin: 0 0 0.75rem 0;">
+            Akun bertipe <strong>Sysadmin</strong> memiliki wewenang penuh atas seluruh dataset, organisasi, dan konfigurasi server Portal Open Data BMKG.
+          </p>
+          <div class="security-tip-box">
+            <i class="fa-solid fa-lock"></i>
+            <span>Hanya berikan akses ini kepada personil resmi Pusdatin BMKG yang berwenang.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bmkg-admin-card">
+        <div class="admin-card-header">
+          <i class="fa-solid fa-book" style="color: var(--bmkg-blue);"></i>
+          <span>Dokumentasi Resmi</span>
+        </div>
+        <div class="admin-card-body">
+          <p style="font-size: 0.84rem; color: var(--text-secondary); margin: 0 0 0.85rem 0; line-height: 1.45;">
+            Pelajari pedoman pengelolaan sistem dan arsitektur data CKAN untuk instansi pemerintah.
+          </p>
+          <a href="https://docs.ckan.org/en/2.10/sysadmin-guide.html" target="_blank" rel="noreferrer" class="admin-doc-link">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>CKAN Sysadmin Guide</span>
+          </a>
+        </div>
+      </div>
+      {% endblock %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
