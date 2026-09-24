@@ -3,13 +3,21 @@ import sys
 import json
 import requests
 
-API_URL = "http://127.0.0.1:8080/api/3/action"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJyekRuTDJ5RzZRSW5reFJNdl9UZTFVaFNMaTNjd1Btd0FlU1ljUUszdzlvIiwiaWF0IjoxNzg5OTYwNDE0fQ.txgcZYYGXfiAWJsJBKGt5srFJkMKmD6zFdy1HX4Vz4c"
+# Konfigurasi Endpoint API CKAN (Default Port 5000, dapat di-override lewat env)
+API_PORT = os.environ.get("CKAN_PORT", "5000")
+API_URL = os.environ.get("CKAN_API_URL", f"http://127.0.0.1:{API_PORT}/api/3/action")
+
+# Token API CKAN dari Environment Variable (mencegah credential hardcoded di Git)
+TOKEN = os.environ.get("CKAN_API_TOKEN") or os.environ.get("CKAN_TOKEN", "")
 
 HEADERS = {
-    "Authorization": TOKEN,
     "Content-Type": "application/json"
 }
+if TOKEN:
+    HEADERS["Authorization"] = TOKEN
+
+# Path direktori proyek dinamis (independen dari sistem operasi / username pengguna)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def post_action(action, data=None):
     url = f"{API_URL}/{action}"
@@ -20,9 +28,18 @@ def post_action(action, data=None):
     return r.json()
 
 def main():
-    print("Testing connection to CKAN API...")
-    status = requests.get(f"{API_URL}/status_show").json()
-    print("CKAN Status:", status.get('success'))
+    print("Testing connection to CKAN API at:", API_URL)
+    if not TOKEN:
+        print("[WARN] Environment variable CKAN_API_TOKEN belum disetel!")
+        print("       Setel terlebih dahulu dengan: export CKAN_API_TOKEN='<token_jwt_ckan>'")
+        print("       Atau jalankan: CKAN_API_TOKEN='<token>' python scripts/seed_ckan_data.py")
+
+    try:
+        status = requests.get(f"{API_URL}/status_show", timeout=5).json()
+        print("CKAN Status:", status.get('success'))
+    except Exception as e:
+        print(f"[ERROR] Gagal terhubung ke CKAN di {API_URL}: {e}")
+        return
 
     # 1. Create 4 Pilar MKG Groups
     pilars = [
@@ -100,12 +117,15 @@ def main():
         if show.get('success'):
             pkg_id = show['result']['id']
 
-    # 4. Upload CSV Resource
+    # 4. Upload CSV Resource (Path Dinamis)
     if pkg_id:
-        csv_file_path = '/mnt/c/Users/ASUS-DF/.gemini/antigravity-ide/scratch/portal_open_data_bmkg/sample_data/cuaca_harian_stamet_cengkareng.csv'
+        default_csv = os.path.join(BASE_DIR, 'sample_data', 'cuaca_harian_stamet_cengkareng.csv')
+        csv_file_path = os.environ.get('SAMPLE_CSV_PATH', default_csv)
         if os.path.exists(csv_file_path):
             print(f"Uploading file: {csv_file_path} to dataset {pkg_id}...")
-            upload_headers = {"Authorization": TOKEN}
+            upload_headers = {}
+            if TOKEN:
+                upload_headers["Authorization"] = TOKEN
             data_fields = {
                 'package_id': pkg_id,
                 'name': 'Data Observasi Cuaca Harian Permukaan Agustus 2026 (CSV)',
@@ -120,15 +140,17 @@ def main():
                 else:
                     print("[WARN] Resource upload response:", up_res)
         else:
-            print(f"CSV file not found at {csv_file_path}")
+            print(f"[WARN] CSV file not found at {csv_file_path}")
 
     # 5. Verify Package List & Detail
-    pkg_list = requests.get(f"{API_URL}/package_list").json()
-    print("\n=== Dataset List in CKAN ===")
-    print("Total:", len(pkg_list.get('result', [])))
-    for p in pkg_list.get('result', []):
-        print(" -", p)
+    try:
+        pkg_list = requests.get(f"{API_URL}/package_list", headers=HEADERS).json()
+        print("\n=== Dataset List in CKAN ===")
+        print("Total:", len(pkg_list.get('result', [])))
+        for p in pkg_list.get('result', []):
+            print(" -", p)
+    except Exception as e:
+        print("[WARN] Gagal mengambil package_list:", e)
 
 if __name__ == '__main__':
     main()
-
