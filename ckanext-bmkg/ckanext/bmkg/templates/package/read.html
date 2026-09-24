@@ -111,6 +111,7 @@
           <i class="fa-solid fa-code"></i> Salin API Endpoint
         </button>
 
+        {% if c.userobj and (c.userobj.sysadmin or can_edit) %}
         {% set current_u = g.userobj or c.userobj %}
         {% if current_u and (current_u.sysadmin or can_edit) %}
           <a href="{{ h.url_for('dataset.edit', id=pkg.name) }}" class="btn-hero-admin" title="Edit Metadata & Status Visibilitas">

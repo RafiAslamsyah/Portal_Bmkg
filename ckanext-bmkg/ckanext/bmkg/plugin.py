@@ -76,6 +76,7 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             pkg_id = package.get('id') if isinstance(package, dict) else getattr(package, 'id', None)
             if not pkg_id:
                 return False
+            return toolkit.check_access('package_update', {'id': pkg_id})
 
             user_obj = getattr(toolkit.g, 'userobj', None) or getattr(toolkit.c, 'userobj', None)
             user_name = getattr(toolkit.g, 'user', None) or getattr(toolkit.c, 'user', None)
