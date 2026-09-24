@@ -63,20 +63,25 @@
       </nav>
 
       <div class="header-right-actions">
-        {% if c.userobj %}
+        {% set current_u = g.userobj or c.userobj %}
+        {% if current_u %}
           <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive btn-header-add" title="Tambah Dataset Baru">
             <i class="fa-solid fa-plus"></i>
             <span>Tambah Data</span>
           </a>
-          <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive btn-header-catalog" title="Jelajahi Katalog Data">
-            <i class="fa-solid fa-database"></i>
-            <span>Akses Data</span>
+          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive btn-header-nav-link" title="Dashboard Dataset Saya">
+            <i class="fa-solid fa-gauge-high" style="color: var(--bmkg-blue);"></i>
+            <span>Dashboard</span>
           </a>
-          {% set dashboard_url = h.url_for('admin.index') if c.userobj.sysadmin else h.url_for('dashboard.datasets') %}
-          <a href="{{ dashboard_url }}" class="btn-interactive header-user-badge" title="Akses Dashboard Admin Portal BMKG">
+          <a href="{{ h.url_for('user.edit', id=current_u.name) }}" class="btn-interactive btn-header-nav-link" title="Kelola Profil &amp; Sandi Pengguna">
+            <i class="fa-solid fa-user-gear" style="color: var(--bmkg-blue);"></i>
+            <span>Profil &amp; Sandi</span>
+          </a>
+          {% set admin_url = h.url_for('admin.index') if current_u.sysadmin else h.url_for('dashboard.datasets') %}
+          <a href="{{ admin_url }}" class="btn-interactive header-user-badge" title="Akses Panel Admin BMKG">
             <i class="fa-solid fa-circle-user"></i>
-            <span>{{ c.userobj.display_name }}</span>
-            <span class="badge-admin-tag">ADMIN</span>
+            <span>{{ current_u.display_name }}</span>
+            <span class="badge-admin-tag">{% if current_u.sysadmin %}SYSADMIN{% else %}ADMIN{% endif %}</span>
           </a>
           <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline; margin: 0;">
             {{ h.csrf_input() }}
@@ -99,6 +104,6 @@
     </div>
   </header>
 
-  {% if not c.userobj %}
+  {% if not (g.userobj or c.userobj) %}
     {% snippet 'snippets/login_modal.html' %}
   {% endif %}

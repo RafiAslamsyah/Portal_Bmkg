@@ -2075,7 +2075,10 @@
       e.preventDefault();
       const id = document.getElementById('loginIdentifier').value;
       closeLoginModal();
-      showToast(`Autentikasi Berhasil! Selamat datang di Portal Data BMKG, ${id}`);
+      showToast(`Login Administrator Berhasil! Mengalihkan ke halaman ckan-admin...`);
+      setTimeout(() => {
+        window.location.href = '/ckan-admin';
+      }, 700);
     }
 
     function handleRegisterSubmit(e) {

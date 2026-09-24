@@ -26,7 +26,7 @@
 
       <form id="loginForm" action="{{ h.url_for('user.login') }}" method="post" onsubmit="handleLoginSubmit(event)">
         {{ h.csrf_input() }}
-        <input type="hidden" name="came_from" value="{{ request.url }}">
+        <input type="hidden" name="came_from" value="{{ h.url_for('admin.index') }}">
 
         <div class="form-group" id="formGroupIdentifier">
           <label id="labelIdentifier">Username / NIP Pegawai BMKG</label>

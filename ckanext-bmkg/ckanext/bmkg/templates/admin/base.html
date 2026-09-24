@@ -40,6 +40,14 @@
           <i class="fa-solid fa-trash-can"></i>
           <span>Pemulihan &amp; Sampah (Trash)</span>
         </a>
+        <a href="{{ h.url_for('dashboard.datasets') }}" class="admin-tab-item {% if 'dashboard' in request.endpoint %}active{% endif %}" title="Dashboard Koleksi Dataset Mandiri">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard Dataset</span>
+        </a>
+        <a href="{{ h.url_for('user.edit', id=c.userobj.name) }}" class="admin-tab-item {% if request.endpoint == 'user.edit' %}active{% endif %}" title="Kelola Profil &amp; Sandi Pengguna">
+          <i class="fa-solid fa-user-gear"></i>
+          <span>Profil &amp; Sandi</span>
+        </a>
       </nav>
     </div>
   </section>

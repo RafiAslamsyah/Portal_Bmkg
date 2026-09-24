@@ -1,0 +1,165 @@
+{% extends "page.html" %}
+
+{% set user = current_user %}
+{% set org_type = h.default_group_type('organization') %}
+{% set group_type = h.default_group_type('group') %}
+{% set dataset_type = h.default_package_type() %}
+
+{% block subtitle %}Dashboard Pengelola Data — Portal Data BMKG{% endblock %}
+
+{% block content %}
+<div class="dashboard-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="dashboard-hero">
+    <div class="dashboard-hero-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>Dashboard Pengelola Data</span>
+      </div>
+
+      <div class="dashboard-hero-content-row">
+        <div class="dashboard-hero-info">
+          <div class="dashboard-hero-badge">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>Dashboard Kerja Administrator &amp; Pengelola Data</span>
+          </div>
+          <h1 class="dashboard-hero-title">
+            Dashboard Kurasi &amp; Pengelolaan Dataset BMKG
+          </h1>
+          <p class="dashboard-hero-lead">
+            Pantau dan kelola koleksi dataset observasi, berkas tabular DataStore, serta unit kerja kedinasan BMKG yang berada di bawah otoritas akun Anda.
+          </p>
+        </div>
+
+        <div class="dashboard-hero-quick-actions">
+          {% if h.check_access('package_create') %}
+            <a href="{{ h.url_for(dataset_type ~ '.new') }}" class="btn-interactive btn-hero-create" title="Publikasikan Dataset Baru">
+              <i class="fa-solid fa-circle-plus"></i> Tambah Dataset
+            </a>
+          {% endif %}
+          <a href="{{ h.url_for('user.edit', id=user.name) }}" class="btn-interactive btn-hero-profile" title="Kelola Profil &amp; Kredensial">
+            <i class="fa-solid fa-user-gear"></i> Pengaturan Profil
+          </a>
+        </div>
+      </div>
+
+      <!-- Modern Segmented Navigation Tabs -->
+      <nav class="dashboard-nav-tabs">
+        <a href="{{ h.url_for('dashboard.datasets') }}" class="dashboard-tab-item {% if request.endpoint == 'dashboard.datasets' or request.endpoint == 'dashboard.index' %}active{% endif %}">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Dataset Saya</span>
+          {% if user_dict and user_dict.datasets is defined %}
+            <span class="tab-counter-badge">{{ user_dict.datasets|length }}</span>
+          {% endif %}
+        </a>
+        <a href="{{ h.url_for('dashboard.organizations') }}" class="dashboard-tab-item {% if request.endpoint == 'dashboard.organizations' %}active{% endif %}">
+          <i class="fa-solid fa-building-columns"></i>
+          <span>Organisasi / Unit Kerja</span>
+        </a>
+        <a href="{{ h.url_for('dashboard.groups') }}" class="dashboard-tab-item {% if request.endpoint == 'dashboard.groups' %}active{% endif %}">
+          <i class="fa-solid fa-shapes"></i>
+          <span>Pilar Layanan MKG</span>
+        </a>
+        <a href="{{ h.url_for('user.edit', id=user.name) }}" class="dashboard-tab-item {% if request.endpoint == 'user.edit' %}active{% endif %}">
+          <i class="fa-solid fa-user-gear"></i>
+          <span>Profil &amp; Sandi</span>
+        </a>
+        {% if user.sysadmin %}
+          <a href="{{ h.url_for('admin.index') }}" class="dashboard-tab-item" style="margin-left: auto;">
+            <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i>
+            <span>Konsol Admin</span>
+          </a>
+        {% endif %}
+      </nav>
+    </div>
+  </section>
+
+  <!-- 2. Content Layout Grid -->
+  <div class="dashboard-layout-container">
+    <div class="dashboard-main-col">
+      <div class="bmkg-admin-card">
+        <div class="admin-card-header flex-between">
+          <div>
+            <h3 class="admin-card-title">
+              {% block dashboard_card_title %}Koleksi Dataset Mandiri{% endblock %}
+            </h3>
+            <p class="admin-card-desc">
+              {% block dashboard_card_desc %}Daftar dataset terbuka resmi yang telah Anda unggah atau kelola di Portal Open Data BMKG.{% endblock %}
+            </p>
+          </div>
+          <div>
+            {% block dashboard_card_actions %}
+              {% if h.check_access('package_create') %}
+                <a href="{{ h.url_for(dataset_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+                  <i class="fa-solid fa-plus"></i> Tambah Dataset
+                </a>
+              {% endif %}
+            {% endblock %}
+          </div>
+        </div>
+
+        <div class="admin-card-body">
+          {% block primary_content_inner %}{% endblock %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Guidance & Stat Summary -->
+    <aside class="dashboard-sidebar-col">
+      <!-- Card Profil Ringkas -->
+      <div class="bmkg-admin-card user-summary-card">
+        <div class="user-summary-header">
+          <div class="user-summary-avatar">
+            {% if user.image_url %}
+              <img src="{{ user.image_url }}" alt="{{ user.display_name }}">
+            {% else %}
+              <div class="avatar-fallback">{{ (user.fullname or user.name or 'A')[:2]|upper }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <h4 class="user-summary-name">{{ user.fullname or user.name }}</h4>
+            <div class="user-summary-email">{{ user.email or 'admin@bmkg.go.id' }}</div>
+            <div class="user-summary-role">
+              {% if user.sysadmin %}
+                <span class="badge-role-sysadmin"><i class="fa-solid fa-shield-halved"></i> Sysadmin Pusdatin</span>
+              {% else %}
+                <span class="badge-role-admin"><i class="fa-solid fa-user-check"></i> Pengelola Data BMKG</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="user-summary-footer">
+          <a href="{{ h.url_for('user.edit', id=user.name) }}" class="btn-user-edit-link">
+            <i class="fa-solid fa-pen-to-square"></i> Sunting Profil &amp; Sandi
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Pedoman Publikasi -->
+      <div class="bmkg-admin-card guidance-card">
+        <div class="admin-card-header">
+          <i class="fa-solid fa-lightbulb" style="color: #0284c7;"></i>
+          <span>Pedoman Kurasi Data BMKG</span>
+        </div>
+        <div class="admin-card-body">
+          <ul class="dashboard-guide-list">
+            <li>
+              <i class="fa-solid fa-check-double text-success"></i>
+              <span><strong>Format Tabular:</strong> Utamakan format CSV atau GeoJSON terstandarisasi.</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-tag text-primary"></i>
+              <span><strong>Klasifikasi Pilar:</strong> Tautkan dataset ke salah satu dari 4 Pilar MKG.</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-database text-info"></i>
+              <span><strong>Aktifkan DataStore:</strong> Berkas CSV akan otomatis memiliki API REST terprogram.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

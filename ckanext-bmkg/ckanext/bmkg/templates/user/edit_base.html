@@ -1,0 +1,18 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Manage') }} — Portal Data BMKG{% endblock %}
+
+{% block content %}
+<div class="user-page-wrapper">
+  {% block primary_content %}
+    <div class="user-layout-container">
+      <div class="user-main-col">
+        {% block primary_content_inner %}{% endblock %}
+      </div>
+      <aside class="user-sidebar-col">
+        {% block secondary_content %}{% endblock %}
+      </aside>
+    </div>
+  {% endblock %}
+</div>
+{% endblock %}

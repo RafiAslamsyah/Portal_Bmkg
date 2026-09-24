@@ -1,0 +1,38 @@
+{% extends "user/dashboard.html" %}
+
+{% set group_type = h.default_group_type('group') %}
+
+{% block dashboard_card_title %}Pilar Layanan MKG &amp; Kategori Data{% endblock %}
+{% block dashboard_card_desc %}Pilar tematik data BMKG (Meteorologi, Klimatologi, Geofisika, Kualitas Udara) yang terhubung dengan wewenang akun Anda.{% endblock %}
+
+{% block dashboard_card_actions %}
+  {% if h.check_access('group_create') %}
+    <a href="{{ h.url_for(group_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+      <i class="fa-solid fa-plus"></i> Tambah Grup Tematik
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+  {% set groups = h.groups_available(am_member=True, include_dataset_count=True, include_member_count=True) %}
+  {% if groups %}
+    <div class="dashboard-group-grid">
+      {% snippet "group/snippets/group_list.html", groups=groups, show_capacity=True %}
+    </div>
+  {% else %}
+    <div class="dashboard-empty-state">
+      <div class="empty-state-icon">
+        <i class="fa-solid fa-shapes"></i>
+      </div>
+      <h4 class="empty-state-title">Belum Ada Pilar atau Grup Tematik</h4>
+      <p class="empty-state-desc">
+        Akun Anda belum terhubung dengan grup kurasi pilar spesifik BMKG.
+      </p>
+      {% if h.check_access('group_create') %}
+        <a href="{{ h.url_for(group_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+          <i class="fa-solid fa-plus"></i> Buat Grup Baru
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

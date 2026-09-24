@@ -1,0 +1,232 @@
+{% import 'macros/form.html' as form %}
+
+{% block form %}
+  <form id="user-edit-form" class="bmkg-user-edit-form" method="post" action="{{ action }}" enctype="multipart/form-data">
+    {{ h.csrf_input() }}
+
+    <!-- Error Summary jika ada validasi gagal -->
+    {% if error_summary %}
+      <div class="bmkg-alert-banner alert-danger">
+        <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="alert-content">
+          <strong>Perhatian: Mohon perbaiki beberapa isian profil berikut:</strong>
+          <ul>
+            {% for key, error in error_summary.items() %}
+              <li><strong>{{ key }}:</strong> {{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- CARD 1: IDENTITAS & KREDENSIAL AKUN PEGAWAI -->
+    <div class="bmkg-form-card">
+      <div class="card-section-header">
+        <div class="section-icon-badge" style="background: rgba(0, 90, 158, 0.1); color: #005a9e;">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+        <div>
+          <h3 class="section-heading">1. Identitas &amp; Profil Pegawai BMKG</h3>
+          <p class="section-subheading">Informasi nama pengguna, NIP/nama resmi kedinasan, dan kontak surat elektronik.</p>
+        </div>
+      </div>
+
+      <div class="card-section-body">
+        <div class="form-row-2col">
+          <!-- Username -->
+          <div class="bmkg-form-group">
+            <label class="bmkg-label" for="field-username">
+              Username Pegawai <span class="required-star">*</span>
+            </label>
+            {% if g.userobj.sysadmin %}
+              <input type="text" name="name" id="field-username" value="{{ data.name or '' }}" class="bmkg-input {% if errors.name %}has-error{% endif %}" required>
+            {% else %}
+              <div class="input-readonly-wrapper">
+                <input type="text" name="name" id="field-username" value="{{ data.name or '' }}" class="bmkg-input readonly-input" readonly>
+                <span class="readonly-badge" title="Username dikunci untuk integritas akun"><i class="fa-solid fa-lock"></i> Terkunci</span>
+              </div>
+            {% endif %}
+            {% if errors.name %}
+              <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.name }}</span>
+            {% else %}
+              <small class="field-helper-text">Digunakan untuk autentikasi sistem dan hak akses dataset.</small>
+            {% endif %}
+          </div>
+
+          <!-- Full name -->
+          <div class="bmkg-form-group">
+            <label class="bmkg-label" for="field-fullname">
+              Nama Lengkap &amp; Gelar Resmi
+            </label>
+            <input type="text" name="fullname" id="field-fullname" value="{{ data.fullname or '' }}" placeholder="contoh: Dr. Andi Wijaya, M.Sc." class="bmkg-input {% if errors.fullname %}has-error{% endif %}">
+            {% if errors.fullname %}
+              <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.fullname }}</span>
+            {% else %}
+              <small class="field-helper-text">Nama yang ditampilkan pada log riwayat kurasi dataset.</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-row-2col" style="margin-top: 1rem;">
+          <!-- Email -->
+          <div class="bmkg-form-group">
+            <label class="bmkg-label" for="field-email">
+              Alamat Email Kedinasan <span class="required-star">*</span>
+            </label>
+            <div class="input-with-icon-wrap">
+              <i class="fa-solid fa-envelope input-prefix-icon"></i>
+              <input type="email" name="email" id="field-email" value="{{ data.email or '' }}" placeholder="contoh: nama.pegawai@bmkg.go.id" class="bmkg-input with-prefix-icon {% if errors.email %}has-error{% endif %}" required>
+            </div>
+            {% if errors.email %}
+              <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.email }}</span>
+            {% else %}
+              <small class="field-helper-text">Gunakan email dinas @bmkg.go.id untuk notifikasi resmi.</small>
+            {% endif %}
+          </div>
+
+          <!-- Profile Picture URL -->
+          <div class="bmkg-form-group">
+            <label class="bmkg-label" for="field-image-url">
+              Tautan Foto Profil / Avatar (URL)
+            </label>
+            <div class="input-with-icon-wrap">
+              <i class="fa-solid fa-image input-prefix-icon"></i>
+              <input type="text" name="image_url" id="field-image-url" value="{{ data.image_url or '' }}" placeholder="https://..." class="bmkg-input with-prefix-icon {% if errors.image_url %}has-error{% endif %}">
+            </div>
+            <small class="field-helper-text">Tautan foto formal pegawai atau logo unit kerja BMKG.</small>
+          </div>
+        </div>
+
+        <!-- About / Biodata Singkat -->
+        <div class="bmkg-form-group" style="margin-top: 1rem;">
+          <label class="bmkg-label" for="field-about">
+            Biodata Singkat / Penugasan Unit Kerja
+          </label>
+          <textarea name="about" id="field-about" rows="3" class="bmkg-textarea" placeholder="Tuliskan unit kerja, kedeputian, atau penugasan pengelolaan data Anda di BMKG...">{{ data.about or '' }}</textarea>
+          <small class="field-helper-text">Mendukung format teks sederhana Markdown.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: KEAMANAN & PEMBARUAN KATA SANDI -->
+    <div class="bmkg-form-card">
+      <div class="card-section-header">
+        <div class="section-icon-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h3 class="section-heading">2. Pembaruan Kata Sandi &amp; Keamanan Akun</h3>
+          <p class="section-subheading">Kosongkan bagian ini jika Anda tidak bermaksud mengubah kata sandi.</p>
+        </div>
+      </div>
+
+      <div class="card-section-body">
+        {% if is_sysadmin and current_user.name != data.name %}
+          <!-- Sysadmin changing other user's password -->
+          <div class="form-row-2col">
+            <div class="bmkg-form-group">
+              <label class="bmkg-label" for="field-password">Kata Sandi Baru</label>
+              <div class="password-toggle-group">
+                <input type="password" name="password1" id="field-password" class="bmkg-input with-eye {% if errors.password1 %}has-error{% endif %}" autocomplete="new-password" placeholder="Minimal 8 karakter">
+                <button type="button" class="btn-toggle-eye" onclick="togglePasswordEye('field-password', this)"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              {% if errors.password1 %}
+                <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.password1 }}</span>
+              {% endif %}
+            </div>
+            <div class="bmkg-form-group">
+              <label class="bmkg-label" for="field-password-confirm">Konfirmasi Sandi Baru</label>
+              <div class="password-toggle-group">
+                <input type="password" name="password2" id="field-password-confirm" class="bmkg-input with-eye {% if errors.password2 %}has-error{% endif %}" autocomplete="new-password" placeholder="Ulangi sandi baru">
+                <button type="button" class="btn-toggle-eye" onclick="togglePasswordEye('field-password-confirm', this)"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              {% if errors.password2 %}
+                <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.password2 }}</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="bmkg-form-group" style="margin-top: 1rem; max-width: 480px;">
+            <label class="bmkg-label" for="field-password-old">Konfirmasi Sandi Sysadmin Anda <span class="required-star">*</span></label>
+            <input type="password" name="old_password" id="field-password-old" class="bmkg-input {% if errors.oldpassword %}has-error{% endif %}" autocomplete="off" placeholder="Masukkan kata sandi Sysadmin Anda saat ini">
+            {% if errors.oldpassword %}
+              <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.oldpassword }}</span>
+            {% endif %}
+          </div>
+        {% else %}
+          <!-- Standard User / Self Password Change -->
+          <div class="bmkg-form-group" style="max-width: 480px;">
+            <label class="bmkg-label" for="field-password-old">Kata Sandi Saat Ini (Lama)</label>
+            <div class="password-toggle-group">
+              <input type="password" name="old_password" id="field-password-old" class="bmkg-input with-eye {% if errors.oldpassword %}has-error{% endif %}" autocomplete="current-password" placeholder="Masukkan kata sandi Anda saat ini">
+              <button type="button" class="btn-toggle-eye" onclick="togglePasswordEye('field-password-old', this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            {% if errors.oldpassword %}
+              <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.oldpassword }}</span>
+            {% else %}
+              <small class="field-helper-text">Diperlukan untuk memverifikasi kepemilikan akun sebelum mengubah sandi.</small>
+            {% endif %}
+          </div>
+
+          <div class="form-row-2col" style="margin-top: 1rem;">
+            <div class="bmkg-form-group">
+              <label class="bmkg-label" for="field-password">Kata Sandi Baru</label>
+              <div class="password-toggle-group">
+                <input type="password" name="password1" id="field-password" class="bmkg-input with-eye {% if errors.password1 %}has-error{% endif %}" autocomplete="new-password" placeholder="Minimal 8 karakter kombinasi">
+                <button type="button" class="btn-toggle-eye" onclick="togglePasswordEye('field-password', this)"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              {% if errors.password1 %}
+                <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.password1 }}</span>
+              {% endif %}
+            </div>
+
+            <div class="bmkg-form-group">
+              <label class="bmkg-label" for="field-password-confirm">Ulangi Kata Sandi Baru</label>
+              <div class="password-toggle-group">
+                <input type="password" name="password2" id="field-password-confirm" class="bmkg-input with-eye {% if errors.password2 %}has-error{% endif %}" autocomplete="new-password" placeholder="Ketik ulang kata sandi baru">
+                <button type="button" class="btn-toggle-eye" onclick="togglePasswordEye('field-password-confirm', this)"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              {% if errors.password2 %}
+                <span class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.password2 }}</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="bmkg-form-actions-bar">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        {% set is_deleted = data.state == 'deleted' %}
+        <button class="btn-interactive btn-save-profile" type="submit" name="save">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>{{ 'Aktifkan Kembali Akun' if is_deleted else 'Simpan Perubahan Profil' }}</span>
+        </button>
+        <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive btn-cancel-profile">
+          Batal
+        </a>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    function togglePasswordEye(inputId, btn) {
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      var icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        }
+      } else {
+        input.type = 'password';
+        if (icon) {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+    }
+  </script>
+{% endblock %}

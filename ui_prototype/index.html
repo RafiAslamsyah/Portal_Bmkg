@@ -2950,7 +2950,10 @@ if payload.get("success"):
       e.preventDefault();
       const id = document.getElementById('loginIdentifier').value;
       closeLoginModal();
-      showToast(`Login Administrator Berhasil! Hak akses CRUD aktif untuk akun: ${id}`);
+      showToast(`Login Administrator Berhasil! Mengalihkan ke halaman ckan-admin...`);
+      setTimeout(() => {
+        window.location.href = '/ckan-admin';
+      }, 700);
     }
 
     document.addEventListener('keydown', (e) => {

@@ -1,0 +1,134 @@
+{% extends "page.html" %}
+
+{% set u = user_dict or c.user_dict or current_user %}
+
+{% block subtitle %}Sunting Profil Pengguna — {{ u.display_name }} — Portal Data BMKG{% endblock %}
+
+{% block content %}
+<div class="user-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="user-hero">
+    <div class="user-hero-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <a href="{{ h.url_for('dashboard.datasets') }}">Dashboard</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>Pengaturan Akun &amp; Profil</span>
+      </div>
+
+      <div class="user-hero-content-row">
+        <div class="user-hero-info">
+          <div class="user-hero-badge">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Pusat Pengaturan Akun Pegawai BMKG</span>
+          </div>
+          <h1 class="user-hero-title">
+            Kelola Profil &amp; Kredensial Pengguna
+          </h1>
+          <p class="user-hero-lead">
+            Perbarui data profil kedinasan, surat elektronik resmi @bmkg.go.id, foto profil, serta lakukan pembaruan kata sandi akun secara berkala untuk menjaga integritas data.
+          </p>
+        </div>
+
+        <div class="user-hero-quick-actions">
+          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive btn-hero-back" title="Kembali ke Dashboard">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- Modern Segmented Navigation Tabs -->
+      <nav class="dashboard-nav-tabs">
+        <a href="{{ h.url_for('user.edit', id=u.name) }}" class="dashboard-tab-item active">
+          <i class="fa-solid fa-user-gear"></i>
+          <span>Profil &amp; Sandi</span>
+        </a>
+        <a href="{{ h.url_for('dashboard.datasets') }}" class="dashboard-tab-item">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Dashboard Dataset</span>
+        </a>
+        {% if u.sysadmin %}
+          <a href="{{ h.url_for('admin.index') }}" class="dashboard-tab-item" style="margin-left: auto;">
+            <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i>
+            <span>Konsol Admin</span>
+          </a>
+        {% endif %}
+      </nav>
+    </div>
+  </section>
+
+  <!-- 2. Content Layout Grid -->
+  <div class="user-layout-container">
+    <div class="user-main-col">
+      {% block primary_content_inner %}
+        {{ form | safe }}
+      {% endblock %}
+    </div>
+
+    <!-- Sidebar Guidance & User Summary -->
+    <aside class="user-sidebar-col">
+      <!-- Card Ringkasan Akun -->
+      <div class="bmkg-admin-card user-summary-card">
+        <div class="user-summary-header">
+          <div class="user-summary-avatar">
+            {% if u.image_url %}
+              <img src="{{ u.image_url }}" alt="{{ u.display_name }}">
+            {% else %}
+              <div class="avatar-fallback">{{ (u.fullname or u.name or 'A')[:2]|upper }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <h4 class="user-summary-name">{{ u.fullname or u.name }}</h4>
+            <div class="user-summary-email">{{ u.email or 'admin@bmkg.go.id' }}</div>
+            <div class="user-summary-role">
+              {% if u.sysadmin %}
+                <span class="badge-role-sysadmin"><i class="fa-solid fa-shield-halved"></i> Sysadmin Pusdatin</span>
+              {% else %}
+                <span class="badge-role-admin"><i class="fa-solid fa-user-check"></i> Pengelola Data BMKG</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="user-summary-stats">
+          <div class="stat-mini-item">
+            <span class="stat-mini-label">Status Akun</span>
+            <span class="stat-mini-val text-success"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+          </div>
+          <div class="stat-mini-item">
+            <span class="stat-mini-label">Username / NIP</span>
+            <span class="stat-mini-val font-mono">{{ u.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Standar Keamanan Sandi -->
+      <div class="bmkg-admin-card security-alert-card">
+        <div class="admin-card-header">
+          <i class="fa-solid fa-shield-halved" style="color: #005a9e;"></i>
+          <span>Standar Keamanan Sandi BMKG</span>
+        </div>
+        <div class="admin-card-body">
+          <p style="font-size: 0.84rem; color: #334155; line-height: 1.5; margin: 0 0 0.85rem 0;">
+            Sesuai standar operasional keamanan informasi Pusdatin BMKG:
+          </p>
+          <ul class="dashboard-guide-list">
+            <li>
+              <i class="fa-solid fa-lock text-primary"></i>
+              <span>Minimal panjang kata sandi adalah <strong>8 karakter</strong>.</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-key text-info"></i>
+              <span>Gunakan kombinasi <strong>huruf besar, kecil, angka, dan simbol</strong>.</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-user-secret text-danger"></i>
+              <span>Dilarang membagikan kredensial atau sandi kedinasan kepada pihak luar.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

@@ -89,33 +89,39 @@
       </div>
 
       <!-- Dynamic Facets from CKAN / Solr -->
-      {% for facet_name, facet_title in facet_titles.items() %}
-        {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
-        {% if items %}
-          <div class="filter-group">
-            <div class="filter-group-title">
-              <span>{{ facet_title }}</span>
-              <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
-            </div>
-            <ul class="filter-items-list">
-              {% for item in items %}
-                {% set href = h.remove_url_param(facet_name, item.name) if item.active else h.add_url_param(new_params={facet_name: item.name}) %}
-                <li>
-                  <a href="{{ href }}" class="filter-item-label" style="text-decoration: none; {% if item.active %}background: var(--bmkg-blue-subtle);{% endif %}">
-                    <span class="filter-checkbox-wrap">
-                      <input type="checkbox" {% if item.active %}checked{% endif %} style="pointer-events: none;">
-                      <span style="{% if item.active %}font-weight: 700; color: var(--bmkg-blue-deep);{% endif %}">
-                        {{ item.display_name }}
+      {% if facet_titles %}
+        {% for facet_name, facet_title in facet_titles.items() %}
+          {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
+          {% if items %}
+            <div class="filter-group">
+              <div class="filter-group-title">
+                <span>{{ facet_title }}</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+              </div>
+              <ul class="filter-items-list">
+                {% for item in items %}
+                  {% set href = h.remove_url_param(facet_name, item.name) if item.active else h.add_url_param(new_params={facet_name: item.name}) %}
+                  <li>
+                    <a href="{{ href }}" class="filter-item-label" style="text-decoration: none; {% if item.active %}background: var(--bmkg-blue-subtle);{% endif %}">
+                      <span class="filter-checkbox-wrap">
+                        {% if item.active %}
+                          <i class="fa-solid fa-square-check" style="color: var(--bmkg-blue); font-size: 0.85rem; flex-shrink: 0;"></i>
+                        {% else %}
+                          <i class="fa-regular fa-square" style="color: #94a3b8; font-size: 0.85rem; flex-shrink: 0;"></i>
+                        {% endif %}
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; {% if item.active %}font-weight: 700; color: var(--bmkg-blue-deep);{% endif %}">
+                          {{ item.display_name }}
+                        </span>
                       </span>
-                    </span>
-                    <span class="filter-count-badge">{{ item.count }}</span>
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endif %}
-      {% endfor %}
+                      <span class="filter-count-badge">{{ item.count }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </aside>
 
     <!-- Right Column: Result Status Bar & Cards -->
@@ -138,7 +144,7 @@
               ('Judul (Z - A)', 'title_string desc')
             ] %}
             {% for label, sort_val in sort_options %}
-              <option value="{{ h.add_url_param(new_params={'sort': sort_val}) }}" {% if sort_by_selected == sort_val %}selected{% endif %}>
+              <option value="{{ h.remove_url_param('sort', replace=sort_val) }}" {% if sort_by_selected == sort_val %}selected{% endif %}>
                 {{ label }}
               </option>
             {% endfor %}
@@ -157,19 +163,21 @@
           </span>
         {% endif %}
 
-        {% for facet_name, facet_title in facet_titles.items() %}
-          {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
-          {% for item in items %}
-            {% if item.active %}
-              <span class="chip-badge">
-                <span>{{ facet_title }}: <strong>{{ item.display_name }}</strong></span>
-                <a href="{{ h.remove_url_param(facet_name, item.name) }}" style="color: inherit; text-decoration: none; margin-left: 4px;" title="Hapus filter {{ item.display_name }}">
-                  <i class="fa-solid fa-circle-xmark"></i>
-                </a>
-              </span>
-            {% endif %}
+        {% if facet_titles %}
+          {% for facet_name, facet_title in facet_titles.items() %}
+            {% set items = h.get_facet_items_dict(facet_name, search_facets) %}
+            {% for item in items %}
+              {% if item.active %}
+                <span class="chip-badge">
+                  <span>{{ facet_title }}: <strong>{{ item.display_name }}</strong></span>
+                  <a href="{{ h.remove_url_param(facet_name, item.name) }}" style="color: inherit; text-decoration: none; margin-left: 4px;" title="Hapus filter {{ item.display_name }}">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                  </a>
+                </span>
+              {% endif %}
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
+        {% endif %}
       </div>
 
       <!-- Dataset Cards List -->

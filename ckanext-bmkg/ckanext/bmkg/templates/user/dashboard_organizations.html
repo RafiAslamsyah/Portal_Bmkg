@@ -1,0 +1,38 @@
+{% extends "user/dashboard.html" %}
+
+{% set org_type = h.default_group_type('organization') %}
+
+{% block dashboard_card_title %}Unit Kerja / Organisasi Kedinasan BMKG{% endblock %}
+{% block dashboard_card_desc %}Daftar Kedeputian, Balai Besar MKG, dan Stasiun Pemantau tempat Anda terdaftar sebagai pengelola data.{% endblock %}
+
+{% block dashboard_card_actions %}
+  {% if h.check_access('organization_create') %}
+    <a href="{{ h.url_for(org_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+      <i class="fa-solid fa-plus"></i> Tambah Unit Kerja
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+  {% set organizations = h.organizations_available(permission='manage_group', include_dataset_count=True, include_member_count=True) %}
+  {% if organizations %}
+    <div class="dashboard-org-grid">
+      {% snippet "organization/snippets/organization_list.html", organizations=organizations, show_capacity=True %}
+    </div>
+  {% else %}
+    <div class="dashboard-empty-state">
+      <div class="empty-state-icon">
+        <i class="fa-solid fa-building-circle-xmark"></i>
+      </div>
+      <h4 class="empty-state-title">Belum Terdaftar di Unit Kerja</h4>
+      <p class="empty-state-desc">
+        Akun Anda belum terdaftar sebagai anggota atau pengelola unit kerja/organisasi BMKG mana pun.
+      </p>
+      {% if h.check_access('organization_create') %}
+        <a href="{{ h.url_for(org_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+          <i class="fa-solid fa-plus"></i> Daftarkan Unit Kerja Baru
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
