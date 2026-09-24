@@ -101,7 +101,6 @@
 
     <div class="pillars-grid">
       <!-- Meteorologi -->
-      <a href="#peta" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi')">
       <a href="/dataset/?groups=meteorologi" class="pillar-box meteorologi scroll-reveal stagger-1" onclick="filterByPilar('meteorologi', event)">
         <div>
           <div class="pillar-header">
@@ -126,7 +125,6 @@
       </a>
 
       <!-- Klimatologi -->
-      <a href="#peta" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi')">
       <a href="/dataset/?groups=klimatologi" class="pillar-box klimatologi scroll-reveal stagger-2" onclick="filterByPilar('klimatologi', event)">
         <div>
           <div class="pillar-header">
@@ -157,7 +155,6 @@
       </a>
 
       <!-- Geofisika -->
-      <a href="#peta" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika')">
       <a href="/dataset/?groups=geofisika" class="pillar-box geofisika scroll-reveal stagger-3" onclick="filterByPilar('geofisika', event)">
         <div>
           <div class="pillar-header">
@@ -183,8 +180,6 @@
       </a>
 
       <!-- Kualitas Udara -->
-      <a href="#peta" class="pillar-box kualitas-udara scroll-reveal stagger-4"
-        onclick="filterByPilar('kualitas-udara')">
       <a href="/dataset/?groups=kualitas-udara" class="pillar-box kualitas-udara scroll-reveal stagger-4"
         onclick="filterByPilar('kualitas-udara', event)">
         <div>
@@ -1035,10 +1030,6 @@ if payload.get("success"):
 
   function applySearchTag(tagText) {
     const input = document.getElementById('portalSearchInput');
-    input.value = tagText;
-    handleLiveSearch(tagText);
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    input.focus();
     if (input) {
       input.value = tagText;
     }
@@ -1046,20 +1037,15 @@ if payload.get("success"):
   }
 
   function executeSearch() {
-    const query = document.getElementById('portalSearchInput').value.trim();
     const input = document.getElementById('portalSearchInput');
     const query = input ? input.value.trim() : '';
     if (!query) {
-      showToast("Silakan ketik kata kunci pencarian dataset terlebih dahulu");
       window.location.href = '/dataset/';
       return;
     }
-    showToast(`Mencari dataset: "${query}" (Endpoint: /dataset?q=${encodeURIComponent(query)})`);
     window.location.href = '/dataset/?q=' + encodeURIComponent(query);
   }
 
-  function filterByPilar(pilar) {
-    showToast(`Memfilter pilar: ${pilar.toUpperCase()}`);
   function filterByPilar(pilar, event) {
     if (event) {
       event.preventDefault();
