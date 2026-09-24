@@ -20,7 +20,6 @@
       </div>
       <input type="text" id="portalSearchInput" class="search-input"
         placeholder="Ketik nama dataset, parameter cuaca, wilayah, atau kode stasiun WMO..."
-        oninput="handleLiveSearch(this.value)" />
         oninput="handleLiveSearch(this.value)"
         onkeydown="if(event.key === 'Enter') executeSearch()" />
       <button class="btn-interactive search-submit-btn" onclick="executeSearch()">
@@ -180,8 +179,7 @@
       </a>
 
       <!-- Kualitas Udara -->
-      <a href="/dataset/?groups=kualitas-udara" class="pillar-box kualitas-udara scroll-reveal stagger-4"
-        onclick="filterByPilar('kualitas-udara', event)">
+      <a href="/dataset/?groups=kualitas-udara" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara', event)">
         <div>
           <div class="pillar-header">
             <div class="pillar-icon-badge">
@@ -518,6 +516,14 @@ if payload.get("success"):
     maxZoom: 18,
     zoomControl: true,
     attributionControl: false
+  });
+
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 250);
+
+  window.addEventListener('resize', () => {
+    map.invalidateSize();
   });
 
   // Definisi Basemap Berwarna Bersih (Bebas Watermark, Bebas API Key, Bebas Blokir OSM)
@@ -981,12 +987,10 @@ if payload.get("success"):
     }
   }
 
-  // Live Search Filter with Instant Count
   // Live Search Filter with Real CKAN package_search API Debounced
   let liveSearchTimer = null;
   function handleLiveSearch(query) {
     const feedback = document.getElementById('liveSearchFeedback');
-    const clean = query.trim().toLowerCase();
     if (!feedback) return;
     const clean = query ? query.trim() : '';
     if (!clean) {
@@ -995,9 +999,6 @@ if payload.get("success"):
       return;
     }
 
-    // Simulated matches from catalog
-    const count = Math.floor(Math.random() * 12) + 4;
-    feedback.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Ditemukan <strong>${count} dataset</strong> yang cocok dengan kata kunci <em>"${query}"</em>`;
     if (liveSearchTimer) clearTimeout(liveSearchTimer);
     feedback.innerHTML = '<span style="color: #64748b; font-weight: 500;"><i class="fa-solid fa-spinner fa-spin"></i> Mencari dataset...</span>';
 
