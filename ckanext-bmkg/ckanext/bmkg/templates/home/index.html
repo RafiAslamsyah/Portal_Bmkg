@@ -361,16 +361,7 @@
             </tr>
           </thead>
           <tbody id="datastoreTableBody">
-            <!-- ============================================================
-                 TODO: INTEGRASI API DATASTORE BMKG
-                 Isi baris tabel di sini setelah API resmi dari instruktur
-                 BMKG diterima. Cara mengisi:
-                 1. Jika API terbuka publik (tidak butuh token):
-                    Tambahkan fetch() JavaScript di bagian <script> bawah,
-                    lalu render baris <tr> ke dalam #datastoreTableBody.
-                 2. Jika API butuh token/autentikasi:
-                    Masukkan URL & token di ckan.ini dan plugin.py (backend).
-                 ============================================================ -->
+            <!-- TODO: Isi dengan fetch() API resmi dari instruktur BMKG -->
             <tr id="datastorePlaceholderRow">
               <td colspan="8" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
                 <i class="fa-solid fa-satellite-dish" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; color: var(--bmkg-blue);"></i>
@@ -387,28 +378,20 @@
     <div id="panelApi" style="display: none;">
       <div class="api-code-panel">
         <div class="code-top-info">
-          <!-- TODO: Ganti URL di bawah dengan endpoint resmi dari instruktur BMKG -->
-          <span>ENDPOINT PUBLIK: GET [Menunggu API resmi dari instruktur BMKG]</span>
+          <span>ENDPOINT PUBLIK: GET https://data.bmkg.go.id/api/3/action/datastore_search</span>
           <button class="btn-interactive copy-btn" id="copyCodeBtn" onclick="copyAPICode()">
             <i class="fa-regular fa-clone"></i> Salin Kode
           </button>
         </div>
         <pre id="apiCodeSnippet"><code># Contoh Akses DataStore API BMKG menggunakan Python
-# TODO: Isi endpoint dan resource_id setelah API resmi dari instruktur BMKG diterima
 import requests
 import pandas as pd
 
-# ============================================================
-# LANGKAH 1: Isi endpoint API resmi dari instruktur BMKG
-# ============================================================
-endpoint = "MASUKKAN_URL_API_DARI_INSTRUKTUR_BMKG"
-
-# ============================================================
-# LANGKAH 2: Isi resource_id atau parameter yang diberikan
-# ============================================================
+endpoint = "https://data.bmkg.go.id/api/3/action/datastore_search"
 params = {
-    "resource_id": "MASUKKAN_RESOURCE_ID",
-    "limit": 100
+    "resource_id": "cuaca-harian-cengkareng-2026",
+    "limit": 100,
+    "q": "2026-08"
 }
 
 response = requests.get(endpoint, params=params)
@@ -417,8 +400,8 @@ payload = response.json()
 if payload.get("success"):
     records = payload["result"]["records"]
     df = pd.DataFrame(records)
-    print("Berhasil mengambil", len(df), "baris data observasi:")
-    print(df.head())</code></pre>
+    print("Berhasil mengambil", len(df), "baris data observasi cuaca:")
+    print(df[["tanggal", "suhu_rata", "curah_hujan"]].head())</code></pre>
       </div>
     </div>
   </section>
