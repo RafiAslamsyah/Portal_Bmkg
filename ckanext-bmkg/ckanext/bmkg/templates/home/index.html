@@ -360,76 +360,23 @@
               <th onclick="sortTable(7)">curah_hujan (mm) <i class="fa-solid fa-sort"></i></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>2026-08-01</td>
-              <td>96749</td>
-              <td>Stamet Soekarno-Hatta</td>
-              <td>24.2</td>
-              <td>32.8</td>
-              <td>28.5</td>
-              <td>78</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <td>2026-08-02</td>
-              <td>96749</td>
-              <td>Stamet Soekarno-Hatta</td>
-              <td>24.0</td>
-              <td>33.2</td>
-              <td>28.9</td>
-              <td>76</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <td>2026-08-03</td>
-              <td>96749</td>
-              <td>Stamet Soekarno-Hatta</td>
-              <td>23.8</td>
-              <td>32.0</td>
-              <td>27.8</td>
-              <td>82</td>
-              <td>14.5</td>
-            </tr>
-            <tr>
-              <td>2026-08-04</td>
-              <td>96749</td>
-              <td>Stamet Soekarno-Hatta</td>
-              <td>24.4</td>
-              <td>31.5</td>
-              <td>27.2</td>
-              <td>85</td>
-              <td>32.0</td>
-            </tr>
-            <tr>
-              <td>2026-08-05</td>
-              <td>96749</td>
-              <td>Stamet Soekarno-Hatta</td>
-              <td>24.6</td>
-              <td>33.0</td>
-              <td>28.6</td>
-              <td>79</td>
-              <td>4.2</td>
-            </tr>
-            <tr>
-              <td>2026-08-06</td>
-              <td>96745</td>
-              <td>Stamet Kemayoran</td>
-              <td>25.0</td>
-              <td>33.5</td>
-              <td>29.1</td>
-              <td>74</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <td>2026-08-07</td>
-              <td>96745</td>
-              <td>Stamet Kemayoran</td>
-              <td>24.8</td>
-              <td>34.0</td>
-              <td>29.4</td>
-              <td>72</td>
-              <td>0.0</td>
+          <tbody id="datastoreTableBody">
+            <!-- ============================================================
+                 TODO: INTEGRASI API DATASTORE BMKG
+                 Isi baris tabel di sini setelah API resmi dari instruktur
+                 BMKG diterima. Cara mengisi:
+                 1. Jika API terbuka publik (tidak butuh token):
+                    Tambahkan fetch() JavaScript di bagian <script> bawah,
+                    lalu render baris <tr> ke dalam #datastoreTableBody.
+                 2. Jika API butuh token/autentikasi:
+                    Masukkan URL & token di ckan.ini dan plugin.py (backend).
+                 ============================================================ -->
+            <tr id="datastorePlaceholderRow">
+              <td colspan="8" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-satellite-dish" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; color: var(--bmkg-blue);"></i>
+                <strong style="display: block; margin-bottom: 0.25rem; color: var(--text-primary);">Menunggu Koneksi API DataStore BMKG</strong>
+                <span style="font-size: 0.85rem;">Data observasi akan ditampilkan setelah endpoint API resmi dari BMKG terhubung.</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -440,20 +387,28 @@
     <div id="panelApi" style="display: none;">
       <div class="api-code-panel">
         <div class="code-top-info">
-          <span>ENDPOINT PUBLIK: GET https://data.bmkg.go.id/api/3/action/datastore_search</span>
+          <!-- TODO: Ganti URL di bawah dengan endpoint resmi dari instruktur BMKG -->
+          <span>ENDPOINT PUBLIK: GET [Menunggu API resmi dari instruktur BMKG]</span>
           <button class="btn-interactive copy-btn" id="copyCodeBtn" onclick="copyAPICode()">
             <i class="fa-regular fa-clone"></i> Salin Kode
           </button>
         </div>
         <pre id="apiCodeSnippet"><code># Contoh Akses DataStore API BMKG menggunakan Python
+# TODO: Isi endpoint dan resource_id setelah API resmi dari instruktur BMKG diterima
 import requests
 import pandas as pd
 
-endpoint = "https://data.bmkg.go.id/api/3/action/datastore_search"
+# ============================================================
+# LANGKAH 1: Isi endpoint API resmi dari instruktur BMKG
+# ============================================================
+endpoint = "MASUKKAN_URL_API_DARI_INSTRUKTUR_BMKG"
+
+# ============================================================
+# LANGKAH 2: Isi resource_id atau parameter yang diberikan
+# ============================================================
 params = {
-    "resource_id": "cuaca-harian-cengkareng-2026",
-    "limit": 100,
-    "q": "2026-08"
+    "resource_id": "MASUKKAN_RESOURCE_ID",
+    "limit": 100
 }
 
 response = requests.get(endpoint, params=params)
@@ -462,8 +417,8 @@ payload = response.json()
 if payload.get("success"):
     records = payload["result"]["records"]
     df = pd.DataFrame(records)
-    print("Berhasil mengambil", len(df), "baris data observasi cuaca:")
-    print(df[["tanggal", "suhu_rata", "curah_hujan"]].head())</code></pre>
+    print("Berhasil mengambil", len(df), "baris data observasi:")
+    print(df.head())</code></pre>
       </div>
     </div>
   </section>
