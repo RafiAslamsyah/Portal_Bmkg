@@ -37,7 +37,6 @@
       {% endif %}
 
       <!-- Admin Quick Action Buttons (Edit / Kelola Berkas) -->
-      {% if c.userobj and (c.userobj.sysadmin or can_edit) %}
       {% set current_u = g.userobj or c.userobj %}
       {% if current_u and (current_u.sysadmin or can_edit) %}
         <div class="card-admin-group">
