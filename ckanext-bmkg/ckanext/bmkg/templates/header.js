@@ -1,0 +1,123 @@
+/**
+ * Portal Open Data BMKG — Komponen Tampilan Front-End (header)
+ * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\header.html ke JavaScript (.js)
+ */
+
+function renderHeader(context = {}) {
+  return `  <!-- 1. Top Identity Bar -->
+  <div class="gov-identity-bar">
+    <div class="gov-identity-inner">
+      <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
+        <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
+        <span id="liveClockDate" style="color: #cbd5e1;"></span>
+        <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
+        <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
+      </div>
+      <script>
+        (function() {
+          function renderBmkgClock() {
+            var tElem = document.getElementById('liveClockTime');
+            var dElem = document.getElementById('liveClockDate');
+            if (!tElem || !dElem) return;
+            var now = new Date();
+            var dOpts = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+            dElem.textContent = now.toLocaleDateString('id-ID', dOpts);
+            var hh = String(now.getHours()).padStart(2, '0');
+            var mm = String(now.getMinutes()).padStart(2, '0');
+            var ss = String(now.getSeconds()).padStart(2, '0');
+            var offset = -now.getTimezoneOffset() / 60;
+            var tz = 'WIB';
+            if (offset === 8) tz = 'WITA';
+            else if (offset === 9) tz = 'WIT';
+            else if (offset !== 7) tz = (offset >= 0 ? 'UTC+' : 'UTC') + offset;
+            tElem.textContent = hh + ':' + mm + ':' + ss + ' ' + tz;
+          }
+          renderBmkgClock();
+          if (!window._bmkgClockInterval) {
+            window._bmkgClockInterval = setInterval(renderBmkgClock, 1000);
+          }
+        })();
+      </script>
+      <div class="gov-links">
+        <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
+        <a href="#kontak">Layanan Bantuan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Site Header with Official BMKG Logo -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="{{ h.url_for('home.index') }}" class="brand-section">
+        <div class="bmkg-official-logo">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-names">
+          <div class="brand-title">
+            Portal Data BMKG
+          </div>
+          <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+        </div>
+      </a>
+
+      <nav class="primary-nav">
+        <a href="{{ h.url_for('home.index') }}" class="{% if request.endpoint == 'home.index' %}active{% endif %}">Beranda</a>
+        <a href="{{ h.url_for('dataset.search') }}" class="{% if request.endpoint == 'dataset.search' %}active{% endif %}">Katalog Data</a>
+        <a href="{{ h.url_for('home.index') }}#pilar">4 Pilar MKG</a>
+        <a href="{{ h.url_for('home.index') }}#peta">Peta Observasi</a>
+        <a href="{{ h.url_for('home.index') }}#datastore">DataStore API</a>
+      </nav>
+
+      <div class="header-right-actions">
+        {% set current_u = g.userobj or c.userobj %}
+        {% if current_u %}
+          <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive btn-header-add" title="Tambah Dataset Baru">
+            <i class="fa-solid fa-plus"></i>
+            <span>Tambah Data</span>
+          </a>
+          <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive btn-header-nav-link" title="Dashboard Dataset Saya">
+            <i class="fa-solid fa-gauge-high" style="color: var(--bmkg-blue);"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{{ h.url_for('user.edit', id=current_u.name) }}" class="btn-interactive btn-header-nav-link" title="Kelola Profil &amp; Sandi Pengguna">
+            <i class="fa-solid fa-user-gear" style="color: var(--bmkg-blue);"></i>
+            <span>Profil &amp; Sandi</span>
+          </a>
+          {% set admin_url = h.url_for('admin.index') if current_u.sysadmin else h.url_for('dashboard.datasets') %}
+          <a href="{{ admin_url }}" class="btn-interactive header-user-badge" title="Akses Panel Admin BMKG">
+            <i class="fa-solid fa-circle-user"></i>
+            <span>{{ current_u.display_name }}</span>
+            <span class="badge-admin-tag">{% if current_u.sysadmin %}SYSADMIN{% else %}ADMIN{% endif %}</span>
+          </a>
+          <form action="{{ h.url_for('user.logout') }}" method="post" style="display: inline; margin: 0;">
+            {{ h.csrf_input() }}
+            <button type="submit" class="btn-interactive btn-header-logout" title="Keluar">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Keluar</span>
+            </button>
+          </form>
+        {% else %}
+          <button class="btn-interactive btn-header-login" onclick="openLoginModal()" title="Login Administrator / Pengelola Data BMKG">
+            <i class="fa-solid fa-lock"></i>
+            <span>Login</span>
+          </button>
+          <a href="{{ h.url_for('dataset.search') }}" class="btn-interactive btn-header-catalog" title="Jelajahi Katalog Data">
+            <i class="fa-solid fa-database"></i>
+            <span>Akses Data</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if not (g.userobj or c.userobj) %}
+    {% snippet 'snippets/login_modal.html' %}
+  {% endif %}
+`;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = renderHeader;
+  module.exports.renderHeader = renderHeader;
+  module.exports.default = renderHeader;
+}

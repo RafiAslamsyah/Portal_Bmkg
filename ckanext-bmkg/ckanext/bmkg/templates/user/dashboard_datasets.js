@@ -1,0 +1,42 @@
+/**
+ * Portal Open Data BMKG — Komponen Tampilan Front-End (dashboard_datasets)
+ * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\dashboard_datasets.html ke JavaScript (.js)
+ */
+
+function renderDashboardDatasets(context = {}) {
+  return `{% extends "user/dashboard.html" %}
+{% set dataset_type = h.default_package_type() %}
+
+{% block dashboard_card_title %}Koleksi Dataset Mandiri{% endblock %}
+{% block dashboard_card_desc %}Daftar dataset observasi, klimatologi, geofisika, atau kualitas udara resmi yang berada dalam pengelolaan akun Anda.{% endblock %}
+
+{% block primary_content_inner %}
+  {% if user_dict.datasets %}
+    <div class="dashboard-dataset-list">
+      {% snippet 'snippets/package_list.html', packages=user_dict.datasets %}
+    </div>
+  {% else %}
+    <div class="dashboard-empty-state">
+      <div class="empty-state-icon">
+        <i class="fa-solid fa-box-open"></i>
+      </div>
+      <h4 class="empty-state-title">Belum Ada Dataset yang Dikelola</h4>
+      <p class="empty-state-desc">
+        Anda belum mengunggah atau mengelola dataset pengamatan. Mulai bagikan data terbuka BMKG yang terstandarisasi untuk masyarakat, akademisi, dan pengembang.
+      </p>
+      {% if h.check_access('package_create') %}
+        <a href="{{ h.url_for(dataset_type ~ '.new') }}" class="btn-interactive btn-primary-action">
+          <i class="fa-solid fa-circle-plus"></i> Publikasikan Dataset Sekarang
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
+`;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = renderDashboardDatasets;
+  module.exports.renderDashboardDatasets = renderDashboardDatasets;
+  module.exports.default = renderDashboardDatasets;
+}

@@ -1,0 +1,55 @@
+/**
+ * Portal Open Data BMKG — Komponen Tampilan Front-End (stages)
+ * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\package\snippets\stages.html ke JavaScript (.js)
+ */
+
+function renderStages(context = {}) {
+  return `{# Stepper Wizard Modern Bertema Portal Open Data BMKG #}
+{% set s1 = stages[0] or 'active' %}
+{% set s2 = stages[1] or 'uncomplete' %}
+{% set dataset_type = dataset_type or h.default_package_type() %}
+
+<div class="bmkg-stepper-container">
+  <div class="bmkg-stepper-track">
+    <!-- Step 1: Metadata Dataset -->
+    <div class="bmkg-step-item {{ s1 }} {% if s1 == 'complete' %}is-done{% elif s1 == 'active' %}is-active{% else %}is-pending{% endif %}">
+      <div class="step-indicator">
+        {% if s1 == 'complete' %}
+          <i class="fa-solid fa-check"></i>
+        {% else %}
+          <span>1</span>
+        {% endif %}
+      </div>
+      <div class="step-meta">
+        <span class="step-badge">Tahap 1</span>
+        <span class="step-title">{{ 'Edit Informasi Dataset' if form_style == 'edit' else 'Informasi & Metadata' }}</span>
+      </div>
+    </div>
+
+    <!-- Stepper Divider Line -->
+    <div class="bmkg-step-divider {% if s1 == 'complete' %}divider-completed{% endif %}"></div>
+
+    <!-- Step 2: Berkas Sumber Data -->
+    <div class="bmkg-step-item {{ s2 }} {% if s2 == 'complete' %}is-done{% elif s2 == 'active' %}is-active{% else %}is-pending{% endif %}">
+      <div class="step-indicator">
+        {% if s2 == 'complete' %}
+          <i class="fa-solid fa-check"></i>
+        {% else %}
+          <span>2</span>
+        {% endif %}
+      </div>
+      <div class="step-meta">
+        <span class="step-badge">Tahap 2</span>
+        <span class="step-title">Unggah &amp; Konfigurasi Berkas</span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = renderStages;
+  module.exports.renderStages = renderStages;
+  module.exports.default = renderStages;
+}

@@ -1,0 +1,134 @@
+/**
+ * Portal Open Data BMKG — Komponen Tampilan Front-End (login_modal)
+ * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\snippets\login_modal.html ke JavaScript (.js)
+ */
+
+function renderLoginModal(context = {}) {
+  return `<!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
+<div class="bmkg-modal-overlay" id="loginModal" onclick="handleModalBackdropClick(event)">
+  <div class="login-dialog-card" onclick="event.stopPropagation()">
+    <div class="login-card-header">
+      <div style="width: 34px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+        <img src="/img/logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: #ffffff; line-height: 1.2;" id="modalHeaderTitle">Portal Data BMKG</h3>
+        <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 2px;" id="modalHeaderSubtitle">Login Administrator &amp; Pengelola Data (CRUD)</div>
+      </div>
+      <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup Dialog">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="login-card-body">
+      <!-- Banner Informasi Hak Akses Publik vs Admin (Ringkas & Informatif) -->
+      <div class="login-info-banner">
+        <i class="fa-solid fa-circle-info" style="color: var(--bmkg-blue); font-size: 1rem; margin-top: 2px; flex-shrink: 0;"></i>
+        <div>
+          <strong style="color: var(--bmkg-blue-deep); display: block; margin-bottom: 2px; font-size: 0.78rem;">Data Terbuka untuk Publik (Bebas Akses):</strong>
+          Unduh dataset &amp; API publik <strong>tidak memerlukan login</strong>. Form ini khusus bagi <strong>Administrator / Pengelola Data BMKG</strong>.
+        </div>
+      </div>
+
+      <form id="loginForm" action="{{ h.url_for('user.login') }}" method="post" onsubmit="handleLoginSubmit(event)">
+        {{ h.csrf_input() }}
+        <input type="hidden" name="came_from" value="{{ h.url_for('admin.index') }}">
+
+        <div class="form-group" id="formGroupIdentifier">
+          <label id="labelIdentifier">Username / NIP Pegawai BMKG</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user-shield input-icon"></i>
+            <input type="text" name="login" id="loginIdentifier" class="form-control-input with-icon"
+              placeholder="contoh: admin_bmkg atau NIP" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Kata Sandi Administrator</label>
+          <div class="password-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" name="password" id="loginPassword" class="form-control-input with-icon with-eye"
+              placeholder="Masukkan kata sandi akun" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; font-size: 0.78rem;">
+          <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); cursor: pointer; user-select: none;">
+            <input type="checkbox" name="remember" value="63072000" checked> Ingat sesi login
+          </label>
+          <a href="#" onclick="alert('Silakan hubungi Administrator Pusdatin BMKG untuk pemulihan akun'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
+        </div>
+
+        <button type="submit" class="btn-interactive btn-login-submit">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span id="btnLoginText">Masuk sebagai Administrator</span>
+        </button>
+      </form>
+
+      <div class="login-footer-security">
+        <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
+        Terproteksi Single Sign-On (SSO) Pusdatin BMKG &amp; Enkripsi TLS 1.3
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      var idInput = document.getElementById('loginIdentifier');
+      if (idInput) idInput.focus();
+    }, 80);
+  }
+
+  function closeLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function handleModalBackdropClick(e) {
+    if (e.target.id === 'loginModal') {
+      closeLoginModal();
+    }
+  }
+
+  function togglePasswordVisibility(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    } else {
+      input.type = 'password';
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  }
+
+  function handleLoginSubmit(e) {
+    return true;
+  }
+</script>
+`;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = renderLoginModal;
+  module.exports.renderLoginModal = renderLoginModal;
+  module.exports.default = renderLoginModal;
+}

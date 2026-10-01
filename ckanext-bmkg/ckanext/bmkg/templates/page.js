@@ -1,0 +1,42 @@
+/**
+ * Portal Open Data BMKG — Komponen Tampilan Front-End (page)
+ * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\page.html ke JavaScript (.js)
+ */
+
+function renderPage(context = {}) {
+  return `{% ckan_extends %}
+
+{% block styles %}
+  {{ super() }}
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Theme CSS BMKG -->
+  <link rel="stylesheet" href="/css/bmkg-theme.css?v=2.1.0">
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- BMKG Real-Time Clock Module -->
+  <script src="/js/bmkg-realtime-clock.js"></script>
+{% endblock %}
+
+{% block body_extras %}
+  {{ super() }}
+  <script src="/js/bmkg-realtime-clock.js"></script>
+{% endblock %}
+`;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = renderPage;
+  module.exports.renderPage = renderPage;
+  module.exports.default = renderPage;
+}
