@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (config)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\admin\config.html ke JavaScript (.js)
- */
-
-function renderConfig(context = {}) {
-  return `{% extends "admin/base.html" %}
+{% extends "admin/base.html" %}
 
 {% block primary_content_inner %}
   <div class="bmkg-admin-card">
@@ -70,11 +64,3 @@ function renderConfig(context = {}) {
     </div>
   </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderConfig;
-  module.exports.renderConfig = renderConfig;
-  module.exports.default = renderConfig;
-}

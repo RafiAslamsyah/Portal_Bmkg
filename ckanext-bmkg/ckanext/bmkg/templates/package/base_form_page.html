@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (base_form_page)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\package\base_form_page.html ke JavaScript (.js)
- */
-
-function renderBaseFormPage(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% block subtitle %}{{ h.humanize_entity_type('package', dataset_type, 'create title') or 'Tambah Dataset Baru' }}{% endblock %}
 
@@ -113,11 +107,3 @@ function renderBaseFormPage(context = {}) {
   </div>
 </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderBaseFormPage;
-  module.exports.renderBaseFormPage = renderBaseFormPage;
-  module.exports.default = renderBaseFormPage;
-}

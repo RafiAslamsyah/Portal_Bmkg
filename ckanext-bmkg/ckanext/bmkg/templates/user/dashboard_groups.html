@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (dashboard_groups)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\dashboard_groups.html ke JavaScript (.js)
- */
-
-function renderDashboardGroups(context = {}) {
-  return `{% extends "user/dashboard.html" %}
+{% extends "user/dashboard.html" %}
 
 {% set group_type = h.default_group_type('group') %}
 
@@ -42,11 +36,3 @@ function renderDashboardGroups(context = {}) {
     </div>
   {% endif %}
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderDashboardGroups;
-  module.exports.renderDashboardGroups = renderDashboardGroups;
-  module.exports.default = renderDashboardGroups;
-}

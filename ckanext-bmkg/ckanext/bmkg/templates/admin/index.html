@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (index)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\admin\index.html ke JavaScript (.js)
- */
-
-function renderIndex(context = {}) {
-  return `{% extends "admin/base.html" %}
+{% extends "admin/base.html" %}
 
 {% block primary_content_inner %}
   <!-- CARD 1: Tabel Sysadmin Terdaftar -->
@@ -124,11 +118,3 @@ function renderIndex(context = {}) {
     </div>
   </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderIndex;
-  module.exports.renderIndex = renderIndex;
-  module.exports.default = renderIndex;
-}

@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (trash)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\admin\trash.html ke JavaScript (.js)
- */
-
-function renderTrash(context = {}) {
-  return `{% extends "admin/base.html" %}
+{% extends "admin/base.html" %}
 
 {% block primary_content_inner %}
   <div class="bmkg-admin-card">
@@ -46,11 +40,3 @@ function renderTrash(context = {}) {
     </div>
   </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderTrash;
-  module.exports.renderTrash = renderTrash;
-  module.exports.default = renderTrash;
-}

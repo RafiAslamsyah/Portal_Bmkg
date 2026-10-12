@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (package_item)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\snippets\package_item.html ke JavaScript (.js)
- */
-
-function renderPackageItem(context = {}) {
-  return `{# Template Universal Kartu Dataset BMKG (User Publik & Admin) #}
+{# Template Kartu Dataset BMKG Responsif & User-Friendly (User Publik & Admin) #}
 {% set title = package.title or package.name %}
 {% set notes = h.markdown_extract(package.notes, extract_length=200) %}
 {% set pilar = h.bmkg_get_package_pilar(package) %}
@@ -126,11 +120,3 @@ function renderPackageItem(context = {}) {
     </div>
   </div>
 </article>
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderPackageItem;
-  module.exports.renderPackageItem = renderPackageItem;
-  module.exports.default = renderPackageItem;
-}

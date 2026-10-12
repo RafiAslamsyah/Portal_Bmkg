@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (edit_user_form)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\edit_user_form.html ke JavaScript (.js)
- */
-
-function renderEditUserForm(context = {}) {
-  return `{% import 'macros/form.html' as form %}
+{% import 'macros/form.html' as form %}
 
 {% block form %}
   <form id="user-edit-form" class="bmkg-user-edit-form" method="post" action="{{ action }}" enctype="multipart/form-data">
@@ -236,11 +230,3 @@ function renderEditUserForm(context = {}) {
     }
   </script>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderEditUserForm;
-  module.exports.renderEditUserForm = renderEditUserForm;
-  module.exports.default = renderEditUserForm;
-}

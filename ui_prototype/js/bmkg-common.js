@@ -142,8 +142,7 @@ function initNavbarSoftScroll() {
       window.requestAnimationFrame(() => {
         const sections = [
           { id: 'pilar', link: document.querySelector('.primary-nav a[href$="#pilar"]') },
-          { id: 'peta', link: document.querySelector('.primary-nav a[href$="#peta"]') },
-          { id: 'datastore', link: document.querySelector('.primary-nav a[href$="#datastore"]') }
+          { id: 'peta', link: document.querySelector('.primary-nav a[href$="#peta"]') }
         ];
 
         const scrollPos = window.pageYOffset + 150;

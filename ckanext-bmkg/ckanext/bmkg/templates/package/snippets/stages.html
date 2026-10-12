@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (stages)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\package\snippets\stages.html ke JavaScript (.js)
- */
-
-function renderStages(context = {}) {
-  return `{# Stepper Wizard Modern Bertema Portal Open Data BMKG #}
+{# Stepper Wizard Modern Bertema Portal Open Data BMKG #}
 {% set s1 = stages[0] or 'active' %}
 {% set s2 = stages[1] or 'uncomplete' %}
 {% set dataset_type = dataset_type or h.default_package_type() %}
@@ -45,11 +39,3 @@ function renderStages(context = {}) {
     </div>
   </div>
 </div>
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderStages;
-  module.exports.renderStages = renderStages;
-  module.exports.default = renderStages;
-}

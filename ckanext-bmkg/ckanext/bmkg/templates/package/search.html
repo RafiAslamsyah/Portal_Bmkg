@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (search)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\package\search.html ke JavaScript (.js)
- */
-
-function renderSearch(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% block subtitle %}{{ _('Katalog Dataset Terbuka BMKG') }}{% endblock %}
 
@@ -330,7 +324,7 @@ function renderSearch(context = {}) {
               
               var html = '<div style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">';
               html += '<span>Menampilkan <strong>' + records.length + '</strong> baris sampel dari PostgreSQL DataStore:</span>';
-              html += '<span style="font-family: \\'JetBrains Mono\\', monospace; font-size: 0.75rem; background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Format SQL Aktif</span>';
+              html += '<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Format SQL Aktif</span>';
               html += '</div>';
               html += '<div class="preview-table-container"><table class="preview-data-table preview-table"><thead><tr>';
               fields.forEach(function(f) {
@@ -391,11 +385,3 @@ function renderSearch(context = {}) {
   </script>
 
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderSearch;
-  module.exports.renderSearch = renderSearch;
-  module.exports.default = renderSearch;
-}

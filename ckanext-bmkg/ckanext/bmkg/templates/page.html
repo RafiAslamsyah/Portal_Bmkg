@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (page)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\page.html ke JavaScript (.js)
- */
-
-function renderPage(context = {}) {
-  return `{% ckan_extends %}
+{% ckan_extends %}
 
 {% block styles %}
   {{ super() }}
@@ -32,11 +26,3 @@ function renderPage(context = {}) {
   {{ super() }}
   <script src="/js/bmkg-realtime-clock.js"></script>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderPage;
-  module.exports.renderPage = renderPage;
-  module.exports.default = renderPage;
-}

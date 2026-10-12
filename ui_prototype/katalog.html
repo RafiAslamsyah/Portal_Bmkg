@@ -1,14 +1,4 @@
-/**
- * Portal Open Data BMKG — Modul Halaman Katalog Dataset (Catalog Page)
- * File: ui_prototype/katalog.js
- * 
- * Pengganti murni dari katalog.html.
- * Menghasilkan tampilan Katalog Dataset Terbuka secara dinamis melalui JavaScript,
- * sehingga berkas katalog.html statis tidak lagi diperlukan.
- */
-
-function renderKatalogPage() {
-  return `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -1193,7 +1183,7 @@ function renderKatalogPage() {
       </div>
       <div class="gov-links">
         <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
-        <a href="/">Kembali ke Beranda</a>
+        <a href="index.html">Kembali ke Beranda</a>
       </div>
     </div>
   </div>
@@ -1201,9 +1191,9 @@ function renderKatalogPage() {
   <!-- 2. Main Site Header -->
   <header class="site-header">
     <div class="site-header-inner">
-      <a href="/" class="brand-section">
+      <a href="index.html" class="brand-section">
         <div class="bmkg-official-logo">
-          <img src="/logo-bmkg.png" alt="Logo Resmi BMKG">
+          <img src="logo-bmkg.png" alt="Logo Resmi BMKG">
         </div>
         <div class="brand-names">
           <div class="brand-title">Portal Data BMKG</div>
@@ -1212,10 +1202,9 @@ function renderKatalogPage() {
       </a>
 
       <nav class="primary-nav">
-        <a href="/">Beranda</a>
+        <a href="index.html">Beranda</a>
         <a href="index.html#pilar">4 Pilar MKG</a>
         <a href="index.html#peta">Peta Observasi</a>
-        <a href="index.html#datastore">DataStore API</a>
       </nav>
 
       <button class="btn-interactive header-login-btn" onclick="openLoginModal('login')" title="Masuk / Daftar Akun Portal">
@@ -1229,7 +1218,7 @@ function renderKatalogPage() {
   <section class="catalog-top-banner">
     <div class="catalog-top-inner">
       <div class="breadcrumbs">
-        <a href="/"><i class="fa-solid fa-house"></i> Beranda</a>
+        <a href="index.html"><i class="fa-solid fa-house"></i> Beranda</a>
         <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
         <span>Katalog Dataset Terbuka</span>
       </div>
@@ -1529,7 +1518,7 @@ function renderKatalogPage() {
     <div class="footer-inner">
       <div class="footer-col">
         <div class="footer-brand-header">
-          <img src="/logo-bmkg.png" alt="Logo BMKG">
+          <img src="logo-bmkg.png" alt="Logo BMKG">
           <div>
             <h4 style="margin-bottom: 2px;">Portal Data BMKG</h4>
             <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
@@ -1580,7 +1569,7 @@ function renderKatalogPage() {
     <div class="login-dialog-card" onclick="event.stopPropagation()">
       <div class="login-card-header">
         <div style="width: 38px; height: 46px; flex-shrink: 0;">
-          <img src="/logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+          <img src="logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
         <div>
           <h3 style="font-size: 1.12rem; font-weight: 800; margin: 0; color: #ffffff;" id="modalHeaderTitle">Portal Data BMKG</h3>
@@ -1752,35 +1741,579 @@ function renderKatalogPage() {
     <span id="toastMessage">Pencarian diperbarui!</span>
   </div>
 
-  <!-- Modular Front-end JavaScript Modules BMKG -->
-  <script src="/js/bmkg-common.js"></script>
-  <script src="/js/bmkg-katalog.js"></script>
-  <!-- Modular Front-end JavaScript Modules BMKG -->
-  <script src="/js/bmkg-common.js"></script>
-  <script src="/js/bmkg-katalog.js"></script>
   <script>
+    // ==========================================================================
+    // AUTO RESET POSISI SCROLL KE ATAS PADA SETIAP REFRESH
+    // ==========================================================================
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      initRealtimeClock();
-      initKatalogPage();
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
     });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 10);
+    });
+
+    // ==========================================================================
+    // SEED DATA — 1 dataset default untuk presentasi
+    // ==========================================================================
+    const SEED_DATASETS = [
+      {
+        id: 'cuaca-harian-cengkareng',
+        pilar: 'meteorologi',
+        formats: ['csv'],
+        org: 'balai2',
+        time: 'harian',
+        title: 'Data Observasi Cuaca Harian Permukaan Stasiun Soekarno-Hatta (WMO: 96749) Tahun 2026',
+        description: 'Dataset time-series rekaman harian parameter atmosfer permukaan meliputi suhu minimum, suhu maksimum, suhu rata-rata, kelembapan nisbi udara, kecepatan angin maksimum, dan curah hujan harian terkalibrasi.',
+        producer: 'Stasiun Meteorologi Kelas I Soekarno-Hatta (BBMKG Wilayah II)',
+        temporalRange: '01 Agu 2026 – 31 Agu 2026',
+        datastoreActive: true
+      }
+    ];
+
+    // ==========================================================================
+    // PILAR CONFIG — mapping pilar ke tag class, icon, dan label
+    // ==========================================================================
+    const PILAR_CONFIG = {
+      'meteorologi':    { cls: 'met',  icon: 'fa-cloud-sun',        label: 'Meteorologi' },
+      'klimatologi':    { cls: 'klim', icon: 'fa-temperature-half', label: 'Klimatologi' },
+      'geofisika':      { cls: 'geo',  icon: 'fa-volcano',          label: 'Geofisika' },
+      'kualitas-udara': { cls: 'ku',   icon: 'fa-wind',             label: 'Kualitas Udara' }
+    };
+
+    // ==========================================================================
+    // LOCALSTORAGE HELPERS
+    // ==========================================================================
+    const STORAGE_KEY = 'bmkg_datasets';
+
+    function getDatasets() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        // Pertama kali: simpan seed data
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATASETS));
+        return [...SEED_DATASETS];
+      }
+      return JSON.parse(raw);
+    }
+
+    function saveDatasets(datasets) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(datasets));
+    }
+
+    // ==========================================================================
+    // RENDER DATASET CARDS
+    // ==========================================================================
+    function renderDatasetCards() {
+      const container = document.getElementById('datasetListContainer');
+      const datasets = getDatasets();
+
+      container.innerHTML = '';
+
+      if (datasets.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; color: var(--border-medium);"></i>
+            <p style="font-size: 1.05rem; font-weight: 600;">Belum ada dataset tersedia</p>
+            <p style="font-size: 0.85rem;">Dataset akan muncul setelah admin menginput data melalui panel admin.</p>
+          </div>
+        `;
+        document.getElementById('datasetResultCount').textContent = '0';
+        document.getElementById('datasetTotalCount').textContent = '0';
+        return;
+      }
+
+      datasets.forEach(ds => {
+        const pilarInfo = PILAR_CONFIG[ds.pilar] || { cls: 'met', icon: 'fa-database', label: ds.pilar };
+
+        // Format badges
+        const formatBadges = (ds.formats || []).map(f =>
+          `<span class="format-badge ${f.toLowerCase()}">${f.toUpperCase()}</span>`
+        ).join('');
+
+        // DataStore badge
+        const datastoreBadge = ds.datastoreActive
+          ? `<span style="font-size: 0.76rem; color: var(--bmkg-green-dark); font-weight: 700; background: var(--bmkg-green-light); padding: 2px 8px; border-radius: 4px;">
+               <i class="fa-solid fa-database"></i> DataStore API Aktif
+             </span>`
+          : '';
+
+        const cardHTML = `
+          <article class="dataset-card" data-pilar="${ds.pilar}" data-format="${(ds.formats || []).join(' ')}" data-org="${ds.org || ''}" data-time="${ds.time || ''}">
+            <div class="card-top-meta">
+              <span class="pillar-tag ${pilarInfo.cls}"><i class="fa-solid ${pilarInfo.icon}"></i> ${pilarInfo.label}</span>
+              <span class="org-producer-text"><i class="fa-solid fa-building"></i> ${ds.producer || '-'}</span>
+            </div>
+
+            <a href="#" class="dataset-card-title" onclick="openDatasetDetail('${ds.id}')">
+              ${ds.title}
+            </a>
+
+            <p class="dataset-card-description">
+              ${ds.description}
+            </p>
+
+            <div class="card-bottom-row">
+              <div class="format-pills-group">
+                ${formatBadges}
+                ${datastoreBadge}
+              </div>
+
+              <div class="temporal-range-tag">
+                <i class="fa-regular fa-calendar"></i> ${ds.temporalRange || '-'}
+              </div>
+
+              <div class="card-action-links">
+                <button class="btn-interactive card-sub-btn" onclick="showToast('Membuka Pratinjau Tabel DataStore...')">
+                  <i class="fa-solid fa-table-cells"></i> Pratinjau
+                </button>
+                <button class="btn-interactive card-sub-btn" onclick="showToast('Mengunduh berkas...')">
+                  <i class="fa-solid fa-download"></i> Unduh
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+
+        container.innerHTML += cardHTML;
+      });
+
+      // Update counters
+      document.getElementById('datasetTotalCount').textContent = datasets.length;
+      document.getElementById('datasetResultCount').textContent = datasets.length;
+    }
+
+    // ==========================================================================
+    // INIT — render cards on page load
+    // ==========================================================================
+    renderDatasetCards();
+    updateFacetCounts();
+
+    // ==========================================================================
+    // UPDATE FACET COUNTS — hitung dari data localStorage
+    // ==========================================================================
+    function updateFacetCounts() {
+      const datasets = getDatasets();
+
+      // Helper: count datasets matching a field value
+      function countBy(field, value) {
+        return datasets.filter(ds => {
+          if (field === 'formats') {
+            return (ds.formats || []).map(f => f.toLowerCase()).includes(value);
+          }
+          return (ds[field] || '') === value;
+        }).length;
+      }
+
+      // Pilar counts
+      ['meteorologi', 'klimatologi', 'geofisika', 'kualitas-udara'].forEach(v => {
+        const el = document.getElementById(`count-pilar-${v}`);
+        if (el) el.textContent = countBy('pilar', v);
+      });
+
+      // Format counts
+      ['csv', 'geojson', 'netcdf', 'kml'].forEach(v => {
+        const el = document.getElementById(`count-format-${v}`);
+        if (el) el.textContent = countBy('formats', v);
+      });
+
+      // Org counts
+      ['pusat', 'balai1', 'balai2', 'balai3', 'balai4', 'balai5'].forEach(v => {
+        const el = document.getElementById(`count-org-${v}`);
+        if (el) el.textContent = countBy('org', v);
+      });
+
+      // Time counts
+      ['harian', 'jam', 'dasarian', 'bulanan'].forEach(v => {
+        const el = document.getElementById(`count-time-${v}`);
+        if (el) el.textContent = countBy('time', v);
+      });
+    }
+
+    // Modal Login & Register Handlers
+    // ==========================================================================
+    function openLoginModal(defaultTab = 'login') {
+      const modal = document.getElementById('loginModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      switchAuthMode(defaultTab);
+      setTimeout(() => {
+        if (defaultTab === 'register') {
+          const regInput = document.getElementById('regName');
+          if (regInput) regInput.focus();
+        } else {
+          const idInput = document.getElementById('loginIdentifier');
+          if (idInput) idInput.focus();
+        }
+      }, 100);
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === 'loginModal') {
+        closeLoginModal();
+      }
+    }
+
+    function switchAuthMode(mode) {
+      const tabLogin = document.getElementById('mainTabLogin');
+      const tabRegister = document.getElementById('mainTabRegister');
+      const formLogin = document.getElementById('authFormLogin');
+      const formRegister = document.getElementById('authFormRegister');
+      const headerTitle = document.getElementById('modalHeaderTitle');
+      const headerSubtitle = document.getElementById('modalHeaderSubtitle');
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'block';
+        formRegister.style.display = 'none';
+        headerTitle.textContent = 'Masuk ke Portal Data BMKG';
+        headerSubtitle.textContent = 'Akses SSO Resmi & Akun Terbuka Publik';
+        setTimeout(() => document.getElementById('loginIdentifier')?.focus(), 50);
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formLogin.style.display = 'none';
+        formRegister.style.display = 'block';
+        headerTitle.textContent = 'Daftar Akun Portal Data BMKG';
+        headerSubtitle.textContent = 'Dapatkan Akses API Key & Unduhan Data Lengkap';
+        setTimeout(() => document.getElementById('regName')?.focus(), 50);
+      }
+    }
+
+    function switchLoginTab(type) {
+      const tabAsn = document.getElementById('tabLoginAsn');
+      const tabPublic = document.getElementById('tabLoginPublic');
+      const labelId = document.getElementById('labelIdentifier');
+      const inputId = document.getElementById('loginIdentifier');
+      const btnText = document.getElementById('btnLoginText');
+
+      if (type === 'asn') {
+        tabAsn.classList.add('active');
+        tabPublic.classList.remove('active');
+        labelId.textContent = 'NIP / Akun Email BMKG';
+        inputId.placeholder = 'contoh: 19900815... atau nama@bmkg.go.id';
+        btnText.textContent = 'Masuk via SSO BMKG';
+      } else {
+        tabPublic.classList.add('active');
+        tabAsn.classList.remove('active');
+        labelId.textContent = 'Alamat Email Pengembang / Publik';
+        inputId.placeholder = 'contoh: peneliti@universitas.ac.id';
+        btnText.textContent = 'Masuk ke Portal';
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        }
+      } else {
+        input.type = 'password';
+        if (icon) {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+    }
+
+    function checkPasswordStrength(val) {
+      const fill = document.getElementById('pwdStrengthFill');
+      const text = document.getElementById('pwdStrengthText');
+      if (!fill || !text) return;
+
+      if (!val) {
+        fill.style.width = '0%';
+        text.textContent = 'Kekuatan sandi: minimal 8 karakter';
+        text.style.color = 'var(--text-muted)';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      if (score <= 1) {
+        fill.style.width = '25%';
+        fill.style.backgroundColor = '#ef4444';
+        text.textContent = 'Kekuatan: Lemah (tambahkan angka & huruf kapital)';
+        text.style.color = '#ef4444';
+      } else if (score === 2) {
+        fill.style.width = '60%';
+        fill.style.backgroundColor = '#f59e0b';
+        text.textContent = 'Kekuatan: Sedang (tambahkan simbol atau panjang lagi)';
+        text.style.color = '#d97706';
+      } else {
+        fill.style.width = '100%';
+        fill.style.backgroundColor = '#10b981';
+        text.textContent = 'Kekuatan: Sangat Kuat 👍';
+        text.style.color = '#059669';
+      }
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginIdentifier').value;
+      closeLoginModal();
+      showToast(`Login Administrator Berhasil! Mengalihkan ke halaman ckan-admin...`);
+      setTimeout(() => {
+        window.location.href = '/ckan-admin';
+      }, 700);
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const p1 = document.getElementById('regPassword').value;
+      const p2 = document.getElementById('regPasswordConfirm').value;
+
+      if (p1 !== p2) {
+        showToast("Konfirmasi kata sandi tidak cocok! Silakan periksa kembali.");
+        document.getElementById('regPasswordConfirm').focus();
+        return;
+      }
+
+      closeLoginModal();
+      showToast(`Registrasi Berhasil! Selamat datang, ${name}. Cek ${email} untuk aktivasi API Key.`);
+      document.getElementById('registerForm').reset();
+      checkPasswordStrength('');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLoginModal();
+      }
+    });
+
+    // ==========================================================================
+    // Live Filter & Search Logic (works with dynamic cards)
+    // ==========================================================================
+    function applyFilterAndSearch() {
+      const searchInput = document.getElementById('catalogSearchInput').value.trim().toLowerCase();
+      
+      const selectedPilars = Array.from(document.querySelectorAll('.facet-pilar:checked')).map(cb => cb.value);
+      const selectedFormats = Array.from(document.querySelectorAll('.facet-format:checked')).map(cb => cb.value);
+      const selectedOrgs = Array.from(document.querySelectorAll('.facet-org:checked')).map(cb => cb.value);
+      const selectedTimes = Array.from(document.querySelectorAll('.facet-time:checked')).map(cb => cb.value);
+
+      const cards = document.querySelectorAll('.dataset-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const titleEl = card.querySelector('.dataset-card-title');
+        const descEl = card.querySelector('.dataset-card-description');
+        const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+        const desc = descEl ? descEl.textContent.toLowerCase() : '';
+        const pilar = card.getAttribute('data-pilar') || '';
+        const formats = (card.getAttribute('data-format') || '').split(' ');
+        const org = card.getAttribute('data-org') || '';
+        const time = card.getAttribute('data-time') || '';
+
+        // Search text match
+        const matchesText = !searchInput || title.includes(searchInput) || desc.includes(searchInput);
+        
+        // Facet filter match
+        const matchesPilar = selectedPilars.length === 0 || selectedPilars.includes(pilar);
+        const matchesFormat = selectedFormats.length === 0 || selectedFormats.some(f => formats.includes(f));
+        const matchesOrg = selectedOrgs.length === 0 || selectedOrgs.includes(org);
+        const matchesTime = selectedTimes.length === 0 || selectedTimes.includes(time);
+
+        if (matchesText && matchesPilar && matchesFormat && matchesOrg && matchesTime) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Update Result Count
+      document.getElementById('datasetResultCount').textContent = visibleCount;
+
+      // Update Active Filter Chips
+      renderActiveChips(selectedPilars, selectedFormats, selectedOrgs, selectedTimes, searchInput);
+    }
+
+    function renderActiveChips(pilars, formats, orgs, times, searchInput) {
+      const container = document.getElementById('activeChipsContainer');
+      container.innerHTML = '';
+
+      if (searchInput) {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Kata Kunci: "${searchInput}"</span>
+            <button onclick="clearSearchInput()"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      }
+
+      pilars.forEach(p => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Pilar: ${p.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-pilar', '${p}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      formats.forEach(f => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Format: ${f.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-format', '${f}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      orgs.forEach(o => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Unit: ${o.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-org', '${o}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+
+      times.forEach(t => {
+        container.innerHTML += `
+          <span class="chip-badge">
+            <span>Waktu: ${t.toUpperCase()}</span>
+            <button onclick="uncheckFacet('facet-time', '${t}')"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      });
+    }
+
+    function clearSearchInput() {
+      document.getElementById('catalogSearchInput').value = '';
+      applyFilterAndSearch();
+    }
+
+    function uncheckFacet(className, val) {
+      const cb = document.querySelector(`.${className}[value="${val}"]`);
+      if (cb) {
+        cb.checked = false;
+        applyFilterAndSearch();
+      }
+    }
+
+    function resetAllFilters() {
+      document.getElementById('catalogSearchInput').value = '';
+      document.querySelectorAll('.facet-pilar, .facet-format, .facet-org, .facet-time').forEach(cb => cb.checked = false);
+      applyFilterAndSearch();
+      showToast('Seluruh filter telah di-reset');
+    }
+
+    function applySorting(sortVal) {
+      showToast(`Mengurutkan dataset berdasarkan: ${sortVal}`);
+    }
+
+    function toggleSpatialFilter() {
+      showToast('Membuka modal seleksi Bounding Box (ckanext-spatial)');
+    }
+
+    function openDatasetDetail(datasetId) {
+      showToast(`Membuka halaman detail dataset: ${datasetId}`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastFeedback');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ==========================================================================
+    // LISTEN FOR STORAGE CHANGES (from admin panel in another tab)
+    // ==========================================================================
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        renderDatasetCards();
+        updateFacetCounts();
+        applyFilterAndSearch();
+      }
+    });
+
+    // ==========================================================================
+    // REAL-TIME CLOCK INITIALIZATION
+    // ==========================================================================
+    function initRealtimeClock() {
+      const timeElem = document.getElementById('liveClockTime');
+      const dateElem = document.getElementById('liveClockDate');
+      if (!timeElem || !dateElem) return;
+
+      function updateClock() {
+        const now = new Date();
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+        dateElem.textContent = now.toLocaleDateString('id-ID', dateOptions);
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        let tz = 'WIB';
+        const offset = -now.getTimezoneOffset() / 60;
+        if (offset === 8) tz = 'WITA';
+        else if (offset === 9) tz = 'WIT';
+        else if (offset !== 7) tz = `UTC${offset >= 0 ? '+' : ''}${offset}`;
+
+        timeElem.textContent = `${hours}:${minutes}:${seconds} ${tz}`;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    initRealtimeClock();
+
+    // Parse URL parameters for q and pilar
+    function initUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const q = urlParams.get('q');
+      const pilar = urlParams.get('pilar');
+      let shouldFilter = false;
+
+      if (q) {
+        const searchEl = document.getElementById('catalogSearchInput');
+        if (searchEl) {
+          searchEl.value = q;
+          shouldFilter = true;
+        }
+      }
+
+      if (pilar) {
+        const pilarCb = document.querySelector(`.facet-pilar[value="${pilar}"]`);
+        if (pilarCb) {
+          pilarCb.checked = true;
+          shouldFilter = true;
+        }
+      }
+
+      if (shouldFilter) {
+        applyFilterAndSearch();
+      }
+    }
+    initUrlParams();
+
   </script>
 </body>
 </html>
-`;
-}
-
-// Ekspor fungsi render untuk digunakan oleh server web
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { renderKatalogPage };
-}
-
-// Jika dijalankan langsung via 'node katalog.js', jalankan server pada port 8080
-if (typeof require !== 'undefined' && require.main === module) {
-  const { startServer } = require('./server');
-  startServer(8080, '/katalog');
-}

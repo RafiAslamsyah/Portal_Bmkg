@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (base)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\admin\base.html ke JavaScript (.js)
- */
-
-function renderBase(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% block subtitle %}Administrasi Portal — Portal Data BMKG{% endblock %}
 
@@ -103,11 +97,3 @@ function renderBase(context = {}) {
   </div>
 </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderBase;
-  module.exports.renderBase = renderBase;
-  module.exports.default = renderBase;
-}

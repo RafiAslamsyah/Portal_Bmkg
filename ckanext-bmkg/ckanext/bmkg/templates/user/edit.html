@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (edit)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\edit.html ke JavaScript (.js)
- */
-
-function renderEdit(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% set u = user_dict or c.user_dict or current_user %}
 
@@ -138,11 +132,3 @@ function renderEdit(context = {}) {
   </div>
 </div>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderEdit;
-  module.exports.renderEdit = renderEdit;
-  module.exports.default = renderEdit;
-}

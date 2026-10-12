@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (header)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\header.html ke JavaScript (.js)
- */
-
-function renderHeader(context = {}) {
-  return `  <!-- 1. Top Identity Bar -->
+  <!-- 1. Top Identity Bar -->
   <div class="gov-identity-bar">
     <div class="gov-identity-inner">
       <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
@@ -65,7 +59,6 @@ function renderHeader(context = {}) {
         <a href="{{ h.url_for('dataset.search') }}" class="{% if request.endpoint == 'dataset.search' %}active{% endif %}">Katalog Data</a>
         <a href="{{ h.url_for('home.index') }}#pilar">4 Pilar MKG</a>
         <a href="{{ h.url_for('home.index') }}#peta">Peta Observasi</a>
-        <a href="{{ h.url_for('home.index') }}#datastore">DataStore API</a>
       </nav>
 
       <div class="header-right-actions">
@@ -113,11 +106,3 @@ function renderHeader(context = {}) {
   {% if not (g.userobj or c.userobj) %}
     {% snippet 'snippets/login_modal.html' %}
   {% endif %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderHeader;
-  module.exports.renderHeader = renderHeader;
-  module.exports.default = renderHeader;
-}

@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (read)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\package\read.html ke JavaScript (.js)
- */
-
-function renderRead(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% block subtitle %}{{ pkg_dict.title or pkg_dict.name }}{% endblock %}
 
@@ -553,7 +547,7 @@ if data.get("success"):
         });
         lines.push(rowVals.join(','));
       });
-      fallbackCopyText(lines.join('\\n'));
+      fallbackCopyText(lines.join('\n'));
       showDetailToast('Seluruh data tabel (' + _cachedTableRecords.length + ' baris) disalin sebagai CSV!');
     }
 
@@ -616,7 +610,7 @@ if data.get("success"):
 
     // Simple robust CSV Text Parser
     function parseCSVText(text) {
-      var lines = text.trim().split(/\\r\\n|\\n/);
+      var lines = text.trim().split(/\r\n|\n/);
       if (lines.length < 1) return { fields: [], records: [] };
       
       var parseLine = function(line) {
@@ -717,16 +711,8 @@ if data.get("success"):
       var badgeElem = document.getElementById('liveTableRowCountBadge');
       if (badgeElem) badgeElem.textContent = '0 baris';
       if (loadingElem) {
-        loadingElem.innerHTML = '<div style="padding: 2.5rem 1.5rem; text-align: center;"><i class="fa-solid fa-file-circle-exclamation" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.75rem;"></i><h4 style="color: var(--bmkg-blue-deep); margin-bottom: 0.35rem;">Pratinjau Tabel Tidak Tersedia</h4><p style="color: var(--text-muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem auto;">' + message + '</p><button class="btn-interactive card-sub-btn" onclick="switchDatasetTab(\\'tab-resources\\')"><i class="fa-solid fa-folder-open"></i> Buka Tab Berkas Sumber</button></div>';
+        loadingElem.innerHTML = '<div style="padding: 2.5rem 1.5rem; text-align: center;"><i class="fa-solid fa-file-circle-exclamation" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.75rem;"></i><h4 style="color: var(--bmkg-blue-deep); margin-bottom: 0.35rem;">Pratinjau Tabel Tidak Tersedia</h4><p style="color: var(--text-muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem auto;">' + message + '</p><button class="btn-interactive card-sub-btn" onclick="switchDatasetTab(\'tab-resources\')"><i class="fa-solid fa-folder-open"></i> Buka Tab Berkas Sumber</button></div>';
       }
     }
   </script>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderRead;
-  module.exports.renderRead = renderRead;
-  module.exports.default = renderRead;
-}

@@ -1,10 +1,8 @@
 {
   "name": "portal-open-data-bmkg",
   "version": "1.0.0",
-  "description": "Portal Open Data BMKG - Pure JavaScript Front-End",
-  "main": "ui_prototype/server.js",
+  "description": "Portal Open Data BMKG UI Prototype",
   "scripts": {
-    "start": "node ui_prototype/server.js",
-    "dev": "node ui_prototype/server.js"
+    "start": "npx serve ui_prototype -p 8080"
   }
 }

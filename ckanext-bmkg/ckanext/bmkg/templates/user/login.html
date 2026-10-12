@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (login)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\login.html ke JavaScript (.js)
- */
-
-function renderLogin(context = {}) {
-  return `{% extends "page.html" %}
+{% extends "page.html" %}
 
 {% block subtitle %}{{ _('Login Administrator BMKG') }}{% endblock %}
 
@@ -112,11 +106,3 @@ function renderLogin(context = {}) {
     }
   </script>
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderLogin;
-  module.exports.renderLogin = renderLogin;
-  module.exports.default = renderLogin;
-}

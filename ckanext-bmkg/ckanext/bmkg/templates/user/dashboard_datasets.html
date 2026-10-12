@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (dashboard_datasets)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\user\dashboard_datasets.html ke JavaScript (.js)
- */
-
-function renderDashboardDatasets(context = {}) {
-  return `{% extends "user/dashboard.html" %}
+{% extends "user/dashboard.html" %}
 {% set dataset_type = h.default_package_type() %}
 
 {% block dashboard_card_title %}Koleksi Dataset Mandiri{% endblock %}
@@ -32,11 +26,3 @@ function renderDashboardDatasets(context = {}) {
     </div>
   {% endif %}
 {% endblock %}
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderDashboardDatasets;
-  module.exports.renderDashboardDatasets = renderDashboardDatasets;
-  module.exports.default = renderDashboardDatasets;
-}

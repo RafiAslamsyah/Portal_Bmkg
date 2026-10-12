@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (footer)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\footer.html ke JavaScript (.js)
- */
-
-function renderFooter(context = {}) {
-  return `  <!-- 6. Institutional Footer with Official Logo -->
+  <!-- 6. Institutional Footer with Official Logo -->
   <footer class="gov-footer" id="kontak">
     <div class="footer-inner">
       <div class="footer-col">
@@ -56,11 +50,3 @@ function renderFooter(context = {}) {
       <div>Platform CKAN 2.12 Stable • Native Ubuntu 22.04 LTS Stack</div>
     </div>
   </footer>
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderFooter;
-  module.exports.renderFooter = renderFooter;
-  module.exports.default = renderFooter;
-}

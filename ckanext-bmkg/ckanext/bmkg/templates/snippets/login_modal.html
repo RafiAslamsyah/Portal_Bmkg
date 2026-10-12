@@ -1,10 +1,4 @@
-/**
- * Portal Open Data BMKG — Komponen Tampilan Front-End (login_modal)
- * Dikonversi murni dari: ckanext-bmkg\ckanext\bmkg\templates\snippets\login_modal.html ke JavaScript (.js)
- */
-
-function renderLoginModal(context = {}) {
-  return `<!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
+<!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
 <div class="bmkg-modal-overlay" id="loginModal" onclick="handleModalBackdropClick(event)">
   <div class="login-dialog-card" onclick="event.stopPropagation()">
     <div class="login-card-header">
@@ -124,11 +118,3 @@ function renderLoginModal(context = {}) {
     return true;
   }
 </script>
-`;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = renderLoginModal;
-  module.exports.renderLoginModal = renderLoginModal;
-  module.exports.default = renderLoginModal;
-}
