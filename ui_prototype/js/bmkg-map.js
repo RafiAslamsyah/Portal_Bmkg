@@ -26,17 +26,34 @@ const fallbackGempaList = [
   { wilayah: "Pusat gempa di laut 83 km selatan Kab. Sukabumi", mag: 4.3, kedalaman: "23 km", lat: -7.74, lon: 106.55, tanggal: "13 Sep 2026 17:06:52 WIB", jam: "17:06 WIB", status: "Tidak berpotensi tsunami", dirasakan: "III Kab. Cianjur, II Sukabumi", shakemap: null, isLatestLive: false, kategori: "dirasakan" }
 ];
 
-// Titik Stasiun BMKG Nyata
-const stasiunList = [
-  { nama: "Stamet Soekarno-Hatta", id: "96749", lat: -6.1256, lon: 106.6559, tipe: "Meteorologi", suhu: "28.5°C", angin: "14 knot", color: "#005a9e" },
-  { nama: "Stamet Kemayoran", id: "96745", lat: -6.1558, lon: 106.8417, tipe: "Meteorologi / GAW", suhu: "29.1°C", angin: "11 knot", color: "#00875a" },
-  { nama: "Staklim Banten", id: "96739", lat: -6.1833, lon: 106.2500, tipe: "Klimatologi", suhu: "27.8°C", angin: "8 knot", color: "#005a9e" },
-  { nama: "Stageof Tangerang", id: "96753", lat: -6.1783, lon: 106.6319, tipe: "Geofisika", suhu: "28.0°C", angin: "9 knot", color: "#005a9e" },
-  { nama: "BBMKG Wilayah I Medan", id: "96035", lat: 3.5852, lon: 98.6756, tipe: "Balai Wilayah I", suhu: "29.4°C", angin: "10 knot", color: "#003865" },
-  { nama: "BBMKG Wilayah III Denpasar", id: "97230", lat: -8.6705, lon: 115.2126, tipe: "Balai Wilayah III", suhu: "30.2°C", angin: "15 knot", color: "#003865" },
-  { nama: "BBMKG Wilayah IV Makassar", id: "97180", lat: -5.1477, lon: 119.4327, tipe: "Balai Wilayah IV", suhu: "31.0°C", angin: "12 knot", color: "#003865" },
-  { nama: "BBMKG Wilayah V Jayapura", id: "97560", lat: -2.5337, lon: 140.7181, tipe: "Balai Wilayah V", suhu: "28.8°C", angin: "7 knot", color: "#003865" }
-];
+// Titik Stasiun BMKG (Disiapkan bersih tanpa data dummy, siap menerima data resmi)
+const stasiunList = [];
+
+function renderStasiunMarkers(list) {
+  if (!stasiunLayer) return;
+  stasiunLayer.clearLayers();
+  if (!Array.isArray(list) || list.length === 0) return;
+  list.forEach(st => {
+    if (!st.lat || !st.lon) return;
+    const marker = L.circleMarker([st.lat, st.lon], {
+      radius: 8,
+      fillColor: st.color || "#005a9e",
+      color: "#ffffff",
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.95
+    });
+    marker.bindPopup(`
+      <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; padding: 2px;">
+        <strong style="color: #003865; font-size: 14px;">${escapeHtml(st.nama || 'Stasiun BMKG')}</strong><br>
+        <span style="color: #64748b; font-family: monospace;">WMO ID: ${escapeHtml(st.id || '-')} • ${escapeHtml(st.tipe || 'UPT')}</span>
+        ${st.suhu ? `<div style="background: #f1f7fc; padding: 6px 8px; border-radius: 6px; margin: 6px 0; font-size: 12px;">🌡️ Suhu: <strong>${escapeHtml(st.suhu)}</strong> | 💨 Angin: <strong>${escapeHtml(st.angin || '-')}</strong></div>` : ''}
+      </div>
+    `);
+    stasiunLayer.addLayer(marker);
+  });
+}
+window.renderStasiunMarkers = renderStasiunMarkers;
 
 function initBmkgMap() {
   const mapContainer = document.getElementById('bmkgMap');
@@ -83,30 +100,8 @@ function initBmkgMap() {
   stasiunLayer = L.layerGroup().addTo(bmkgMap);
   gempaLayer = L.layerGroup().addTo(bmkgMap);
 
-  // Plot Stasiun UPT
-  stasiunList.forEach(st => {
-    const marker = L.circleMarker([st.lat, st.lon], {
-      radius: 8,
-      fillColor: st.color,
-      color: "#ffffff",
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.95
-    });
-    marker.bindPopup(`
-      <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; padding: 2px;">
-        <strong style="color: #003865; font-size: 14px;">${escapeHtml(st.nama)}</strong><br>
-        <span style="color: #64748b; font-family: monospace;">WMO ID: ${escapeHtml(st.id)} • ${escapeHtml(st.tipe)}</span>
-        <div style="background: #f1f7fc; padding: 6px 8px; border-radius: 6px; margin: 6px 0; font-size: 12px;">
-          🌡️ Suhu Terkini: <strong>${escapeHtml(st.suhu)}</strong> | 💨 Angin: <strong>${escapeHtml(st.angin)}</strong>
-        </div>
-        <button onclick="applySearchTag('${escapeHtml(st.nama)}')" style="background: #005a9e; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%;">
-          Buka Dataset Stasiun Ini &rarr;
-        </button>
-      </div>
-    `);
-    stasiunLayer.addLayer(marker);
-  });
+  // Plot Stasiun UPT (bersih saat awal, siap menerima data dinamis)
+  renderStasiunMarkers(stasiunList);
 
   // Render gempa awal dan polling live TEWS
   renderGempaMarkers();
@@ -161,7 +156,11 @@ function toggleMapLayer(layerType) {
     } else {
       bmkgMap.addLayer(stasiunLayer);
       if (btn) btn.classList.add('active');
-      showToast("Layer Stasiun Observasi diaktifkan");
+      if (stasiunLayer.getLayers().length === 0) {
+        showToast("Layer Stasiun Observasi aktif (menunggu pembaruan data resmi)");
+      } else {
+        showToast("Layer Stasiun Observasi diaktifkan");
+      }
     }
   } else if (layerType === 'gempa') {
     const btn = document.getElementById('filterGempa');
