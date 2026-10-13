@@ -1733,7 +1733,7 @@
         <div class="metric-desc">Meteorologi, Iklim, Gempa, Kualitas Udara</div>
       </div>
       <div class="metric-item">
-        <div class="metric-number">218 UPT</div>
+        <div class="metric-number" id="totalUptCount">0 UPT</div>
         <div class="metric-desc">Stasiun Observasi di Seluruh Indonesia</div>
       </div>
       <div class="metric-item">
@@ -2877,88 +2877,151 @@
     }
 
     // ==========================================================================
-    // DYNAMIC REAL-TIME LANDING PAGE STATS (CKAN API & LOCALSTORAGE SYNC)
+    // DYNAMIC REAL-TIME LANDING PAGE STATS (CKAN API & LOCAL DATA SYNC)
     // ==========================================================================
+    function getCustomBmkgUptCount() {
+      try {
+        const storedUpt = localStorage.getItem('portal_bmkg_upt') || localStorage.getItem('bmkg_upt_list');
+        if (storedUpt) {
+          const parsed = JSON.parse(storedUpt);
+          if (Array.isArray(parsed)) return parsed.length;
+          if (typeof parsed === 'number') return parsed;
+          if (parsed && typeof parsed === 'object' && Array.isArray(parsed.features)) return parsed.features.length;
+        }
+      } catch (_) {}
+      if (window.BMKG_UPT_DATA) {
+        if (Array.isArray(window.BMKG_UPT_DATA)) return window.BMKG_UPT_DATA.length;
+        if (typeof window.BMKG_UPT_DATA === 'number') return window.BMKG_UPT_DATA;
+        if (window.BMKG_UPT_DATA && Array.isArray(window.BMKG_UPT_DATA.features)) return window.BMKG_UPT_DATA.features.length;
+      }
+      return null;
+    }
+
     async function initDynamicLandingStats() {
       const elTotal = document.getElementById('totalDatasetCount');
-      const elOrg = document.getElementById('totalOrgCount');
+      const elUpt = document.getElementById('totalUptCount') || document.getElementById('totalOrgCount');
       const elMet = document.getElementById('countPilarMeteorologi');
       const elKlim = document.getElementById('countPilarKlimatologi');
       const elGeof = document.getElementById('countPilarGeofisika');
       const elKu = document.getElementById('countPilarKualitasUdara');
 
-      // 1. Try fetching from live CKAN API
-      try {
-        const res = await fetch('http://localhost:8080/api/3/action/package_search?facet.field=["groups"]&facet.limit=10&rows=0', { cache: 'no-cache' });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.success) {
-            const total = data.result.count || 0;
-            if (elTotal) elTotal.textContent = total;
+      const customUptCount = getCustomBmkgUptCount();
 
-            const groupFacets = data.result.facets && data.result.facets.groups ? data.result.facets.groups : {};
-            if (elMet) elMet.textContent = `${groupFacets['meteorologi'] || 0} Dataset`;
-            if (elKlim) elKlim.textContent = `${groupFacets['klimatologi'] || 0} Dataset`;
-            if (elGeof) elGeof.textContent = `${groupFacets['geofisika'] || 0} Dataset`;
-            if (elKu) elKu.textContent = `${groupFacets['kualitas-udara'] || 0} Dataset`;
+      // 1. Try fetching from live CKAN API (direct relative or port 5000)
+      const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
+      const apiEndpoints = isStandalone ? ['http://127.0.0.1:5000', ''] : [''];
 
-            // Try getting org count
-            try {
-              const resOrg = await fetch('http://localhost:8080/api/3/action/organization_list', { cache: 'no-cache' });
-              if (resOrg.ok) {
-                const dataOrg = await resOrg.json();
-                if (dataOrg.success && elOrg) {
-                  elOrg.textContent = `${dataOrg.result.length} Unit`;
-                }
+      let apiSuccess = false;
+      for (const base of apiEndpoints) {
+        try {
+          const res = await fetch(`${base}/api/3/action/package_search?facet.field=["groups"]&facet.limit=10&rows=0`, { cache: 'no-cache' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.success) {
+              const total = data.result.count || 0;
+              if (elTotal) elTotal.textContent = total;
+
+              const groupFacets = data.result.facets && data.result.facets.groups ? data.result.facets.groups : {};
+              if (elMet) elMet.textContent = `${groupFacets['meteorologi'] || 0} Dataset`;
+              if (elKlim) elKlim.textContent = `${groupFacets['klimatologi'] || 0} Dataset`;
+              if (elGeof) elGeof.textContent = `${groupFacets['geofisika'] || 0} Dataset`;
+              if (elKu) elKu.textContent = `${groupFacets['kualitas-udara'] || 0} Dataset`;
+
+              // Hitung UPT: utamakan custom data asli jika diset, jika tidak ambil dari live organization_list
+              if (customUptCount !== null) {
+                if (elUpt) elUpt.textContent = `${customUptCount} UPT`;
+              } else {
+                try {
+                  const resOrg = await fetch(`${base}/api/3/action/organization_list`, { cache: 'no-cache' });
+                  if (resOrg.ok) {
+                    const dataOrg = await resOrg.json();
+                    if (dataOrg.success && elUpt) {
+                      elUpt.textContent = `${dataOrg.result.length} UPT`;
+                    }
+                  }
+                } catch (_) {}
               }
-            } catch (_) {}
-            return;
+              apiSuccess = true;
+              break;
+            }
           }
-        }
-      } catch (_) {
-        // Fallback to localStorage
+        } catch (_) {}
       }
 
-      // 2. Fallback to localStorage if API is not reached directly
+      if (apiSuccess) return;
+
+      // 2. Fallback ke data lokal jika live CKAN API tidak aktif
       try {
-        const stored = localStorage.getItem('portal_bmkg_datasets');
+        const stored = localStorage.getItem('portal_bmkg_datasets') || localStorage.getItem('bmkg_datasets');
         let datasets = [];
         if (stored) {
           datasets = JSON.parse(stored);
-        }
-        if (!datasets || datasets.length === 0) {
-          // Default single presentation dataset
-          if (elTotal) elTotal.textContent = '1';
-          if (elMet) elMet.textContent = '1 Dataset';
-          if (elKlim) elKlim.textContent = '0 Dataset';
-          if (elGeof) elGeof.textContent = '0 Dataset';
-          if (elKu) elKu.textContent = '0 Dataset';
-          if (elOrg) elOrg.textContent = '2 Unit';
-          return;
         }
 
         const counts = { meteorologi: 0, klimatologi: 0, geofisika: 0, 'kualitas-udara': 0 };
         const orgs = new Set();
 
-        datasets.forEach(d => {
-          const p = (d.pilar || d.pilar_mkg || '').toLowerCase();
-          if (counts[p] !== undefined) counts[p]++;
-          if (d.owner_org || d.organisasi) orgs.add(d.owner_org || d.organisasi);
-        });
+        if (Array.isArray(datasets) && datasets.length > 0) {
+          datasets.forEach(d => {
+            const p = (d.pilar || d.pilar_mkg || '').toLowerCase();
+            if (counts[p] !== undefined) counts[p]++;
+            if (d.owner_org || d.organisasi || d.producer) orgs.add(d.owner_org || d.organisasi || d.producer);
+          });
 
-        if (elTotal) elTotal.textContent = datasets.length;
-        if (elMet) elMet.textContent = `${counts.meteorologi} Dataset`;
-        if (elKlim) elKlim.textContent = `${counts.klimatologi} Dataset`;
-        if (elGeof) elGeof.textContent = `${counts.geofisika} Dataset`;
-        if (elKu) elKu.textContent = `${counts['kualitas-udara']} Dataset`;
-        if (elOrg) elOrg.textContent = `${Math.max(orgs.size, 1)} Unit`;
+          if (elTotal) elTotal.textContent = datasets.length;
+          if (elMet) elMet.textContent = `${counts.meteorologi} Dataset`;
+          if (elKlim) elKlim.textContent = `${counts.klimatologi} Dataset`;
+          if (elGeof) elGeof.textContent = `${counts.geofisika} Dataset`;
+          if (elKu) elKu.textContent = `${counts['kualitas-udara']} Dataset`;
+        } else {
+          if (elTotal) elTotal.textContent = '0';
+          if (elMet) elMet.textContent = '0 Dataset';
+          if (elKlim) elKlim.textContent = '0 Dataset';
+          if (elGeof) elGeof.textContent = '0 Dataset';
+          if (elKu) elKu.textContent = '0 Dataset';
+        }
+
+        // Tentukan jumlah UPT secara dinamis (tanpa angka dummy 218)
+        if (customUptCount !== null) {
+          if (elUpt) elUpt.textContent = `${customUptCount} UPT`;
+        } else if (orgs.size > 0) {
+          if (elUpt) elUpt.textContent = `${orgs.size} UPT`;
+        } else if (typeof stasiunList !== 'undefined' && Array.isArray(stasiunList) && stasiunList.length > 0) {
+          if (elUpt) elUpt.textContent = `${stasiunList.length} UPT`;
+        } else {
+          if (elUpt) elUpt.textContent = '0 UPT';
+        }
       } catch (e) {
         console.warn('Error reading local datasets:', e);
       }
     }
 
+    // Helper global agar pengguna/sistem dapat menyuntikkan data asli UPT kapan saja
+    window.setBmkgUptData = function(data) {
+      if (data === undefined || data === null) return;
+      try {
+        localStorage.setItem('portal_bmkg_upt', JSON.stringify(data));
+        window.BMKG_UPT_DATA = data;
+        initDynamicLandingStats();
+        const count = Array.isArray(data) ? data.length : (typeof data === 'number' ? data : (data.features ? data.features.length : 1));
+        console.info(`[BMKG Portal] Data UPT berhasil diperbarui: ${count} UPT terdaftar.`);
+        if (typeof showToast === 'function') {
+          showToast(`Data UPT berhasil diperbarui: ${count} UPT terdaftar.`);
+        }
+      } catch (err) {
+        console.error('Gagal menyimpan data UPT:', err);
+      }
+    };
+
+    window.updateBmkgUptCount = function(count) {
+      const num = parseInt(count, 10);
+      if (!isNaN(num)) {
+        window.setBmkgUptData(num);
+      }
+    };
+
     window.addEventListener('storage', (e) => {
-      if (e.key === 'portal_bmkg_datasets') {
+      if (e.key === 'portal_bmkg_datasets' || e.key === 'bmkg_datasets' || e.key === 'portal_bmkg_upt' || e.key === 'bmkg_upt_list') {
         initDynamicLandingStats();
       }
     });

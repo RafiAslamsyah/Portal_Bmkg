@@ -1,8 +1,11 @@
 import os
 os.environ['CKAN_INI'] = '/etc/ckan/default/ckan.ini'
+# pyrefly: ignore [missing-import]
 from ckan.cli import load_config
 conf = load_config('/etc/ckan/default/ckan.ini')
+# pyrefly: ignore [missing-import]
 import ckan.model as model
+# pyrefly: ignore [missing-import]
 import sqlalchemy as sa
 
 engine = sa.create_engine(conf.get('sqlalchemy.url'))
