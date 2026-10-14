@@ -5207,3 +5207,75 @@ footer.gov-footer, .gov-footer {
   }
 }
 
+/* ==========================================================================
+   GEOJSON INTERACTIVE MAP PREVIEW (CKAN RESOURCE DETAIL)
+   ========================================================================== */
+.geojson-map-card {
+  background: var(--canvas-white);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 56, 101, 0.05);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.geojson-popup-content {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1e293b;
+  min-width: 250px;
+  max-width: 320px;
+  padding: 4px 2px;
+}
+
+.geojson-popup-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #003865;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.geojson-mag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+.geojson-mag-badge.mag-danger { background: #dc2626; }
+.geojson-mag-badge.mag-warning { background: #ea580c; }
+.geojson-mag-badge.mag-normal { background: #0284c7; }
+
+.geojson-prop-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+
+.geojson-prop-table td {
+  padding: 3px 4px;
+  border-bottom: 1px dashed #e2e8f0;
+  vertical-align: top;
+}
+
+.geojson-prop-table td:first-child {
+  color: #64748b;
+  font-weight: 600;
+  width: 36%;
+}
+
+.geojson-prop-table td:last-child {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+

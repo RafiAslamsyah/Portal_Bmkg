@@ -1,0 +1,36 @@
+{% ckan_extends %}
+
+{% block basic_fields_format %}
+  {% set current_fmt = (data.format or '') %}
+  <div class="control-group control-medium {% if errors.format %}error{% endif %}">
+    <label class="control-label" for="field-format">
+      {{ _('Format Berkas') }}
+      <span class="bmkg-badge-highlight" style="font-size: 0.72rem; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 700;">Standar BMKG</span>
+    </label>
+    <div class="controls">
+      {% set format_attrs = {'data-module': 'autocomplete', 'data-module-source': '/api/2/util/resource/format_autocomplete?incomplete=?'} %}
+      <input id="field-format" type="text" name="format" value="{{ data.format or '' }}" placeholder="{{ _('Pilih atau ketik: GeoJSON, CSV, KML, NetCDF...') }}" list="bmkg-format-datalist" class="form-control" style="width: 100%; max-width: 480px; padding: 0.55rem 0.85rem; border-radius: 8px; font-weight: 600; color: #003865; border: 1.5px solid #cbd5e1;" {{ form.attributes(format_attrs) }} />
+      <datalist id="bmkg-format-datalist">
+        <option value="GeoJSON">GeoJSON (Peta Spasial Interaktif)</option>
+        <option value="CSV">CSV (Tabel Data & DataStore SQL)</option>
+        <option value="JSON">JSON (REST API Object)</option>
+        <option value="KML">KML (Google Earth & GIS)</option>
+        <option value="Shapefile">Shapefile (ESRI SHP/ZIP)</option>
+        <option value="NetCDF">NetCDF (Model Prediksi Cuaca & Iklim)</option>
+        <option value="GRIB">GRIB / GRIB2 (Model Numerik WMO)</option>
+        <option value="BUFR">BUFR (Binary Observasi Cuaca)</option>
+        <option value="WMS">WMS (Web Map Service OGC)</option>
+        <option value="PDF">PDF (Dokumen Laporan Resmi)</option>
+        <option value="XLSX">Excel Spreadsheet (XLSX)</option>
+        <option value="XML">XML (Extensible Markup Language)</option>
+      </datalist>
+      <span class="info-block info-block-small" style="margin-top: 6px; color: #64748b; font-size: 0.82rem; display: block; line-height: 1.45;">
+        <i class="fa fa-info-circle" style="color: #0284c7;"></i>
+        {{ _('Pilih dari dropbar atau ketik format berkas. Khusus berkas GeoJSON, visualisasi peta spasial interaktif akan otomatis diaktifkan pada halaman dataset.') }}
+      </span>
+      {% if errors.format %}
+        <span class="error-block">{{ errors.format }}</span>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

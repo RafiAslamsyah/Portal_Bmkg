@@ -12,6 +12,8 @@
   {% set has_ds = h.bmkg_has_datastore(pkg) %}
   {% set ds_id = h.bmkg_get_datastore_resource_id(pkg) %}
   {% set primary_res = h.bmkg_get_primary_resource(pkg) %}
+  {% set has_geojson = h.bmkg_has_geojson(pkg) %}
+  {% set geojson_res = h.bmkg_get_geojson_resource(pkg) %}
   {% set can_edit = h.bmkg_can_edit_package(pkg) %}
   {% set api_url = h.bmkg_get_api_url(pkg) %}
   <!-- Flash Messages -->
@@ -103,9 +105,15 @@
           </a>
         {% endif %}
 
-        <button type="button" class="btn-interactive" onclick="switchDatasetTab('tab-preview')" style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--bmkg-blue-deep); padding: 0.72rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-          <i class="fa-solid fa-table-cells" style="color: var(--bmkg-blue);"></i> Lihat Pratinjau Tabel
-        </button>
+        {% if has_geojson %}
+          <button type="button" class="btn-interactive" onclick="switchDatasetTab('tab-map')" style="background: var(--canvas-white); border: 1.5px solid var(--bmkg-blue); color: var(--bmkg-blue-deep); padding: 0.72rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 56, 101, 0.08);">
+            <i class="fa-solid fa-map-location-dot" style="color: var(--bmkg-blue); font-size: 1.05rem;"></i> Lihat Pratinjau Peta (GeoJSON)
+          </button>
+        {% else %}
+          <button type="button" class="btn-interactive" onclick="switchDatasetTab('tab-preview')" style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--bmkg-blue-deep); padding: 0.72rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <i class="fa-solid fa-table-cells" style="color: var(--bmkg-blue);"></i> Lihat Pratinjau Tabel
+          </button>
+        {% endif %}
 
         <button type="button" class="btn-interactive" onclick="copyApiEndpoint('{{ api_url }}')" style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--text-secondary); padding: 0.72rem 1.15rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
           <i class="fa-solid fa-code"></i> Salin API Endpoint
@@ -133,9 +141,18 @@
       
       <!-- Modern Navigation Tabs -->
       <nav class="dataset-tab-nav-bar" role="tablist">
-        <button type="button" class="dataset-tab-btn active" id="btn-tab-preview" onclick="switchDatasetTab('tab-preview')">
-          <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel Data (CSV)
-        </button>
+        {% if has_geojson %}
+          <button type="button" class="dataset-tab-btn active" id="btn-tab-map" onclick="switchDatasetTab('tab-map')">
+            <i class="fa-solid fa-map-location-dot"></i> Pratinjau Peta Spasial (GeoJSON)
+          </button>
+          <button type="button" class="dataset-tab-btn" id="btn-tab-preview" onclick="switchDatasetTab('tab-preview')">
+            <i class="fa-solid fa-table-cells"></i> Tabel Atribut Data
+          </button>
+        {% else %}
+          <button type="button" class="dataset-tab-btn active" id="btn-tab-preview" onclick="switchDatasetTab('tab-preview')">
+            <i class="fa-solid fa-table-cells"></i> Pratinjau Tabel Data (CSV)
+          </button>
+        {% endif %}
         <button type="button" class="dataset-tab-btn" id="btn-tab-resources" onclick="switchDatasetTab('tab-resources')">
           <i class="fa-solid fa-file-lines"></i> Berkas Sumber ({{ pkg.resources|length }})
         </button>
@@ -147,8 +164,86 @@
         </button>
       </nav>
 
+      <!-- Tab Pane 0: LIVE INTERACTIVE GEOJSON MAP PREVIEW -->
+      {% if has_geojson %}
+      <section class="dataset-tab-pane active" id="pane-tab-map">
+        <div class="geojson-map-card">
+          <!-- Map Toolbar -->
+          <div class="live-table-toolbar" style="flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-weight: 700; color: var(--bmkg-blue-deep); font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-earth-asia" style="color: var(--bmkg-blue);"></i> Visualisasi Geospasial Interaktif
+              </span>
+              <span id="geoFeatureCountBadge" style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; background: var(--canvas-white); border: 1px solid var(--border-medium); padding: 0.3rem 0.65rem; border-radius: 6px; font-weight: 700; color: var(--bmkg-blue-deep);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Memuat lapisan geospasial...
+              </span>
+            </div>
+
+            <div class="table-toolbar-actions" style="margin-left: auto;">
+              <!-- Basemap Selector -->
+              <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: var(--canvas-white); border: 1px solid var(--border-medium); border-radius: 6px; padding: 0.25rem 0.55rem; font-size: 0.8rem;">
+                <i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue);"></i>
+                <select id="geoBasemapSelect" onchange="changeGeoBasemap(this.value)" style="border: none; background: transparent; font-weight: 600; color: var(--bmkg-blue-deep); outline: none; cursor: pointer; font-size: 0.8rem;">
+                  <option value="positron">Peta Terang (Positron)</option>
+                  <option value="voyager">Peta Berwarna (Voyager)</option>
+                  <option value="osm">Peta Jalan (OSM)</option>
+                  <option value="satellite">Citra Satelit (Esri World)</option>
+                </select>
+              </div>
+
+              <!-- Reset Bounds Button -->
+              <button type="button" class="btn-interactive card-sub-btn" onclick="fitGeojsonBounds()" title="Fokuskan peta ke seluruh fitur">
+                <i class="fa-solid fa-expand"></i> Fokus Wilayah
+              </button>
+
+              <!-- View Attribute Table Button -->
+              <button type="button" class="btn-interactive card-sub-btn" onclick="switchDatasetTab('tab-preview')" title="Lihat atribut fitur dalam bentuk tabel">
+                <i class="fa-solid fa-table-cells"></i> Tabel Atribut
+              </button>
+
+              <!-- Download Button -->
+              {% if geojson_res and geojson_res.url %}
+                <a href="{{ geojson_res.url }}" class="btn-interactive card-sub-btn" target="_blank" rel="noopener noreferrer" download style="background: var(--bmkg-blue-deep); color: #ffffff; border-color: var(--bmkg-blue-deep);">
+                  <i class="fa-solid fa-download"></i> Unduh Berkas
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Map Container -->
+          <div style="position: relative; width: 100%; height: 530px; background: #e2e8f0;">
+            <div id="geojsonLeafletMap" style="width: 100%; height: 100%; z-index: 1;"></div>
+
+            <!-- Loading Spinner Overlay -->
+            <div id="geojsonMapLoading" style="position: absolute; inset: 0; background: rgba(255,255,255,0.85); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: var(--bmkg-blue);"></i>
+              <p style="margin-top: 1rem; color: var(--bmkg-blue-deep); font-weight: 700; font-size: 0.95rem;">
+                Memuat dan merender lapisan spasial GeoJSON...
+              </p>
+            </div>
+          </div>
+
+          <!-- Map Footer Stats & Info -->
+          <div class="live-table-footer" style="flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem;">
+              <span style="color: var(--bmkg-green); font-weight: 700;">
+                <i class="fa-solid fa-circle-check"></i> Proyeksi: EPSG:4326 (WGS 84)
+              </span>
+              <span style="color: var(--border-medium);">|</span>
+              <span id="geoExtentInfo" style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                Koordinat Batas: Menghitung...
+              </span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-hand-pointer" style="color: var(--bmkg-blue);"></i> Klik titik atau poligon pada peta untuk rincian atribut data
+            </div>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+
       <!-- Tab Pane 1: LIVE INTERACTIVE CSV TABLE PREVIEW -->
-      <section class="dataset-tab-pane active" id="pane-tab-preview">
+      <section class="dataset-tab-pane {% if not has_geojson %}active{% endif %}" id="pane-tab-preview">
         <div class="live-table-card">
           <!-- Toolbar -->
           <div class="live-table-toolbar">
@@ -238,7 +333,11 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  {% if res_fmt|lower == 'csv' %}
+                  {% if 'geojson' in res_fmt|lower or 'geojson' in res.url|lower %}
+                    <button type="button" class="btn-interactive card-sub-btn" onclick="previewGeojsonResource('{{ res.url }}')" style="border-color: var(--bmkg-blue); color: var(--bmkg-blue-deep); font-weight: 700;">
+                      <i class="fa-solid fa-map-location-dot" style="color: var(--bmkg-blue);"></i> Pratinjau Peta
+                    </button>
+                  {% elif res_fmt|lower == 'csv' %}
                     <button type="button" class="btn-interactive card-sub-btn" onclick="switchDatasetTab('tab-preview')">
                       <i class="fa-solid fa-table-cells"></i> Pratinjau
                     </button>
@@ -458,6 +557,15 @@ if data.get("success"):
         targetBtn.classList.add('active');
         targetPane.classList.add('active');
       }
+
+      if (tabId === 'tab-map' && _geojsonLeafletMap) {
+        setTimeout(function() {
+          _geojsonLeafletMap.invalidateSize();
+          if (_geojsonBounds && _geojsonBounds.isValid()) {
+            _geojsonLeafletMap.fitBounds(_geojsonBounds, { padding: [35, 35] });
+          }
+        }, 120);
+      }
     }
 
     // Toast Notification Engine
@@ -654,13 +762,326 @@ if data.get("success"):
       return { fields: fields, records: records };
     }
 
+    // ==========================================================
+    // GEOJSON INTERACTIVE LEAFLET ENGINE
+    // ==========================================================
+    var _geojsonLeafletMap = null;
+    var _geojsonLayer = null;
+    var _geojsonBounds = null;
+    var _geoBaseLayers = {};
+
+    function initGeojsonMap(targetUrl) {
+      var mapContainer = document.getElementById('geojsonLeafletMap');
+      if (!mapContainer || typeof L === 'undefined') return;
+
+      if (!_geojsonLeafletMap) {
+        _geojsonLeafletMap = L.map('geojsonLeafletMap', {
+          center: [-2.5489, 118.0149],
+          zoom: 5,
+          zoomControl: true
+        });
+
+        // Setup Basemaps
+        _geoBaseLayers = {
+          positron: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            subdomains: 'abcd'
+          }),
+          voyager: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            subdomains: 'abcd'
+          }),
+          osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+          }),
+          satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19
+          })
+        };
+
+        _geoBaseLayers.positron.addTo(_geojsonLeafletMap);
+      }
+
+      var loadingElem = document.getElementById('geojsonMapLoading');
+      if (loadingElem) loadingElem.style.display = 'flex';
+
+      loadGeojsonData(targetUrl);
+    }
+
+    function changeGeoBasemap(baseType) {
+      if (!_geojsonLeafletMap || !_geoBaseLayers) return;
+      Object.values(_geoBaseLayers).forEach(function(l) {
+        if (_geojsonLeafletMap.hasLayer(l)) _geojsonLeafletMap.removeLayer(l);
+      });
+      if (_geoBaseLayers[baseType]) {
+        _geoBaseLayers[baseType].addTo(_geojsonLeafletMap);
+      }
+    }
+
+    function fitGeojsonBounds() {
+      if (_geojsonLeafletMap && _geojsonBounds && _geojsonBounds.isValid()) {
+        _geojsonLeafletMap.fitBounds(_geojsonBounds, { padding: [35, 35] });
+      }
+    }
+
+    function previewGeojsonResource(url) {
+      switchDatasetTab('tab-map');
+      if (url) {
+        loadGeojsonData(url);
+      }
+    }
+
+    function normalizeToGeoJSON(data) {
+      if (!data) return null;
+      if (data.type === 'FeatureCollection' && Array.isArray(data.features)) {
+        return data;
+      }
+      if (data.type === 'Feature') {
+        return { type: 'FeatureCollection', features: [data] };
+      }
+      // BMKG CAP / InaTEWS GeoJSON format (with info array)
+      if (Array.isArray(data.info)) {
+        var features = [];
+        data.info.forEach(function(item, idx) {
+          var lon = null, lat = null;
+          if (item.point && item.point.coordinates) {
+            var parts = item.point.coordinates.split(',');
+            lon = parseFloat(parts[0]);
+            lat = parseFloat(parts[1]);
+          } else if (item.longitude && item.latitude) {
+            lon = parseFloat(item.longitude);
+            lat = parseFloat(item.latitude);
+            if (String(item.latitude).toUpperCase().indexOf('LS') !== -1) lat = -Math.abs(lat);
+            if (String(item.longitude).toUpperCase().indexOf('BB') !== -1) lon = -Math.abs(lon);
+          }
+          if (lon !== null && lat !== null && !isNaN(lon) && !isNaN(lat)) {
+            features.push({
+              type: 'Feature',
+              id: item.eventid || ('eq-' + idx),
+              geometry: { type: 'Point', coordinates: [lon, lat] },
+              properties: item
+            });
+          }
+        });
+        return { type: 'FeatureCollection', features: features };
+      }
+      // Array of objects with lat/lon or geometry
+      if (Array.isArray(data)) {
+        var features = [];
+        data.forEach(function(item, idx) {
+          if (item.geometry && item.geometry.coordinates) {
+            features.push({ type: 'Feature', id: item.id || idx, geometry: item.geometry, properties: item.properties || item });
+          } else {
+            var lat = item.lat || item.latitude;
+            var lon = item.lon || item.longitude;
+            if (lat !== undefined && lon !== undefined) {
+              features.push({
+                type: 'Feature',
+                id: item.id || idx,
+                geometry: { type: 'Point', coordinates: [parseFloat(lon), parseFloat(lat)] },
+                properties: item
+              });
+            }
+          }
+        });
+        return { type: 'FeatureCollection', features: features };
+      }
+      return null;
+    }
+
+    function createGeojsonPopup(props) {
+      var title = props.area || props.headline || props.subject || props.nama || props.name || props.title || 'Fitur Geospasial BMKG';
+      var mag = props.magnitude || props.mag;
+      var magBadge = '';
+      if (mag !== undefined && mag !== null && mag !== '') {
+        var mVal = parseFloat(mag);
+        var cls = mVal >= 5.0 ? 'mag-danger' : (mVal >= 3.0 ? 'mag-warning' : 'mag-normal');
+        magBadge = '<span class="geojson-mag-badge ' + cls + '">M ' + mVal.toFixed(1) + '</span>';
+      }
+
+      var html = '<div class="geojson-popup-content">';
+      html += '<div class="geojson-popup-title"><span>' + title + '</span>' + magBadge + '</div>';
+
+      html += '<table class="geojson-prop-table">';
+      var shownKeys = 0;
+      var priorityKeys = ['date', 'time', 'waktu', 'depth', 'kedalaman', 'area', 'felt', 'dirasakan', 'potential', 'potensi'];
+      priorityKeys.forEach(function(k) {
+        if (props[k] && typeof props[k] !== 'object') {
+          var label = k.charAt(0).toUpperCase() + k.slice(1);
+          if (k === 'date') label = 'Tanggal';
+          if (k === 'time' || k === 'waktu') label = 'Waktu';
+          if (k === 'depth' || k === 'kedalaman') label = 'Kedalaman';
+          if (k === 'area') label = 'Wilayah';
+          if (k === 'felt' || k === 'dirasakan') label = 'Dirasakan';
+          if (k === 'potential' || k === 'potensi') label = 'Potensi';
+          html += '<tr><td>' + label + '</td><td>' + props[k] + '</td></tr>';
+          shownKeys++;
+        }
+      });
+
+      // Add other properties up to 4 more
+      Object.keys(props).forEach(function(k) {
+        if (shownKeys < 7 && priorityKeys.indexOf(k) === -1 && typeof props[k] !== 'object' && props[k] !== '' && props[k] !== null && k !== 'shakemap') {
+          html += '<tr><td>' + k + '</td><td>' + String(props[k]).substring(0, 50) + '</td></tr>';
+          shownKeys++;
+        }
+      });
+      html += '</table>';
+
+      if (props.shakemap) {
+        var smUrl = String(props.shakemap);
+        if (smUrl.indexOf('http') === -1) {
+          smUrl = 'https://data.bmkg.go.id/DataMKG/TEWS/' + smUrl;
+        }
+        html += '<div style="margin-top: 8px; text-align: center;"><a href="' + smUrl + '" target="_blank" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: underline;"><i class="fa-solid fa-image"></i> Buka Gambar Shakemap MMI</a></div>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function loadGeojsonData(url) {
+      if (!url) return;
+      if (url.indexOf('http://data/') === 0) {
+        url = url.replace('http://data/', '/data/');
+      }
+      var loadingElem = document.getElementById('geojsonMapLoading');
+      var badgeElem = document.getElementById('geoFeatureCountBadge');
+      var extentElem = document.getElementById('geoExtentInfo');
+
+      fetch(url)
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(raw) {
+          var geoData = normalizeToGeoJSON(raw);
+          if (!geoData || !geoData.features || geoData.features.length === 0) {
+            throw new Error('Tidak ada fitur spasial ditemukan dalam berkas GeoJSON.');
+          }
+
+          if (_geojsonLayer && _geojsonLeafletMap) {
+            _geojsonLeafletMap.removeLayer(_geojsonLayer);
+          }
+
+          _geojsonLayer = L.geoJSON(geoData, {
+            pointToLayer: function(feature, latlng) {
+              var props = feature.properties || {};
+              var mag = parseFloat(props.magnitude || props.mag);
+              var radius = 8;
+              var color = '#0284c7';
+              var fillColor = '#38bdf8';
+
+              if (!isNaN(mag)) {
+                if (mag >= 5.0) {
+                  radius = 12;
+                  color = '#b91c1c';
+                  fillColor = '#ef4444';
+                } else if (mag >= 3.0) {
+                  radius = 9;
+                  color = '#c2410c';
+                  fillColor = '#f97316';
+                } else {
+                  radius = 7;
+                  color = '#0369a1';
+                  fillColor = '#38bdf8';
+                }
+              }
+
+              return L.circleMarker(latlng, {
+                radius: radius,
+                fillColor: fillColor,
+                color: color,
+                weight: 2,
+                opacity: 0.95,
+                fillOpacity: 0.8
+              });
+            },
+            style: function(feature) {
+              return {
+                color: '#0284c7',
+                weight: 2.5,
+                fillColor: '#38bdf8',
+                fillOpacity: 0.25
+              };
+            },
+            onEachFeature: function(feature, layer) {
+              if (feature.properties) {
+                layer.bindPopup(createGeojsonPopup(feature.properties));
+                layer.on('mouseover', function() {
+                  if (layer.setStyle) layer.setStyle({ weight: 4, color: '#003865' });
+                });
+                layer.on('mouseout', function() {
+                  if (_geojsonLayer) _geojsonLayer.resetStyle(layer);
+                });
+              }
+            }
+          }).addTo(_geojsonLeafletMap);
+
+          _geojsonBounds = _geojsonLayer.getBounds();
+          if (_geojsonBounds && _geojsonBounds.isValid()) {
+            _geojsonLeafletMap.fitBounds(_geojsonBounds, { padding: [35, 35] });
+
+            if (extentElem) {
+              var sw = _geojsonBounds.getSouthWest();
+              var ne = _geojsonBounds.getNorthEast();
+              extentElem.textContent = 'BBox: [' + sw.lat.toFixed(2) + ', ' + sw.lng.toFixed(2) + '] s/d [' + ne.lat.toFixed(2) + ', ' + ne.lng.toFixed(2) + ']';
+            }
+          }
+
+          if (badgeElem) {
+            badgeElem.innerHTML = '<i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue);"></i> ' + geoData.features.length + ' Fitur Geospasial';
+          }
+
+          // Also populate Attribute Table Tab safely without breaking map rendering
+          try {
+            var tableRecords = geoData.features.map(function(f, i) {
+              var row = Object.assign({}, f.properties);
+              row['#'] = i + 1;
+              if (f.geometry && Array.isArray(f.geometry.coordinates)) {
+                var c0 = f.geometry.coordinates[0];
+                var c1 = f.geometry.coordinates[1];
+                if (typeof c0 === 'number' && typeof c1 === 'number') {
+                  row['koordinat'] = c0.toFixed(4) + ', ' + c1.toFixed(4);
+                } else if (Array.isArray(c0)) {
+                  row['koordinat'] = 'Geometri Garis/Poligon';
+                } else {
+                  row['koordinat'] = String(c0) + ', ' + String(c1);
+                }
+              }
+              return row;
+            });
+            if (tableRecords.length > 0) {
+              var keys = Object.keys(tableRecords[0]);
+              var fields = keys.map(function(k) { return { id: k }; });
+              renderTableDOM(fields, tableRecords, 'Atribut Berkas GeoJSON');
+            }
+          } catch (tabErr) {
+            console.warn('Gagal memetakan tabel atribut GeoJSON:', tabErr);
+          }
+
+          if (loadingElem) loadingElem.style.display = 'none';
+        })
+        .catch(function(err) {
+          console.error('Error loading GeoJSON:', err);
+          if (loadingElem) {
+            loadingElem.innerHTML = '<div style="text-align: center; padding: 2.5rem;"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #dc2626; margin-bottom: 0.75rem;"></i><h4 style="color: #003865;">Gagal Menampilkan Peta GeoJSON</h4><p style="color: #64748b; font-size: 0.88rem; max-width: 400px; margin: 0 auto;">' + err.message + '</p></div>';
+          }
+          if (badgeElem) badgeElem.textContent = 'Gagal memuat';
+        });
+    }
+
     // Automatic Bootstrapper on Page Load
     document.addEventListener('DOMContentLoaded', function() {
       var dsId = "{{ ds_id or '' }}";
       var primaryUrl = "{{ primary_res.url if (primary_res and primary_res.url) else '' }}";
       var primaryFormat = "{{ primary_res.format|lower if primary_res else '' }}";
+      var hasGeojson = {{ 'true' if has_geojson else 'false' }};
+      var geojsonUrl = "{{ geojson_res.url if (geojson_res and geojson_res.url) else '' }}";
 
-      if (dsId) {
+      if (hasGeojson && geojsonUrl) {
+        initGeojsonMap(geojsonUrl);
+      } else if (dsId) {
         // Mode 1: Fetch via CKAN DataStore API
         fetch('/api/3/action/datastore_search?resource_id=' + dsId + '&limit=100')
           .then(function(res) { return res.json(); })

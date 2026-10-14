@@ -8,6 +8,7 @@
 {% set has_ds = h.bmkg_has_datastore(package) %}
 {% set ds_id = h.bmkg_get_datastore_resource_id(package) %}
 {% set primary_res = h.bmkg_get_primary_resource(package) %}
+{% set has_geojson = h.bmkg_has_geojson(package) %}
 {% set can_edit = h.bmkg_can_edit_package(package) %}
 {% set api_url = h.bmkg_get_api_url(package) %}
 
@@ -91,15 +92,21 @@
 
     <!-- Action Buttons Group -->
     <div class="card-action-links">
-      <button type="button" class="btn-interactive card-sub-btn btn-trigger-preview" 
-        data-pkg-name="{{ package.name }}"
-        data-pkg-title="{{ title }}"
-        data-ds-id="{{ ds_id or '' }}"
-        data-res-url="{{ primary_res.url if (primary_res and primary_res.url) else '' }}"
-        onclick="handlePreviewClick(this)" 
-        title="Pratinjau data tabular secara cepat">
-        <i class="fa-solid fa-table-cells"></i> Pratinjau
-      </button>
+      {% if has_geojson %}
+        <a href="{{ h.url_for('dataset.read', id=package.name) }}" class="btn-interactive card-sub-btn btn-trigger-preview" style="color: var(--bmkg-blue-deep); border-color: var(--bmkg-blue); font-weight: 700;" title="Buka Pratinjau Peta Interaktif GeoJSON">
+          <i class="fa-solid fa-map-location-dot" style="color: var(--bmkg-blue);"></i> Peta GeoJSON
+        </a>
+      {% else %}
+        <button type="button" class="btn-interactive card-sub-btn btn-trigger-preview" 
+          data-pkg-name="{{ package.name }}"
+          data-pkg-title="{{ title }}"
+          data-ds-id="{{ ds_id or '' }}"
+          data-res-url="{{ primary_res.url if (primary_res and primary_res.url) else '' }}"
+          onclick="handlePreviewClick(this)" 
+          title="Pratinjau data tabular secara cepat">
+          <i class="fa-solid fa-table-cells"></i> Pratinjau
+        </button>
+      {% endif %}
 
       <button type="button" class="btn-interactive card-sub-btn" 
         data-api-url="{{ api_url }}"

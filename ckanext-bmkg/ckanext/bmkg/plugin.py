@@ -101,6 +101,31 @@ def get_bmkg_gempa_realtime():
     resp.headers['Cache-Control'] = 'public, max-age=15'
     return resp
 
+def custom_format_autocomplete(context, data_dict):
+    q = (data_dict.get('q') or '').lower().strip()
+    if q == '?':
+        q = ''
+    standard_formats = [
+        'geojson', 'csv', 'json', 'kml', 'netcdf', 'shapefile', 'grib', 'bufr', 'pdf', 'xlsx', 'xml', 'wms'
+    ]
+    if not q:
+        return standard_formats
+    matched = [f for f in standard_formats if q in f]
+    try:
+        import ckan.model as model
+        session = context.get('session') or model.Session
+        query = session.query(model.Resource.format).filter(
+            model.Resource.state == 'active',
+            model.Resource.format.ilike(f'%{q}%')
+        ).distinct()
+        for r in query:
+            fmt = (r.format or '').lower().strip()
+            if fmt and fmt not in matched:
+                matched.append(fmt)
+    except Exception:
+        pass
+    return matched[:15]
+
 class BMKGThemePlugin(plugins.SingletonPlugin):
     """
     Plugin kustomisasi tema visual Portal Data BMKG.
@@ -110,10 +135,17 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.IActions)
 
     # IBlueprint
     def get_blueprint(self):
         return bmkg_api_blueprint
+
+    # IActions
+    def get_actions(self):
+        return {
+            'format_autocomplete': custom_format_autocomplete,
+        }
 
     # IConfigurer
     def update_config(self, config_):
@@ -136,6 +168,8 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'bmkg_get_api_url': self._get_api_url,
             'bmkg_get_dataset_stats': self._get_dataset_stats,
             'bmkg_get_group_dataset_count': self._get_group_dataset_count,
+            'bmkg_has_geojson': self._has_geojson,
+            'bmkg_get_geojson_resource': self._get_geojson_resource,
         }
 
     def _get_dataset_stats(self):
@@ -315,6 +349,26 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
         if lat is not None and lon is not None:
             return f"{lat:.4f}, {lon:.4f}"
         return "-"
+
+    def _has_geojson(self, package):
+        resources = package.get('resources', []) if isinstance(package, dict) else getattr(package, 'resources', [])
+        for r in resources:
+            fmt = (r.get('format', '') if isinstance(r, dict) else getattr(r, 'format', '')).lower()
+            url = (r.get('url', '') if isinstance(r, dict) else getattr(r, 'url', '')).lower()
+            name = (r.get('name', '') if isinstance(r, dict) else getattr(r, 'name', '')).lower()
+            if 'geojson' in fmt or 'geojson' in url or 'geojson' in name or url.endswith('.geojson'):
+                return True
+        return False
+
+    def _get_geojson_resource(self, package):
+        resources = package.get('resources', []) if isinstance(package, dict) else getattr(package, 'resources', [])
+        for r in resources:
+            fmt = (r.get('format', '') if isinstance(r, dict) else getattr(r, 'format', '')).lower()
+            url = (r.get('url', '') if isinstance(r, dict) else getattr(r, 'url', '')).lower()
+            name = (r.get('name', '') if isinstance(r, dict) else getattr(r, 'name', '')).lower()
+            if 'geojson' in fmt or 'geojson' in url or 'geojson' in name or url.endswith('.geojson'):
+                return r
+        return None
 
 
 class BMKGSchemaPlugin(plugins.SingletonPlugin):
