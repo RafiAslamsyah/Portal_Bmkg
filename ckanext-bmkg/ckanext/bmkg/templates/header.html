@@ -64,17 +64,13 @@
       <div class="header-right-actions">
         {% set current_u = g.userobj or c.userobj %}
         {% if current_u %}
-          <a href="{{ h.url_for('dataset.new') }}" class="btn-interactive btn-header-add" title="Tambah Dataset Baru">
-            <i class="fa-solid fa-plus"></i>
-            <span>Tambah Data</span>
-          </a>
           <a href="{{ h.url_for('dashboard.datasets') }}" class="btn-interactive btn-header-nav-link" title="Dashboard Dataset Saya">
             <i class="fa-solid fa-gauge-high" style="color: var(--bmkg-blue);"></i>
             <span>Dashboard</span>
           </a>
-          <a href="{{ h.url_for('user.edit', id=current_u.name) }}" class="btn-interactive btn-header-nav-link" title="Kelola Profil &amp; Sandi Pengguna">
+          <a href="{{ h.url_for('user.edit', id=current_u.name) }}" class="btn-interactive btn-header-nav-link" title="Kelola Profil Pengguna">
             <i class="fa-solid fa-user-gear" style="color: var(--bmkg-blue);"></i>
-            <span>Profil &amp; Sandi</span>
+            <span>Profil</span>
           </a>
           {% set admin_url = h.url_for('admin.index') if current_u.sysadmin else h.url_for('dashboard.datasets') %}
           <a href="{{ admin_url }}" class="btn-interactive header-user-badge" title="Akses Panel Admin BMKG">

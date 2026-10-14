@@ -197,15 +197,19 @@ function toggleMapLegend(forceState) {
 
 function setGempaDisplayFilter(filterType) {
   window._activeGempaFilter = filterType;
-  document.querySelectorAll('#filterGempaAll, #filterGempaM5, #filterGempaDirasakan').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('#filterGempaAll, #filterGempaM5, #filterGempaMikro, #filterGempaDirasakan').forEach(btn => btn.classList.remove('active'));
   if (filterType === 'all') {
     const b = document.getElementById('filterGempaAll');
     if (b) b.classList.add('active');
-    showToast("Menampilkan Semua Episentrum Gempa BMKG TEWS");
+    showToast("Menampilkan Semua Titik Gempa Real-time BMKG");
   } else if (filterType === 'm5') {
     const b = document.getElementById('filterGempaM5');
     if (b) b.classList.add('active');
     showToast("Memfilter: Hanya Gempa M ≥ 5.0 Terkini");
+  } else if (filterType === 'mikro') {
+    const b = document.getElementById('filterGempaMikro');
+    if (b) b.classList.add('active');
+    showToast("Memfilter: Gempa Mikro & Lokal (M < 5.0)");
   } else if (filterType === 'dirasakan') {
     const b = document.getElementById('filterGempaDirasakan');
     if (b) b.classList.add('active');
@@ -222,13 +226,15 @@ function renderGempaMarkers() {
 
   const filteredItems = allItems.filter(g => {
     if (filter === 'm5') return g.mag >= 5.0 || g.kategori === 'm5';
-    if (filter === 'dirasakan') return g.kategori === 'dirasakan' || (g.dirasakan && g.dirasakan.length > 0);
+    if (filter === 'mikro') return g.mag < 5.0;
+    if (filter === 'dirasakan') return (g.dirasakan && g.dirasakan.length > 0) || g.kategori === 'dirasakan';
     return true;
   });
 
   filteredItems.forEach((g) => {
     const isLatest = g.isLatestLive === true;
     const isM5 = g.mag >= 5.0 || g.kategori === 'm5';
+    const isMikro = g.mag < 3.0 || g.kategori === 'mikro';
     let marker;
 
     if (isLatest) {
@@ -252,19 +258,30 @@ function renderGempaMarkers() {
         iconAnchor: [26, 11]
       });
       marker = L.marker([g.lat, g.lon], { icon: m5Icon, zIndexOffset: 1000 });
+    } else if (isMikro) {
+      const mikroIcon = L.divIcon({
+        className: 'gempa-marker-wrapper',
+        html: `<div class="gempa-mikro-badge" title="${escapeHtml(g.wilayah)} (M ${g.mag})"><span>●</span> M ${g.mag}</div>`,
+        iconSize: [50, 20],
+        iconAnchor: [25, 10]
+      });
+      marker = L.marker([g.lat, g.lon], { icon: mikroIcon, zIndexOffset: 700 });
     } else {
       const dirasakanIcon = L.divIcon({
         className: 'gempa-marker-wrapper',
-        html: `<div class="gempa-dirasakan-badge" title="${escapeHtml(g.wilayah)} (M ${g.mag})"><span>📢</span> M ${g.mag}</div>`,
+        html: `<div class="gempa-dirasakan-badge" title="${escapeHtml(g.wilayah)} (M ${g.mag})"><span>${g.dirasakan ? '📢' : '●'}</span> M ${g.mag}</div>`,
         iconSize: [50, 20],
         iconAnchor: [25, 10]
       });
       marker = L.marker([g.lat, g.lon], { icon: dirasakanIcon, zIndexOffset: 800 });
     }
 
+    const badgeColor = isLatest ? '#dc2626' : (g.mag >= 5.0 ? '#dc2626' : (g.mag < 3.0 ? '#0d9488' : '#0284c7'));
+    const badgeLabel = isLatest ? '🔴 GEMPA TERKINI REALTIME' : (g.mag >= 5.0 ? '⚠️ GEMPA M ≥ 5.0' : (g.mag < 3.0 ? '🟢 GEMPA MIKRO (M < 3.0)' : (g.dirasakan ? '📢 GEMPA DIRASAKAN' : '🔵 GEMPA M 3.0 - 4.9')));
+
     marker.bindTooltip(`
       <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;">
-        <span style="color: ${g.mag >= 5 ? '#dc2626' : '#d97706'}; font-weight: 800;">M ${g.mag}</span> — ${escapeHtml(g.wilayah)}<br>
+        <span style="color: ${badgeColor}; font-weight: 800;">M ${g.mag}</span> — ${escapeHtml(g.wilayah)}<br>
         <span style="color: #64748b; font-size: 11px;">🕒 ${escapeHtml(g.tanggal)} • ⚓ ${escapeHtml(g.kedalaman)}</span>
       </div>
     `, { direction: 'top', offset: [0, -10] });
@@ -286,9 +303,6 @@ function renderGempaMarkers() {
       </div>
     ` : '';
 
-    const badgeColor = isLatest ? '#dc2626' : (g.mag >= 5.0 ? '#dc2626' : '#0284c7');
-    const badgeLabel = isLatest ? '🔴 GEMPA TERKINI (DETIK INI)' : (g.mag >= 5.0 ? '⚠️ GEMPA M ≥ 5.0' : '📢 GEMPA DIRASAKAN');
-
     marker.bindPopup(`
       <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-width: 250px; max-width: 290px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
@@ -305,8 +319,9 @@ function renderGempaMarkers() {
         </div>
         ${dirasakanHtml}
         ${shakemapHtml}
-        <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 5px; margin-top: 6px;">
-          🛡️ ${escapeHtml(g.status || 'Tidak berpotensi tsunami')}
+        <div style="font-size: 11px; font-weight: 700; color: #00875a; border-top: 1px solid #e2e8f0; padding-top: 5px; margin-top: 6px; display: flex; align-items: center; justify-content: space-between;">
+          <span>🛡️ ${escapeHtml(g.status || 'Data Resmi BMKG')}</span>
+          <a href="https://www.bmkg.go.id/gempabumi/gempabumi-realtime" target="_blank" rel="noreferrer" style="color: #005a9e; font-size: 10px; text-decoration: underline;" title="Buka Portal Realtime BMKG">Web BMKG ↗</a>
         </div>
       </div>
     `);
@@ -314,31 +329,148 @@ function renderGempaMarkers() {
   });
 }
 
+function parseBMKGRealtimeHtml(html) {
+  const m = html.match(/<script[^>]*id="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) return [];
+  try {
+    const data = JSON.parse(m[1]);
+    const resolve = (val) => {
+      if (typeof val === 'number' && data[val] !== undefined) return data[val];
+      return val;
+    };
+
+    const rawEvents = [];
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if (item && typeof item === 'object' && item.eventid !== undefined && item.mag !== undefined) {
+        const eventid = resolve(item.eventid);
+        const waktu = resolve(item.waktu);
+        const lat = parseFloat(resolve(item.lintang));
+        const lon = parseFloat(resolve(item.bujur));
+        const dalam = resolve(item.dalam);
+        const mag = parseFloat(resolve(item.mag));
+        const area = resolve(item.area);
+        const status = resolve(item.status);
+
+        if (!isNaN(lat) && !isNaN(lon) && !isNaN(mag)) {
+          let tanggalWib = waktu;
+          let jamWib = '';
+          try {
+            const cleanWaktu = String(waktu).replace(/\s+/g, ' ').trim();
+            const parts = cleanWaktu.split(' ');
+            const dateParts = parts[0].split('/');
+            const timeParts = parts[1].split(':');
+            const dUtc = new Date(Date.UTC(
+              parseInt(dateParts[0]),
+              parseInt(dateParts[1]) - 1,
+              parseInt(dateParts[2]),
+              parseInt(timeParts[0]),
+              parseInt(timeParts[1]),
+              Math.floor(parseFloat(timeParts[2]))
+            ));
+            const dWib = new Date(dUtc.getTime() + 7 * 3600 * 1000);
+            const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            const dd = String(dWib.getUTCDate()).padStart(2, '0');
+            const mm = months[dWib.getUTCMonth()];
+            const yyyy = dWib.getUTCFullYear();
+            const hh = String(dWib.getUTCHours()).padStart(2, '0');
+            const min = String(dWib.getUTCMinutes()).padStart(2, '0');
+            const ss = String(dWib.getUTCSeconds()).padStart(2, '0');
+            tanggalWib = `${dd} ${mm} ${yyyy} ${hh}:${min}:${ss} WIB`;
+            jamWib = `${hh}:${min}:${ss} WIB`;
+          } catch (e) {
+            tanggalWib = waktu + ' WIB';
+            jamWib = waktu;
+          }
+
+          rawEvents.push({
+            id: eventid,
+            mag: mag,
+            kedalaman: typeof dalam === 'number' ? `${dalam} km` : (dalam ? `${dalam} km` : '-'),
+            lat: lat,
+            lon: lon,
+            tanggal: tanggalWib,
+            jam: jamWib,
+            wilayah: area || 'Wilayah Indonesia',
+            status: status === 'confirmed' ? 'Dikonfirmasi Seismolog' : 'Deteksi Otomatis Real-time',
+            dirasakan: '',
+            shakemap: null,
+            isLatestLive: false,
+            kategori: mag >= 5.0 ? 'm5' : (mag < 3.0 ? 'mikro' : 'm3')
+          });
+        }
+      }
+    }
+
+    if (rawEvents.length > 0) {
+      rawEvents[0].isLatestLive = true;
+    }
+    return rawEvents;
+  } catch (e) {
+    console.warn('Gagal mem-parse __NUXT_DATA__ BMKG Realtime:', e);
+    return [];
+  }
+}
+
 async function fetchLiveBMKGGempa(isManual = false) {
   const headline = document.getElementById('liveTewsHeadline');
   const meta = document.getElementById('liveTewsMeta');
   const countAll = document.getElementById('countAllGempa');
   const countM5 = document.getElementById('countM5Gempa');
+  const countMikro = document.getElementById('countMikroGempa');
   const countDirasakan = document.getElementById('countDirasakanGempa');
 
   try {
     const cacheBuster = `?_t=${Date.now()}`;
-    const [resAuto, resM5, resDirasakan] = await Promise.allSettled([
+    const [resProxy, resProxy5000, resRealtime, resAuto, resDirasakan] = await Promise.allSettled([
+      fetch('/api/gempa/realtime' + cacheBuster, { cache: 'no-store' }),
+      fetch('http://localhost:5000/api/gempa/realtime' + cacheBuster, { cache: 'no-store' }),
+      fetch('https://www.bmkg.go.id/gempabumi/gempabumi-realtime' + cacheBuster, { cache: 'no-store' }),
       fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json' + cacheBuster, { cache: 'no-store' }),
-      fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json' + cacheBuster, { cache: 'no-store' }),
       fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json' + cacheBuster, { cache: 'no-store' })
     ]);
 
     let items = [];
 
-    // 1. Autogempa (Gempa Realtime Terkini)
+    // 1. Ekstraksi dari backend proxy internal CKAN (/api/gempa/realtime)
+    for (const r of [resProxy, resProxy5000]) {
+      if (r.status === 'fulfilled' && r.value.ok) {
+        try {
+          const proxyData = await r.value.json();
+          if (Array.isArray(proxyData) && proxyData.length > 0) {
+            items = proxyData;
+            break;
+          }
+        } catch (e) {}
+      }
+    }
+
+    // 2. Ekstraksi langsung jika proxy tidak aktif
+    if (items.length === 0 && resRealtime.status === 'fulfilled' && resRealtime.value.ok) {
+      try {
+        const html = await resRealtime.value.text();
+        const parsedEvents = parseBMKGRealtimeHtml(html);
+        if (parsedEvents.length > 0) {
+          items = parsedEvents;
+        }
+      } catch (e) {
+        console.warn('Error membaca html realtime BMKG:', e);
+      }
+    }
+
+    // 3. Ambil Shakemap jika ada dari autogempa.json
+    let shakemapUrl = null;
     if (resAuto.status === 'fulfilled' && resAuto.value.ok) {
       try {
         const autoJson = await resAuto.value.json();
         const g = autoJson?.Infogempa?.gempa;
-        if (g && g.Coordinates) {
+        if (g && g.Shakemap) {
+          shakemapUrl = `https://data.bmkg.go.id/DataMKG/TEWS/${g.Shakemap}`;
+        }
+        if (items.length === 0 && g && g.Coordinates) {
           const coords = g.Coordinates.split(',');
           items.push({
+            id: 'autogempa',
             wilayah: g.Wilayah,
             mag: parseFloat(g.Magnitude),
             kedalaman: g.Kedalaman,
@@ -348,93 +480,38 @@ async function fetchLiveBMKGGempa(isManual = false) {
             jam: g.Jam,
             status: g.Potensi || 'Data Resmi BMKG TEWS',
             dirasakan: g.Dirasakan || '',
-            shakemap: g.Shakemap ? `https://data.bmkg.go.id/DataMKG/TEWS/${g.Shakemap}` : null,
+            shakemap: shakemapUrl,
             isLatestLive: true,
             kategori: 'autogempa'
           });
         }
-      } catch (e) {
-        console.warn('Error parsing autogempa:', e);
-      }
+      } catch (e) { console.warn('Error parsing autogempa:', e); }
     }
 
-    // 2. Gempaterkini (Daftar 15 Gempa M >= 5.0)
-    let m5Count = 0;
-    if (resM5.status === 'fulfilled' && resM5.value.ok) {
-      try {
-        const m5Json = await resM5.value.json();
-        const rawM5 = m5Json?.Infogempa?.gempa;
-        if (Array.isArray(rawM5)) {
-          rawM5.forEach(g => {
-            const coords = (g.Coordinates || '').split(',');
-            const lat = parseFloat(coords[0]);
-            const lon = parseFloat(coords[1]);
-            const isDup = items.some(existing => 
-              Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
-            );
-            if (!isDup && !isNaN(lat) && !isNaN(lon)) {
-              m5Count++;
-              items.push({
-                wilayah: g.Wilayah,
-                mag: parseFloat(g.Magnitude),
-                kedalaman: g.Kedalaman,
-                lat: lat,
-                lon: lon,
-                tanggal: `${g.Tanggal} ${g.Jam}`,
-                jam: g.Jam,
-                status: g.Potensi || 'Tidak berpotensi tsunami',
-                dirasakan: '',
-                shakemap: null,
-                isLatestLive: false,
-                kategori: 'm5'
-              });
-            }
-          });
-        }
-      } catch (e) {
-        console.warn('Error parsing gempaterkini:', e);
-      }
-    }
-
-    // 3. Gempadirasakan (Daftar 15 Gempa Dirasakan)
-    let dirasakanCount = 0;
-    if (resDirasakan.status === 'fulfilled' && resDirasakan.value.ok) {
-      try {
-        const dirasakanJson = await resDirasakan.value.json();
-        const rawDirasakan = dirasakanJson?.Infogempa?.gempa;
-        if (Array.isArray(rawDirasakan)) {
-          rawDirasakan.forEach(g => {
-            const coords = (g.Coordinates || '').split(',');
-            const lat = parseFloat(coords[0]);
-            const lon = parseFloat(coords[1]);
-            const isDup = items.some(existing => 
-              Math.abs(existing.lat - lat) < 0.05 && Math.abs(existing.lon - lon) < 0.05
-            );
-            if (!isDup && !isNaN(lat) && !isNaN(lon)) {
-              dirasakanCount++;
-              items.push({
-                wilayah: g.Wilayah,
-                mag: parseFloat(g.Magnitude),
-                kedalaman: g.Kedalaman,
-                lat: lat,
-                lon: lon,
-                tanggal: `${g.Tanggal} ${g.Jam}`,
-                jam: g.Jam,
-                status: 'Gempa Dirasakan Masyarakat',
-                dirasakan: g.Dirasakan || '',
-                shakemap: null,
-                isLatestLive: false,
-                kategori: 'dirasakan'
-              });
-            }
-          });
-        }
-      } catch (e) {
-        console.warn('Error parsing gempadirasakan:', e);
-      }
-    }
-
+    // 3. Sinkronisasi data dirasakan dan shakemap
     if (items.length > 0) {
+      if (resDirasakan.status === 'fulfilled' && resDirasakan.value.ok) {
+        try {
+          const dirasakanJson = await resDirasakan.value.json();
+          const rawDirasakan = dirasakanJson?.Infogempa?.gempa;
+          if (Array.isArray(rawDirasakan)) {
+            rawDirasakan.forEach(df => {
+              const coords = (df.Coordinates || '').split(',');
+              const dLat = parseFloat(coords[0]);
+              const dLon = parseFloat(coords[1]);
+              const match = items.find(it => Math.abs(it.lat - dLat) < 0.15 && Math.abs(it.lon - dLon) < 0.15);
+              if (match) {
+                match.dirasakan = df.Dirasakan || '';
+              }
+            });
+          }
+        } catch (e) { console.warn('Error enrich dirasakan:', e); }
+      }
+
+      if (shakemapUrl && items.length > 0) {
+        items[0].shakemap = shakemapUrl;
+      }
+
       window._allGempaItems = items;
       renderGempaMarkers();
 
@@ -445,17 +522,22 @@ async function fetchLiveBMKGGempa(isManual = false) {
       if (meta) {
         meta.textContent = latest.tanggal;
       }
+      const m5Count = items.filter(x => x.mag >= 5.0).length;
+      const mikroCount = items.filter(x => x.mag < 5.0).length;
+      const dirasakanCount = items.filter(x => x.dirasakan && x.dirasakan.length > 0).length;
+
       if (countAll) countAll.textContent = items.length;
-      if (countM5) countM5.textContent = m5Count || 15;
+      if (countM5) countM5.textContent = m5Count;
+      if (countMikro) countMikro.textContent = mikroCount;
       if (countDirasakan) countDirasakan.textContent = dirasakanCount || 15;
 
       if (isManual) {
-        showToast(`Data BMKG TEWS diperbarui: ${items.length} titik gempa aktif`);
+        showToast(`Data BMKG Realtime diperbarui: ${items.length} titik seismik (Terkini: M ${latest.mag})`);
       }
       return;
     }
   } catch (err) {
-    console.warn('Gagal memuat API Live BMKG TEWS, beralih ke observasi lokal:', err);
+    console.warn('Gagal memuat API Live BMKG Realtime, beralih ke observasi lokal:', err);
   }
 
   // Fallback lokal jika offline

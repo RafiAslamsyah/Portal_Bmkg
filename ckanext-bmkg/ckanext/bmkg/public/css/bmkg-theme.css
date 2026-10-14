@@ -1877,6 +1877,30 @@ footer.gov-footer, .gov-footer {
   z-index: 9999 !important;
 }
 
+.gempa-mikro-badge {
+  background: #0d9488;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 12px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 2px 5px rgba(13, 148, 136, 0.5);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+.gempa-mikro-badge:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.85);
+  z-index: 9999 !important;
+}
+
 /* ==========================================================================
    KATALOG DATASET TERBUKA BMKG (ADAPTASI DESAIN KATALOG.HTML UNTUK CKAN)
    ========================================================================== */

@@ -1,6 +1,105 @@
 # encoding: utf-8
+import time
+import urllib.request
+import json
+import re
+from datetime import datetime, timezone, timedelta
+from flask import Blueprint, jsonify
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+
+bmkg_api_blueprint = Blueprint('bmkg_api', __name__)
+
+_CACHED_GEMPA = []
+_LAST_GEMPA_FETCH = 0
+_GEMPA_CACHE_TTL = 30  # 30 detik cache in-memory
+
+def _fetch_bmkg_realtime_events():
+    global _CACHED_GEMPA, _LAST_GEMPA_FETCH
+    now = time.time()
+    if _CACHED_GEMPA and (now - _LAST_GEMPA_FETCH < _GEMPA_CACHE_TTL):
+        return _CACHED_GEMPA
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'id,en-US;q=0.9,en;q=0.8',
+        'Cache-Control': 'no-cache'
+    }
+    req = urllib.request.Request('https://www.bmkg.go.id/gempabumi/gempabumi-realtime', headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            html = resp.read().decode('utf-8', errors='ignore')
+
+        m = re.search(r'<script[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
+        if not m:
+            return _CACHED_GEMPA
+
+        data = json.loads(m.group(1))
+        def resolve(val):
+            if isinstance(val, int) and 0 <= val < len(data):
+                return data[val]
+            return val
+
+        events = []
+        for item in data:
+            if isinstance(item, dict) and 'eventid' in item and 'mag' in item:
+                try:
+                    eventid = resolve(item.get('eventid'))
+                    waktu_str = resolve(item.get('waktu'))
+                    lat = float(resolve(item.get('lintang')))
+                    lon = float(resolve(item.get('bujur')))
+                    dalam = resolve(item.get('dalam'))
+                    mag = float(resolve(item.get('mag')))
+                    area = resolve(item.get('area'))
+                    status = resolve(item.get('status'))
+
+                    # Konversi UTC ke WIB (+7)
+                    try:
+                        clean_w = ' '.join(str(waktu_str).split())
+                        dt_utc = datetime.strptime(clean_w.split('.')[0], '%Y/%m/%d %H:%M:%S')
+                        dt_wib = dt_utc + timedelta(hours=7)
+                        tanggal_wib = dt_wib.strftime('%d %b %Y %H:%M:%S WIB')
+                        jam_wib = dt_wib.strftime('%H:%M:%S WIB')
+                    except Exception:
+                        tanggal_wib = str(waktu_str)
+                        jam_wib = ''
+
+                    events.append({
+                        'id': str(eventid),
+                        'mag': mag,
+                        'kedalaman': f"{dalam} km" if isinstance(dalam, (int, float)) else str(dalam),
+                        'lat': lat,
+                        'lon': lon,
+                        'tanggal': tanggal_wib,
+                        'jam': jam_wib,
+                        'wilayah': str(area) if area else 'Wilayah Indonesia',
+                        'status': 'Dikonfirmasi Seismolog' if status == 'confirmed' else 'Deteksi Otomatis Real-time',
+                        'dirasakan': '',
+                        'shakemap': None,
+                        'isLatestLive': False,
+                        'kategori': 'm5' if mag >= 5.0 else ('mikro' if mag < 3.0 else 'm3')
+                    })
+                except Exception:
+                    continue
+
+        if events:
+            events[0]['isLatestLive'] = True
+            _CACHED_GEMPA = events
+            _LAST_GEMPA_FETCH = now
+            return events
+    except Exception:
+        if _CACHED_GEMPA:
+            return _CACHED_GEMPA
+    return []
+
+@bmkg_api_blueprint.route('/api/gempa/realtime')
+def get_bmkg_gempa_realtime():
+    events = _fetch_bmkg_realtime_events()
+    resp = jsonify(events)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Cache-Control'] = 'public, max-age=15'
+    return resp
 
 class BMKGThemePlugin(plugins.SingletonPlugin):
     """
@@ -10,6 +109,11 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
     """
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IBlueprint)
+
+    # IBlueprint
+    def get_blueprint(self):
+        return bmkg_api_blueprint
 
     # IConfigurer
     def update_config(self, config_):

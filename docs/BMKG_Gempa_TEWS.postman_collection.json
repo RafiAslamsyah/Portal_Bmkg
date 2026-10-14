@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "bmkg-tews-open-data-collection",
+		"name": "BMKG TEWS - Open Data Gempa Bumi",
+		"description": "Koleksi API Resmi BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) untuk data Seismik, Gempa Bumi Terkini, dan Integrasi Peta Portal Open Data BMKG.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Gempa Terkini Real-time (Autogempa)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Validasi Struktur JSON Gempa BMKG\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('Infogempa');",
+							"    pm.expect(jsonData.Infogempa).to.have.property('gempa');",
+							"    ",
+							"    var g = jsonData.Infogempa.gempa;",
+							"    pm.expect(g).to.have.property('Coordinates');",
+							"    pm.expect(g).to.have.property('Magnitude');",
+							"    pm.expect(g).to.have.property('Wilayah');",
+							"    ",
+							"    // Simpan nama file Shakemap ke environment jika ada",
+							"    if (g.Shakemap) {",
+							"        pm.collectionVariables.set(\"shakemap_filename\", g.Shakemap);",
+							"    }",
+							"    ",
+							"    console.log(\"[BMKG] Gempa Terkini: M \" + g.Magnitude + \" - \" + g.Wilayah);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json",
+					"protocol": "https",
+					"host": [
+						"data",
+						"bmkg",
+						"go",
+						"id"
+					],
+					"path": [
+						"DataMKG",
+						"TEWS",
+						"autogempa.json"
+					]
+				},
+				"description": "Mengambil 1 data gempa bumi terbaru secara real-time dari BMKG TEWS lengkap dengan magnitudo, koordinat titik episentrum, kedalaman, dan nama file Shakemap (peta guncangan)."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Daftar 15 Gempa Signifikan (M >= 5.0)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Validasi Array 15 Gempa M >= 5.0\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.Infogempa.gempa).to.be.an('array');",
+							"    pm.expect(jsonData.Infogempa.gempa.length).to.be.greaterThan(0);",
+							"    console.log(\"[BMKG] Total data gempa M5: \" + jsonData.Infogempa.gempa.length);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json",
+					"protocol": "https",
+					"host": [
+						"data",
+						"bmkg",
+						"go",
+						"id"
+					],
+					"path": [
+						"DataMKG",
+						"TEWS",
+						"gempaterkini.json"
+					]
+				},
+				"description": "Mengambil daftar 15 data gempa bumi tektonik terkini dengan magnitudo 5.0 ke atas di seluruh wilayah Indonesia."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Daftar 15 Gempa Dirasakan Masyarakat",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Validasi Array Gempa Dirasakan\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.Infogempa.gempa).to.be.an('array');",
+							"    console.log(\"[BMKG] Total data gempa dirasakan: \" + jsonData.Infogempa.gempa.length);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json",
+					"protocol": "https",
+					"host": [
+						"data",
+						"bmkg",
+						"go",
+						"id"
+					],
+					"path": [
+						"DataMKG",
+						"TEWS",
+						"gempadirasakan.json"
+					]
+				},
+				"description": "Mengambil 15 data kejadian gempa terkini yang dirasakan oleh warga masyarakat lengkap dengan intensitas guncangan (skala MMI)."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Visual Gambar Shakemap BMKG",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://data.bmkg.go.id/DataMKG/TEWS/{{shakemap_filename}}",
+					"protocol": "https",
+					"host": [
+						"data",
+						"bmkg",
+						"go",
+						"id"
+					],
+					"path": [
+						"DataMKG",
+						"TEWS",
+						"{{shakemap_filename}}"
+					]
+				},
+				"description": "Mengunduh visual gambar Shakemap resolusi penuh (.mmi.jpg) yang otomatis diisi dari variabel gempa autogempa.json."
+			},
+			"response": []
+		},
+		{
+			"name": "5. CKAN Backend - Cari Dataset Gempa",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/3/action/package_search?q=gempa",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"3",
+						"action",
+						"package_search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "gempa"
+						}
+					]
+				},
+				"description": "Endpoint CKAN Action API lokal untuk memverifikasi dataset katalog gempa di dalam sistem portal data CKAN."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "shakemap_filename",
+			"value": "20261001074306.mmi.jpg",
+			"type": "string"
+		}
+	]
+}
