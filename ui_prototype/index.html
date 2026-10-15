@@ -1665,7 +1665,7 @@
 
       <nav class="primary-nav">
         <a href="index.html" class="active">Beranda</a>
-        <a href="#pilar">4 Pilar MKG</a>
+        <a href="#pilar">5 Pilar MKG</a>
         <a href="#peta">Peta Observasi</a>
       </nav>
 
@@ -1753,8 +1753,8 @@
         <div class="metric-desc">Dataset Terbuka Terverifikasi</div>
       </div>
       <div class="metric-item">
-        <div class="metric-number">4 Pilar</div>
-        <div class="metric-desc">Meteorologi, Iklim, Gempa, Kualitas Udara</div>
+        <div class="metric-number">5 Pilar</div>
+        <div class="metric-desc">Meteorologi, Iklim, Gempa, Kualitas Udara, Instumen MKG</div>
       </div>
       <div class="metric-item">
         <div class="metric-number" id="totalUptCount">0 UPT</div>
@@ -2733,14 +2733,13 @@
     }
 
     function executeSearch() {
-      const query = document.getElementById('portalSearchInput').value.trim();
+      const input = document.getElementById('portalSearchInput');
+      const query = input ? input.value.trim() : '';
       if (!query) {
         showToast("Silakan ketik kata kunci pencarian dataset terlebih dahulu");
         return;
       }
       showToast(`Mencari dataset: "${query}" (Endpoint: /dataset?q=${encodeURIComponent(query)})`);
-      const input = document.getElementById('portalSearchInput');
-      const query = input ? input.value.trim() : '';
       const isStandalone = window.location.protocol === 'file:' || window.location.pathname.includes('ui_prototype');
       const targetUrl = isStandalone ? (query ? `katalog.html?q=${encodeURIComponent(query)}` : 'katalog.html') : (query ? `/dataset/?q=${encodeURIComponent(query)}` : '/dataset/');
       window.location.href = targetUrl;

@@ -4120,6 +4120,118 @@ footer.gov-footer, .gov-footer {
   }
 }
 
+/* 9. BMKG Image Upload Component Styling */
+.bmkg-image-upload-wrapper {
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 1.35rem 1.5rem;
+  transition: all 0.25s ease;
+}
+
+.bmkg-image-upload-wrapper:hover,
+.bmkg-image-upload-wrapper:focus-within {
+  border-color: #005a9e;
+  background: #f0f7ff;
+}
+
+.bmkg-image-upload-wrapper .image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.bmkg-image-upload-wrapper .image-upload > a.btn-default {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bmkg-image-upload-wrapper .image-upload > a.btn-default:hover {
+  background: #005a9e;
+  border-color: #005a9e;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 90, 158, 0.2);
+}
+
+.bmkg-image-upload-wrapper .image-upload > a.btn-default i {
+  color: #005a9e;
+  transition: color 0.2s ease;
+}
+
+.bmkg-image-upload-wrapper .image-upload > a.btn-default:hover i {
+  color: #ffffff;
+}
+
+.bmkg-image-upload-wrapper .image-upload .btn-remove-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.bmkg-image-upload-wrapper .image-upload .btn-remove-url:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.bmkg-image-upload-wrapper .form-group {
+  margin-bottom: 0.5rem;
+}
+
+.bmkg-image-upload-wrapper .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.bmkg-image-upload-wrapper .form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.bmkg-image-upload-wrapper .form-control {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 0.95rem !important;
+  font-size: 0.9rem !important;
+  width: 100% !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s ease !important;
+}
+
+.bmkg-image-upload-wrapper .form-control:focus {
+  border-color: #005a9e !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 90, 158, 0.15) !important;
+}
+
 /* ==========================================================================
    MODERN BMKG ADMIN CONSOLE STYLES (/ckan-admin)
    ========================================================================== */

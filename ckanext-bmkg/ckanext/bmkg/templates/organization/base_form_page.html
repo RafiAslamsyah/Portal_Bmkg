@@ -1,0 +1,92 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ 'Edit Organisasi' if (form_style == 'edit' or (data and data.id)) else 'Tambah Organisasi Baru' }} — Portal Data BMKG{% endblock %}
+
+{% block content %}
+<div class="dataset-form-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="dataset-form-hero">
+    <div class="dataset-form-hero-inner">
+      <div class="breadcrumbs">
+        <a href="{{ h.url_for('home.index') }}"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <a href="{{ h.url_for('organization.index') }}">Organisasi &amp; Unit Kerja</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>{{ 'Edit Organisasi: ' ~ (data.title or data.name) if (form_style == 'edit' or (data and data.id)) else 'Tambah Organisasi Baru' }}</span>
+      </div>
+
+      <div class="dataset-form-hero-content">
+        <div class="dataset-form-hero-badge">
+          <i class="fa-solid fa-sitemap"></i>
+          <span>Portal Administrasi Data BMKG</span>
+        </div>
+        <h1 class="dataset-form-hero-title">
+          {{ 'Edit Profil & Metadata Organisasi' if (form_style == 'edit' or (data and data.id)) else 'Tambah Organisasi / Unit Kerja Baru' }}
+        </h1>
+        <p class="dataset-form-hero-lead">
+          Kelola entitas produsen data di lingkungan BMKG (Kedeputian, Pusat, Balai Besar MKG, Stasiun Observasi, atau Unit Kerja Teknis) sebagai penanggung jawab data resmi.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Main Content Grid (Form + Guidance Sidebar) -->
+  <div class="dataset-form-layout-container">
+    <div class="dataset-form-main-col">
+      {% block form %}
+        {{ form | safe }}
+      {% endblock %}
+    </div>
+
+    <!-- Sidebar Guidance & Information -->
+    <aside class="dataset-form-sidebar-col">
+      <!-- Card 1: Pedoman Organisasi Produsen Data -->
+      <div class="bmkg-guide-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-building-columns" style="color: var(--bmkg-blue, #005a9e);"></i>
+          <span>Pedoman Unit Kerja BMKG</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <div class="guide-item">
+            <i class="fa-solid fa-circle-check guide-icon"></i>
+            <div>
+              <strong>Nomenklatur Resmi</strong>
+              <p>Gunakan nama kedinasan resmi sesuai Peraturan BMKG (contoh: <em>Pusat Meteorologi Penerbangan</em>, <em>BBMKG Wilayah II Ciputat</em>).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-link guide-icon"></i>
+            <div>
+              <strong>Slug URL Kedinasan</strong>
+              <p>Gunakan singkatan atau kode unit baku, misalnya <code>pusat-meteorologi-penerbangan</code> atau <code>bbmkg-wilayah-2</code>.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-shield-halved guide-icon"></i>
+            <div>
+              <strong>Integritas Produsen Data</strong>
+              <p>Hanya dataset yang diproduksi secara sah oleh unit kerja bersangkutan yang boleh dikaitkan ke organisasi ini.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Bantuan Pengelola -->
+      <div class="bmkg-guide-card help-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-headset" style="color: #003865;"></i>
+          <span>Bantuan Administrator</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <p style="font-size: 0.82rem; color: #64748b; margin: 0 0 0.5rem 0;">
+            Butuh pendaftaran unit kerja baru atau perubahan penanggung jawab produsen data?
+          </p>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #003865;">
+            <i class="fa-solid fa-envelope" style="color: #005a9e; margin-right: 4px;"></i> pusdatin@bmkg.go.id
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "group/base_form_page.html" %}
+
+{% set label = h.humanize_entity_type('group', group_type, 'create title') or 'Buat Grup / Klaster Tematik Baru' %}
+
+{% block subtitle %}{{ label }} — Portal Data BMKG{% endblock %}
+
+{% block page_heading %}{{ label }}{% endblock %}
