@@ -987,3 +987,64 @@ function initKatalogPage() {
 
 // Auto init on DOM ready
 document.addEventListener('DOMContentLoaded', initKatalogPage);
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function initUrlParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const q = urlParams.get('q');
+  const pilar = urlParams.get('pilar');
+  let shouldFilter = false;
+
+  if (q) {
+    const searchEl = document.getElementById('catalogSearchInput');
+    if (searchEl) {
+      searchEl.value = q;
+      shouldFilter = true;
+    }
+  }
+
+  if (pilar) {
+    const pilarCb = document.querySelector(`.facet-pilar[value="${pilar}"]`);
+    if (pilarCb) {
+      pilarCb.checked = true;
+      shouldFilter = true;
+    }
+  }
+
+  if (shouldFilter) {
+    applyFilterAndSearch();
+  }
+}
+
+// Global Storage listener
+window.addEventListener('storage', (e) => {
+  if (e.key === STORAGE_KEY) {
+    renderDatasetCards();
+    updateFacetCounts();
+    applyFilterAndSearch();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closePreviewModal();
+    closeLoginModal();
+    closeUploadModal();
+  }
+});
+
+function initKatalogPage() {
+  renderDatasetCards();
+  updateFacetCounts();
+  initRealtimeClock();
+  initUrlParams();
+}
+
+// Auto init on DOM ready
+document.addEventListener('DOMContentLoaded', initKatalogPage);

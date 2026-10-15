@@ -1957,7 +1957,7 @@
 
             <div class="legend-row">
               <div style="width: 12px; height: 12px; border-radius: 50%; background: #dc2626; border: 2px solid #fbbf24; flex-shrink: 0;"></div>
-              <span>Episentrum Gempa Terkini Live (Radar)</span>
+              <span>Episentrum Gempa Terkini</span>
             </div>
             <div class="legend-row">
               <div style="background: #dc2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">M&ge;5</div>
@@ -2004,7 +2004,7 @@
           <li><a href="#">Katalog Meteorologi</a></li>
           <li><a href="#">Katalog Klimatologi</a></li>
           <li><a href="#">Katalog Geofisika</a></li>
-          <li><a href="#">Katalog Kualitas Udara</a></li>
+          <li><a href="#">Katalog Instrumen MKG</a></li>
         </ul>
       </div>
       <div class="footer-col scroll-reveal stagger-3">
@@ -2673,7 +2673,7 @@
     let liveSearchTimer = null;
     function handleLiveSearch(query) {
       const feedback = document.getElementById('liveSearchFeedback');
-      const clean = query.trim().toLowerCase();
+      const cleans = query.trim().toLowerCase();
       if (!feedback) return;
       const clean = query ? query.trim() : '';
       if (!clean) {

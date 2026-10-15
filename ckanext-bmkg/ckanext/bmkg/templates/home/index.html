@@ -85,10 +85,10 @@
 <!-- 5. Main Body Content -->
 <main class="main-wrapper">
 
-  <!-- 4 Pillars Section with Interactive Cards -->
+  <!-- 5 Pillars Section with Interactive Cards -->
   <section id="pilar">
     <div class="section-headline-group scroll-reveal">
-      <h2 class="section-title">4 Pilar Layanan Data BMKG</h2>
+      <h2 class="section-title">5 Pilar Layanan Data BMKG</h2>
       <p class="section-subtitle">Struktur taksonomi data terbuka yang dikurasi oleh masing-masing unit teknis
         kedeputian</p>
     </div>
@@ -173,28 +173,40 @@
         </div>
       </a>
 
-      <!-- Kualitas Udara -->
-      <a href="/dataset/?groups=kualitas-udara" class="pillar-box kualitas-udara scroll-reveal stagger-4" onclick="filterByPilar('kualitas-udara', event)">
+      <!-- Instrumen MKG -->
+      <a href="/dataset/?groups=instrumen-mkg" class="pillar-box instrumen-mkg scroll-reveal stagger-4" onclick="filterByPilar('instrumen-mkg', event)">
         <div>
           <div class="pillar-header">
             <div class="pillar-icon-badge">
-              <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#00875a" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 11h14a3 3 0 1 0-3-3" fill="none" />
-                <path d="M3 16h20a3.5 3.5 0 1 1-3.5 3.5" fill="none" />
-                <path d="M7 21h10a2.5 2.5 0 1 0-2.5-2.5" fill="none" />
-                <circle cx="26" cy="9" r="1.5" fill="#00875a" />
-              </svg>
+              <i class="fa-solid fa-gauge-high" style="font-size: 1.25rem; color: #00875a;"></i>
             </div>
-            <div class="pillar-name">Kualitas Udara</div>
+            <div class="pillar-name">Instrumen MKG</div>
           </div>
           <p class="pillar-description">
-            Konsentrasi partikulat polusi udara PM2.5 dan PM10 dari stasiun GAW/SPKU, kimia air hujan, dan gas rumah
-            kaca (GRK).
+            Metadata kalibrasi teknis instrumen observasi, jaringan sensor otomatis (AWS, AAWS, ARG), radar, dan seismometer.
           </p>
         </div>
         <div class="pillar-footer">
-          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('kualitas-udara') }} Dataset</span>
+          <span class="dataset-count-tag">{% set c_inst = h.bmkg_get_group_dataset_count('instrumen-mkg') %}{% if c_inst %}{{ c_inst }}{% else %}{{ h.bmkg_get_group_dataset_count('kualitas-udara') }}{% endif %} Dataset</span>
+          <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
+        </div>
+      </a>
+
+      <!-- Modifikasi Cuaca -->
+      <a href="/dataset/?groups=modifikasi-cuaca" class="pillar-box modifikasi-cuaca scroll-reveal stagger-5" onclick="filterByPilar('modifikasi-cuaca', event)">
+        <div>
+          <div class="pillar-header">
+            <div class="pillar-icon-badge">
+              <i class="fa-solid fa-cloud-sun-rain" style="font-size: 1.25rem; color: #7c3aed;"></i>
+            </div>
+            <div class="pillar-name">Modifikasi Cuaca</div>
+          </div>
+          <p class="pillar-description">
+            Data operasional Teknologi Modifikasi Cuaca (TMC), penyemaian awan, mitigasi bencana kekeringan, dan pengisian waduk.
+          </p>
+        </div>
+        <div class="pillar-footer">
+          <span class="dataset-count-tag">{{ h.bmkg_get_group_dataset_count('modifikasi-cuaca') }} Dataset</span>
           <span class="pillar-browse-action">Jelajahi <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </a>

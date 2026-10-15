@@ -375,26 +375,6 @@
       if (!modal) return;
       modal.classList.remove('active');
       document.body.style.overflow = '';
-    }
-
-    function handlePreviewBackdropClick(e) {
-      if (e.target.id === 'dataPreviewModal') {
-        closeDataPreviewModal();
-      }
-    }
-  </script>
-
-{% endblock %}
-      }
-      html += '</div>';
-      bodyElem.innerHTML = html;
-    }
-
-    function closeDataPreviewModal() {
-      var modal = document.getElementById('dataPreviewModal');
-      if (!modal) return;
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
       if (_searchLeafletMap) {
         try { _searchLeafletMap.remove(); } catch(e) {}
         _searchLeafletMap = null;

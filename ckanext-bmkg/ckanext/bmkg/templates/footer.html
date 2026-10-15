@@ -18,12 +18,13 @@
         </p>
       </div>
       <div class="footer-col">
-        <h4>4 Pilar Layanan</h4>
+        <h4>5 Pilar Layanan</h4>
         <ul>
-          <li><a href="{{ h.url_for('dataset.search', q='meteorologi') }}">Katalog Meteorologi</a></li>
-          <li><a href="{{ h.url_for('dataset.search', q='klimatologi') }}">Katalog Klimatologi</a></li>
-          <li><a href="{{ h.url_for('dataset.search', q='geofisika') }}">Katalog Geofisika</a></li>
-          <li><a href="{{ h.url_for('dataset.search', q='kualitas udara') }}">Katalog Kualitas Udara</a></li>
+          <li><a href="{{ h.url_for('dataset.search', groups='meteorologi') }}">Katalog Meteorologi</a></li>
+          <li><a href="{{ h.url_for('dataset.search', groups='klimatologi') }}">Katalog Klimatologi</a></li>
+          <li><a href="{{ h.url_for('dataset.search', groups='geofisika') }}">Katalog Geofisika</a></li>
+          <li><a href="{{ h.url_for('dataset.search', groups='instrumen-mkg') }}">Katalog Instrumen MKG</a></li>
+          <li><a href="{{ h.url_for('dataset.search', groups='modifikasi-cuaca') }}">Katalog Modifikasi Cuaca</a></li>
         </ul>
       </div>
       <div class="footer-col">
