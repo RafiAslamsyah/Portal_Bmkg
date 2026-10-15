@@ -80,7 +80,13 @@ Meteorologi, Klimatologi, dan Geofisika' %}
         <span class="format-badge csv">DATA</span>
         {% endif %}
 
-        {% if has_ds %}
+        {% if h.bmkg_has_csv(package) %}
+        <a href="/api/csv/{{ package.name }}" target="_blank" class="datastore-active-pill"
+          style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; text-decoration: none;"
+          title="Akses Public REST API untuk dataset CSV ini">
+          <i class="fa-solid fa-bolt"></i> CSV REST API
+        </a>
+        {% elif has_ds %}
         <span class="datastore-active-pill"
           title="Data tabular tersimpan di PostgreSQL DataStore dan dapat di-query via SQL API">
           <i class="fa-solid fa-database"></i> DataStore API Aktif

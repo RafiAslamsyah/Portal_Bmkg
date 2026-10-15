@@ -15,6 +15,10 @@ Klimatologi, dan Geofisika' %}
 {% set primary_res = h.bmkg_get_primary_resource(pkg) %}
 {% set has_geojson = h.bmkg_has_geojson(pkg) %}
 {% set geojson_res = h.bmkg_get_geojson_resource(pkg) %}
+{% set has_csv = h.bmkg_has_csv(pkg) %}
+{% set csv_res = h.bmkg_get_csv_resource(pkg) %}
+{% set csv_api_url = h.bmkg_get_csv_api_url(pkg) %}
+{% set csv_download_url = h.bmkg_get_csv_download_url(pkg) %}
 {% set can_edit = h.bmkg_can_edit_package(pkg) %}
 {% set api_url = h.bmkg_get_api_url(pkg) %}
 <!-- Flash Messages -->
@@ -93,6 +97,12 @@ Klimatologi, dan Geofisika' %}
       </span>
       {% endif %}
 
+      {% if has_csv %}
+      <span class="quick-chip-item" style="color: #0369a1; border-color: #7dd3fc; background: #f0f9ff;">
+        <i class="fa-solid fa-code" style="color: #0284c7;"></i> Public CSV REST API Aktif
+      </span>
+      {% endif %}
+
       {% if has_ds %}
       <span class="quick-chip-item" style="color: #047857; border-color: #86efac; background: #ecfdf5;">
         <i class="fa-solid fa-database" style="color: #059669;"></i> DataStore SQL API Aktif
@@ -121,9 +131,16 @@ Klimatologi, dan Geofisika' %}
       </button>
       {% endif %}
 
+      {% if has_csv %}
+      <button type="button" class="btn-interactive" onclick="switchDatasetTab('tab-api')"
+        style="background: var(--bmkg-blue); border: 1.5px solid var(--bmkg-blue); color: #ffffff; padding: 0.72rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 90, 158, 0.2);">
+        <i class="fa-solid fa-code"></i> Akses REST API (CSV)
+      </button>
+      {% endif %}
+
       <button type="button" class="btn-interactive" onclick="copyApiEndpoint('{{ api_url }}')"
         style="background: var(--canvas-white); border: 1.5px solid var(--border-medium); color: var(--text-secondary); padding: 0.72rem 1.15rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-        <i class="fa-solid fa-code"></i> Salin API Endpoint
+        <i class="fa-solid fa-copy"></i> Salin URL API
       </button>
 
       {% set current_u = g.userobj or c.userobj %}
@@ -388,13 +405,191 @@ Klimatologi, dan Geofisika' %}
 
     <!-- Tab Pane 3: DEVELOPER API INTEGRATION -->
     <section class="dataset-tab-pane" id="pane-tab-api">
+      {% if has_csv %}
+      <!-- Dedicated Public CSV REST API Card -->
+      <div class="api-integration-card" style="border-left: 4px solid var(--bmkg-blue); background: #ffffff; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 56, 101, 0.06); margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="background: #e0f2fe; color: #0284c7; padding: 0.3rem 0.65rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase;">
+              <i class="fa-solid fa-bolt"></i> REST API Terbuka Publik
+            </span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Format: CSV &amp; JSON</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <a href="/api/csv/docs" target="_blank" class="btn-interactive card-sub-btn" style="background: #f8fafc; border: 1px solid var(--border-medium); color: var(--bmkg-blue-deep); text-decoration: none; font-size: 0.8rem;">
+              <i class="fa-solid fa-book"></i> Dokumentasi API
+            </a>
+            <a href="/api/csv/datasets" target="_blank" class="btn-interactive card-sub-btn" style="background: #f8fafc; border: 1px solid var(--border-medium); color: var(--bmkg-blue-deep); text-decoration: none; font-size: 0.8rem;">
+              <i class="fa-solid fa-list-check"></i> Katalog Dataset CSV
+            </a>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
+          Public REST API Dataset CSV Resmi BMKG
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.25rem;">
+          Endpoint ini bebas digunakan langsung oleh publik, pengembang aplikasi, dan peneliti tanpa memerlukan autentikasi login (CORS Aktif). Mendukung format JSON terstruktur maupun berkas mentah CSV (RFC 4180) dengan filter kolom, pencarian kata kunci, dan paginasi.
+        </p>
+
+        <!-- Grid 3 Endpoint Spesifik -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <!-- Endpoint 1: JSON Data -->
+          <div style="background: #f8fafc; border: 1.5px solid var(--border-medium); border-radius: 8px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #0284c7; text-transform: uppercase;">
+                <i class="fa-solid fa-code"></i> 1. JSON Data API
+              </span>
+              <span style="font-size: 0.7rem; background: #e0f2fe; color: #0369a1; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 700;">GET JSON</span>
+            </div>
+            <div style="font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; word-break: break-all; background: #ffffff; padding: 0.5rem 0.65rem; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 0.6rem; color: #0f172a;">
+              /api/csv/{{ pkg.name }}
+            </div>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copyApiEndpoint('/api/csv/{{ pkg.name }}')" style="width: 100%; justify-content: center; font-size: 0.78rem;">
+              <i class="fa-solid fa-copy"></i> Salin URL JSON
+            </button>
+          </div>
+
+          <!-- Endpoint 2: Direct CSV Stream -->
+          <div style="background: #f8fafc; border: 1.5px solid var(--border-medium); border-radius: 8px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #059669; text-transform: uppercase;">
+                <i class="fa-solid fa-file-csv"></i> 2. Direct CSV Stream
+              </span>
+              <span style="font-size: 0.7rem; background: #dcfce7; color: #15803d; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 700;">GET CSV</span>
+            </div>
+            <div style="font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; word-break: break-all; background: #ffffff; padding: 0.5rem 0.65rem; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 0.6rem; color: #0f172a;">
+              /api/csv/{{ pkg.name }}.csv
+            </div>
+            <div style="display: flex; gap: 0.4rem;">
+              <button type="button" class="btn-interactive card-sub-btn" onclick="copyApiEndpoint('/api/csv/{{ pkg.name }}.csv')" style="flex: 1; justify-content: center; font-size: 0.78rem;">
+                <i class="fa-solid fa-copy"></i> Salin URL
+              </button>
+              <a href="/api/csv/{{ pkg.name }}.csv?download=1" class="btn-interactive card-sub-btn" style="background: #059669; color: #ffffff; border-color: #059669; font-size: 0.78rem; text-decoration: none;" title="Unduh Berkas CSV Langsung">
+                <i class="fa-solid fa-download"></i> Unduh
+              </a>
+            </div>
+          </div>
+
+          <!-- Endpoint 3: Schema API -->
+          <div style="background: #f8fafc; border: 1.5px solid var(--border-medium); border-radius: 8px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #7c3aed; text-transform: uppercase;">
+                <i class="fa-solid fa-table-list"></i> 3. Metadata Skema
+              </span>
+              <span style="font-size: 0.7rem; background: #f3e8ff; color: #6b21a8; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 700;">SCHEMA</span>
+            </div>
+            <div style="font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; word-break: break-all; background: #ffffff; padding: 0.5rem 0.65rem; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 0.6rem; color: #0f172a;">
+              /api/csv/{{ pkg.name }}/schema
+            </div>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copyApiEndpoint('/api/csv/{{ pkg.name }}/schema')" style="width: 100%; justify-content: center; font-size: 0.78rem;">
+              <i class="fa-solid fa-copy"></i> Salin URL Skema
+            </button>
+          </div>
+        </div>
+
+        <!-- Panduan Parameter Kueri -->
+        <div style="background: #f1f5f9; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-sliders"></i> Parameter Query yang Didukung:
+          </h4>
+          <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.82rem; color: #334155; line-height: 1.6;">
+            <li><code>?limit=100</code> : Batasi jumlah baris data yang diambil (default: 100, maksimal: 10000).</li>
+            <li><code>?offset=0</code> : Indeks baris awal untuk paginasi data.</li>
+            <li><code>?q=kata_kunci</code> : Pencarian teks bebas di seluruh kolom tabel.</li>
+            <li><code>?sort=nama_kolom [asc|desc]</code> : Pengurutan data (contoh: <code>?sort=tanggal desc</code>).</li>
+            <li><code>?&lt;nama_kolom&gt;=nilai</code> : Filter spesifik nilai kolom (contoh: <code>?provinsi=Jawa+Barat</code>).</li>
+            <li><code>?format=csv</code> : Mengembalikan output murni teks CSV alih-alih JSON.</li>
+          </ul>
+        </div>
+
+        <!-- Contoh Script Integrasi Bahasa Pemrograman -->
+        <h4 style="font-size: 0.98rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.75rem;">
+          Contoh Script Pemanggilan API (Siap Pakai):
+        </h4>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-brands fa-python" style="color: #3b82f6;"></i> 1. Python (Pandas - Analisis Data Langsung):</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('pySnippetPandas')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
+          </div>
+          <pre class="code-snippet-box" id="pySnippetPandas">import pandas as pd
+
+# Baca data CSV langsung ke DataFrame melalui endpoint BMKG
+url = "http://localhost:5000/api/csv/{{ pkg.name }}.csv"
+df = pd.read_csv(url)
+
+print("Dimensi dataset:", df.shape)
+print(df.head())</pre>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-brands fa-python" style="color: #3b82f6;"></i> 2. Python (Requests - Format JSON):</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('pySnippetRequests')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
+          </div>
+          <pre class="code-snippet-box" id="pySnippetRequests">import requests
+
+url = "http://localhost:5000/api/csv/{{ pkg.name }}"
+params = {"limit": 20}
+response = requests.get(url, params=params)
+data = response.json()
+
+if data.get("success"):
+    meta = data["meta"]
+    records = data["data"]
+    print(f"Total baris tersedia: {meta['total_records']}")
+    print(f"Baris diambil: {len(records)}")
+    for r in records[:3]:
+        print(r)</pre>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-brands fa-js" style="color: #eab308;"></i> 3. JavaScript (Modern Fetch API / Node.js):</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('jsSnippetFetch')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
+          </div>
+          <pre class="code-snippet-box" id="jsSnippetFetch">fetch("http://localhost:5000/api/csv/{{ pkg.name }}?limit=10")
+  .then(res => res.json())
+  .then(json => {
+    console.log("Status API:", json.success);
+    console.log("Total Data:", json.meta.total_records);
+    console.table(json.data);
+  })
+  .catch(err => console.error("Gagal mengambil data:", err));</pre>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-solid fa-terminal" style="color: #64748b;"></i> 4. cURL (Terminal / Command Line):</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('curlSnippet')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
+          </div>
+          <pre class="code-snippet-box" id="curlSnippet"># Format JSON
+curl -X GET "http://localhost:5000/api/csv/{{ pkg.name }}?limit=10"
+
+# Format CSV Langsung
+curl -X GET "http://localhost:5000/api/csv/{{ pkg.name }}.csv" -o {{ pkg.name }}.csv</pre>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-solid fa-chart-line" style="color: #2563eb;"></i> 5. R (Statistik &amp; Data Science):</span>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('rSnippet')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
+          </div>
+          <pre class="code-snippet-box" id="rSnippet"># Baca CSV ke R Dataframe
+df <- read.csv("http://localhost:5000/api/csv/{{ pkg.name }}.csv")
+summary(df)</pre>
+        </div>
+      </div>
+      {% else %}
+      <!-- Fallback untuk Dataset Non-CSV (GeoJSON / NetCDF / KML / dsb) -->
       <div class="api-integration-card">
         <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
           Akses DataStore &amp; Action API Pengembang
         </h3>
         <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
           Aplikasi pihak ketiga, sistem cerdas, dan peneliti dapat mengambil data secara terprogram menggunakan protokol
-          HTTP REST API standar CKAN 2.10+.
+          HTTP REST API standar CKAN 2.12.
         </p>
 
         <label
@@ -415,38 +610,20 @@ Klimatologi, dan Geofisika' %}
 
         <div style="margin-bottom: 1rem;">
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">1.
-            cURL (Terminal / Command Line):</span>
+            cURL:</span>
           <pre class="code-snippet-box">curl -X GET "http://localhost:5000{{ api_url }}"</pre>
         </div>
 
         <div style="margin-bottom: 1rem;">
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">2.
-            Python (Requests Library):</span>
+            Python:</span>
           <pre class="code-snippet-box">import requests
-
 url = "http://localhost:5000{{ api_url }}"
 response = requests.get(url)
-data = response.json()
-
-if data.get("success"):
-    records = data["result"].get("records", [])
-    print(f"Berhasil mengambil {len(records)} baris data BMKG.")
-    for r in records[:5]:
-        print(r)</pre>
-        </div>
-
-        <div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">3.
-            JavaScript (Fetch API / Node.js):</span>
-          <pre class="code-snippet-box">fetch("http://localhost:5000{{ api_url }}")
-  .then(response => response.json())
-  .then(data => {
-    console.log("Status API BMKG:", data.success);
-    console.log("Records:", data.result);
-  })
-  .catch(error => console.error("Error fetching data:", error));</pre>
+print(response.json())</pre>
         </div>
       </div>
+      {% endif %}
     </section>
 
     <!-- Tab Pane 4: METADATA SDI -->
@@ -623,6 +800,22 @@ if data.get("success"):
     setTimeout(function () {
       toast.classList.remove('show');
     }, 3500);
+  }
+
+  // Copy Snippet Text
+  function copySnippetText(elementId) {
+    var elem = document.getElementById(elementId);
+    if (!elem) return;
+    var text = elem.innerText || elem.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () {
+        showDetailToast('Snippet kode berhasil disalin ke papan klip!');
+      }).catch(function () {
+        fallbackCopyText(text);
+      });
+    } else {
+      fallbackCopyText(text);
+    }
   }
 
   // Copy API Endpoint
@@ -1120,10 +1313,8 @@ if data.get("success"):
   document.addEventListener('DOMContentLoaded', function () {
     var dsId = "{{ ds_id or '' }}";
     var primaryUrl = "{{ primary_res.url if (primary_res and primary_res.url) else '' }}";
-    var primaryFormat = "{{ primary_res.format|lower if primary_res else '' }}";
-    var hasGeojson = {{ 'true' if has_geojson else 'false' }
-  };
-  var geojsonUrl = "{{ geojson_res.url if (geojson_res and geojson_res.url) else '' }}";
+    var hasGeojson = {{ 'true' if has_geojson else 'false' }};
+    var geojsonUrl = "{{ geojson_res.url if (geojson_res and geojson_res.url) else '' }}";
 
   if (hasGeojson && geojsonUrl) {
     initGeojsonMap(geojsonUrl);
