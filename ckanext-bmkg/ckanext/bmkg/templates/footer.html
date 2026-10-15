@@ -18,21 +18,23 @@
       </p>
     </div>
     <div class="footer-col">
-      <h4>4 Pilar Layanan</h4>
+      <h4>5 Pilar Layanan</h4>
       <ul>
-        <li><a href="{{ h.url_for('dataset.search', q='meteorologi') }}">Katalog Meteorologi</a></li>
-        <li><a href="{{ h.url_for('dataset.search', q='klimatologi') }}">Katalog Klimatologi</a></li>
-        <li><a href="{{ h.url_for('dataset.search', q='geofisika') }}">Katalog Geofisika</a></li>
-        <li><a href="{{ h.url_for('dataset.search', q='kualitas udara') }}">Katalog Kualitas Udara</a></li>
+        <li><a href="{{ h.url_for('dataset.search', groups='meteorologi') }}">Katalog Meteorologi</a></li>
+        <li><a href="{{ h.url_for('dataset.search', groups='klimatologi') }}">Katalog Klimatologi</a></li>
+        <li><a href="{{ h.url_for('dataset.search', groups='geofisika') }}">Katalog Geofisika</a></li>
+        <li><a href="{{ h.url_for('dataset.search', groups='instrumen-mkg') }}">Katalog Instrumen MKG</a></li>
+        <li><a href="{{ h.url_for('dataset.search', groups='modifikasi-cuaca') }}">Katalog Modifikasi Cuaca</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Akses Pengembang</h4>
       <ul>
+        <li><a href="/api/csv/docs" target="_blank" style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-code"></i> Public CSV REST API</a></li>
+        <li><a href="/api/csv/datasets" target="_blank">Katalog API Dataset CSV</a></li>
         <li><a href="/api/3/action/package_list" target="_blank">CKAN 2.12 Action API</a></li>
         <li><a href="/api/3/action/help_show?name=datastore_search" target="_blank">DataStore SQL Query</a></li>
-        <li><a href="{{ h.url_for('dataset.search') }}">Spatial Harvest (WFS/WMS)</a></li>
-        <li><a href="https://docs.ckan.org" target="_blank">Dokumentasi Integrasi</a></li>
+        <li><a href="/api/gempa/realtime" target="_blank">Real-time Seismik API</a></li>
       </ul>
     </div>
     <div class="footer-col">

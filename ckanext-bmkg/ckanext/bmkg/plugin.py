@@ -309,8 +309,10 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'meteorologi': {'label': 'Meteorologi', 'class': 'met', 'icon': 'fa-solid fa-cloud-sun'},
             'klimatologi': {'label': 'Klimatologi', 'class': 'klim', 'icon': 'fa-solid fa-temperature-half'},
             'geofisika': {'label': 'Geofisika', 'class': 'geo', 'icon': 'fa-solid fa-volcano'},
-            'kualitas-udara': {'label': 'Kualitas Udara', 'class': 'ku', 'icon': 'fa-solid fa-wind'},
-            'kualitas_udara': {'label': 'Kualitas Udara', 'class': 'ku', 'icon': 'fa-solid fa-wind'},
+            'instrumen-mkg': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
+            'modifikasi-cuaca': {'label': 'Modifikasi Cuaca', 'class': 'mc', 'icon': 'fa-solid fa-cloud-sun-rain'},
+            'kualitas-udara': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
+            'kualitas_udara': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
         }
         return badges.get(pilar_code, {'label': 'Umum / MKG', 'class': 'met', 'icon': 'fa-solid fa-database'})
 

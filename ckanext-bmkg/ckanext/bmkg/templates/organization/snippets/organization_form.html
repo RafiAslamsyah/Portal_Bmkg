@@ -1,0 +1,171 @@
+{% import 'macros/form.html' as form %}
+
+{% set action = g.form_action or '' %}
+{% set is_edit = form_style == 'edit' or (data and data.id) %}
+
+{# Form Modern Tambah / Edit Organisasi Unit Kerja BMKG #}
+<form id="organization-edit-form" class="bmkg-organization-form" method="post" action="{{ action }}" data-module="basic-form" enctype="multipart/form-data" novalidate>
+  {{ h.csrf_input() }}
+
+  <!-- Ringkasan Galat (Error Summary) jika ada validasi yang gagal -->
+  {% block error_summary %}
+    {% if error_summary %}
+      <div class="bmkg-alert-banner alert-danger">
+        <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="alert-content">
+          <strong>Perhatian: Mohon perbaiki beberapa isian formulir organisasi berikut:</strong>
+          <ul>
+            {% for key, error in error_summary.items() %}
+              <li><strong>{{ key }}:</strong> {{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  <!-- CARD 1: Identitas & Nama Organisasi / Unit Kerja -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(0, 90, 158, 0.1); color: #005a9e;">
+        <i class="fa-solid fa-building-columns"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">1. Identitas Unit Kerja Produsen Data</h3>
+        <p class="section-subheading">Informasi nama resmi kedinasan unit kerja BMKG, slug URL, dan profil tugas fungsi.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <!-- Judul / Nama Organisasi -->
+      <div class="bmkg-form-group">
+        <label for="field-name" class="bmkg-label required">
+          Nama Resmi Unit Kerja / Organisasi
+          <span class="required-star">*</span>
+        </label>
+        <div class="input-container">
+          <input id="field-name" type="text" name="title" value="{{ data.title or '' }}"
+            placeholder="Contoh: Pusat Meteorologi Penerbangan"
+            class="bmkg-input form-control {% if errors.title %}has-error{% endif %}" required />
+        </div>
+        {% if errors.title %}
+          <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.title }}</div>
+        {% endif %}
+        <span class="field-helper-text">Gunakan nomenklatur kedinasan baku sesuai struktur organisasi BMKG (misal: <em>Kedeputian Bidang Geofisika</em>, <em>Stasiun Klimatologi Jawa Barat</em>).</span>
+      </div>
+
+      <!-- URL Slug Permanen -->
+      <div class="bmkg-form-group">
+        {% set prefix = h.url_for(group_type + '.read', id='') if group_type else '/organization/' %}
+        {% set domain = h.url_for(group_type + '.read', id='', qualified=true)|replace("http://", "")|replace("https://", "") if group_type else 'localhost:5000/organization/' %}
+        <label for="field-url" class="bmkg-label required">
+          Tautan URL Permanen (Slug)
+          <span class="required-star">*</span>
+        </label>
+        <div class="bmkg-slug-input-wrapper">
+          <span class="slug-prefix">{{ prefix }}</span>
+          <input id="field-url" type="text" name="name" value="{{ data.name or '' }}"
+            placeholder="pusat-meteorologi-penerbangan"
+            class="bmkg-input slug-input form-control {% if errors.name %}has-error{% endif %}" required />
+        </div>
+        {% if errors.name %}
+          <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.name }}</div>
+        {% endif %}
+        <span class="field-helper-text">Pranala ramah mesin pencari. Hanya gunakan huruf kecil, angka, dan tanda hubung (-). Dihasilkan otomatis dari nama organisasi.</span>
+      </div>
+
+      <!-- Deskripsi Organisasi -->
+      <div class="bmkg-form-group">
+        <label for="field-description" class="bmkg-label">
+          Profil &amp; Uraian Tugas Fungsi Unit Kerja
+        </label>
+        <div class="textarea-container">
+          <textarea id="field-description" name="description" class="bmkg-textarea form-control" rows="5"
+            placeholder="Jelaskan mandat kedinasan, cakupan pengamatan operasional, wilayah kerja observasi, dan peran unit dalam penyediaan data publik BMKG...">{{ data.description or '' }}</textarea>
+        </div>
+        {% if errors.description %}
+          <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.description }}</div>
+        {% endif %}
+        <span class="field-helper-text">Mendukung format Markdown untuk penataan teks, poin profil kedinasan, dan tautan portal resmi.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Visual & Identitas Media -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(0, 135, 90, 0.1); color: #00875a;">
+        <i class="fa-solid fa-image"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">2. Logo / Lambang Unit Kerja</h3>
+        <p class="section-subheading">Sematkan logo resmi unit kerja atau lambang BMKG dengan identitas balai/stasiun.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      {% set is_upload = data.image_url and not data.image_url.startswith('http') %}
+      {% set is_url = data.image_url and data.image_url.startswith('http') %}
+
+      <div class="bmkg-image-upload-wrapper">
+        {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label='Unggah Berkas Gambar', url_label='Tautan URL Gambar') }}
+      </div>
+      <span class="field-helper-text" style="margin-top: 0.65rem;">
+        Format gambar disarankan: PNG, SVG, atau JPG rasio 1:1 atau 16:9, dengan latar transparan atau cerah. Maksimum ukuran 2 MB.
+      </span>
+    </div>
+  </div>
+
+  {% block custom_fields %}
+    {% snippet 'snippets/custom_form_fields.html', extras=data.extras, errors=errors, limit=3 %}
+  {% endblock %}
+
+  <!-- CARD 3: Tombol Aksi Formulir (Batal / Hapus / Simpan) -->
+  <div class="bmkg-form-actions-bar">
+    <div class="actions-left">
+      <a href="{{ h.url_for(group_type + '.index') if group_type else '/organization/' }}" class="btn-action-cancel">
+        <i class="fa-solid fa-arrow-left"></i> Batal &amp; Kembali
+      </a>
+      {% block delete_button %}
+        {% if data.id and h.check_access('organization_delete', {'id': data.id}) %}
+          <a class="btn-action-delete" href="{% url_for group_type + '.delete', id=data.id %}" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin menghapus organisasi ini? Catatan: Penghapusan tidak dapat dilakukan jika masih terdapat dataset aktif yang terkait.">
+            <i class="fa-solid fa-trash"></i> Hapus Organisasi
+          </a>
+        {% endif %}
+      {% endblock %}
+    </div>
+
+    <div class="actions-right">
+      <button class="btn-action-submit" name="save" type="submit">
+        <i class="fa-solid fa-check"></i>
+        <span>{% block save_text %}{{ 'Simpan Perubahan' if (form_style == 'edit' or (data and data.id)) else 'Tambah Organisasi' }}{% endblock %}</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<script>
+  (function() {
+    var titleInput = document.getElementById('field-name');
+    var slugInput = document.getElementById('field-url');
+    if (!titleInput || !slugInput) return;
+
+    var slugEdited = (slugInput.value && slugInput.value.trim().length > 0);
+
+    slugInput.addEventListener('input', function() {
+      slugEdited = (this.value.trim().length > 0);
+    });
+
+    titleInput.addEventListener('input', function() {
+      if (!slugEdited) {
+        var str = this.value || '';
+        var slug = str.toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        slugInput.value = slug;
+      }
+    });
+  })();
+</script>

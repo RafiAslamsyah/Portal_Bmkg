@@ -1,0 +1,7 @@
+{% extends "group/base_form_page.html" %}
+
+{% set label = h.humanize_entity_type('group', group_type, 'edit label') or 'Edit Metadata Grup' %}
+
+{% block subtitle %}{{ label }}: {{ group_dict.display_name or group_dict.title or group_dict.name }} — Portal Data BMKG{% endblock %}
+
+{% block page_heading %}{{ label }}{% endblock %}

@@ -375,6 +375,10 @@
       if (!modal) return;
       modal.classList.remove('active');
       document.body.style.overflow = '';
+      if (_searchLeafletMap) {
+        try { _searchLeafletMap.remove(); } catch(e) {}
+        _searchLeafletMap = null;
+      }
     }
 
     function handlePreviewBackdropClick(e) {
