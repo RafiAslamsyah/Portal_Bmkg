@@ -749,6 +749,7 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'bmkg_can_edit_package': self._can_edit_package,
             'bmkg_get_api_url': self._get_api_url,
             'bmkg_get_dataset_stats': self._get_dataset_stats,
+            'bmkg_get_pillars': self._get_pillars,
             'bmkg_get_group_dataset_count': self._get_group_dataset_count,
             'bmkg_has_geojson': self._has_geojson,
             'bmkg_get_geojson_resource': self._get_geojson_resource,
@@ -757,6 +758,131 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'bmkg_get_csv_api_url': self._get_csv_api_url,
             'bmkg_get_csv_download_url': self._get_csv_download_url,
         }
+
+    def _get_pillar_meta(self, group):
+        """Mengembalikan metadata visual pilar (icon, class, deskripsi bawaan, hitungan dataset)."""
+        if isinstance(group, dict):
+            name = (group.get('name') or '').lower().strip()
+            title = (group.get('title') or group.get('display_name') or '').strip()
+            desc = (group.get('description') or '').strip()
+            pkg_count = group.get('package_count')
+        else:
+            name = str(group).lower().strip()
+            title = ''
+            desc = ''
+            pkg_count = None
+
+        if not title:
+            title = name.replace('-', ' ').title()
+
+        if pkg_count is None:
+            pkg_count = self._get_group_dataset_count(name)
+
+        presets = {
+            'meteorologi': {
+                'class': 'meteorologi',
+                'border_color': 'var(--bmkg-blue)',
+                'icon_svg': '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a5 5 0 0 1 5 5v.5a4.5 4.5 0 1 1 2 8.5H10A6 6 0 0 1 12 8z" fill="rgba(0, 90, 158, 0.15)" /><path d="M10 24v3M15 24v3M20 24v3" /></svg>',
+                'icon_class': 'fa-solid fa-cloud-sun',
+                'short_name': 'Meteorologi',
+                'default_desc': 'Data pengamatan cuaca permukaan, prakiraan gelombang laut maritim, cuaca penerbangan, dan data radar cuaca komposit.'
+            },
+            'klimatologi': {
+                'class': 'klimatologi',
+                'border_color': 'var(--alert-amber)',
+                'icon_svg': '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="5" fill="#10b981" stroke="#047857" /><line x1="11" y1="2" x2="11" y2="4" /><line x1="11" y1="18" x2="11" y2="20" /><line x1="2" y1="11" x2="4" y2="11" /><line x1="18" y1="11" x2="20" y2="11" /><path d="M23 15a2 2 0 0 0-2-2v-5a2 2 0 1 1 4 0v5a2 2 0 0 0-2 2z" fill="#d1fae5" /><circle cx="23" cy="22" r="3" fill="#047857" /><line x1="23" y1="12" x2="23" y2="22" stroke="#047857" stroke-width="2.5" /></svg>',
+                'icon_class': 'fa-solid fa-temperature-half',
+                'short_name': 'Iklim',
+                'default_desc': 'Deret waktu iklim historis, pemantauan anomali iklim, data curah hujan dasarian dan bulanan, serta indeks kekeringan (SPI).'
+            },
+            'geofisika': {
+                'class': 'geofisika',
+                'border_color': 'var(--seismic-red)',
+                'icon_svg': '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#c92a2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="13" stroke="#c92a2a" stroke-width="1.8" opacity="0.35" fill="rgba(201, 42, 42, 0.08)" /><path d="M4 16h5l2.5-7 4 14 3.5-10 2.5 5 2-2h6.5" stroke="#c92a2a" stroke-width="2.2" /></svg>',
+                'icon_class': 'fa-solid fa-volcano',
+                'short_name': 'Gempa',
+                'default_desc': 'Katalog parameter gempa bumi tektonik M ≥ 5.0, pemodelan penjalaran tsunami, kerapatan sambaran petir, dan geomagnetisme.'
+            },
+            'kualitas-udara': {
+                'class': 'kualitas-udara',
+                'border_color': 'var(--bmkg-green)',
+                'icon_svg': '<i class="fa-solid fa-wind" style="font-size: 1.35rem; color: #059669;"></i>',
+                'icon_class': 'fa-solid fa-wind',
+                'short_name': 'Kualitas Udara',
+                'default_desc': 'Pemantauan konsentrasi partikulat atmosfer PM2.5 & PM10, kimia air hujan, dan gas rumah kaca (GRK).'
+            },
+            'kualitas_udara': {
+                'class': 'kualitas-udara',
+                'border_color': 'var(--bmkg-green)',
+                'icon_svg': '<i class="fa-solid fa-wind" style="font-size: 1.35rem; color: #059669;"></i>',
+                'icon_class': 'fa-solid fa-wind',
+                'short_name': 'Kualitas Udara',
+                'default_desc': 'Pemantauan konsentrasi partikulat atmosfer PM2.5 & PM10, kimia air hujan, dan gas rumah kaca (GRK).'
+            },
+            'instrumen-mkg': {
+                'class': 'instrumen-mkg',
+                'border_color': 'var(--bmkg-green)',
+                'icon_svg': '<i class="fa-solid fa-gauge-high" style="font-size: 1.25rem; color: #00875a;"></i>',
+                'icon_class': 'fa-solid fa-gauge-high',
+                'short_name': 'Instrumen MKG',
+                'default_desc': 'Metadata kalibrasi teknis instrumen observasi, jaringan sensor otomatis (AWS, AAWS, ARG), radar, dan seismometer.'
+            },
+            'modifikasi-cuaca': {
+                'class': 'modifikasi-cuaca',
+                'border_color': '#7c3aed',
+                'icon_svg': '<i class="fa-solid fa-cloud-sun-rain" style="font-size: 1.25rem; color: #7c3aed;"></i>',
+                'icon_class': 'fa-solid fa-cloud-sun-rain',
+                'short_name': 'Modifikasi Cuaca',
+                'default_desc': 'Data operasional Teknologi Modifikasi Cuaca (TMC), penyemaian awan, mitigasi bencana kekeringan, dan pengisian waduk.'
+            }
+        }
+
+        preset = presets.get(name, {
+            'class': name,
+            'border_color': '#0284c7',
+            'icon_svg': '<i class="fa-solid fa-layer-group" style="font-size: 1.25rem; color: #0284c7;"></i>',
+            'icon_class': 'fa-solid fa-layer-group',
+            'short_name': title,
+            'default_desc': 'Koleksi dataset terbuka institusi BMKG dalam kategori pilar tematik terkait.'
+        })
+
+        return {
+            'id': group.get('id') if isinstance(group, dict) else '',
+            'name': name,
+            'title': title,
+            'short_name': preset.get('short_name', title),
+            'description': desc or preset['default_desc'],
+            'package_count': pkg_count,
+            'class': preset['class'],
+            'border_color': preset['border_color'],
+            'icon_svg': preset['icon_svg'],
+            'icon_class': preset['icon_class']
+        }
+
+    def _get_pillars(self):
+        """Mengambil seluruh daftar pilar (grup) aktif dari CKAN."""
+        try:
+            group_list = toolkit.get_action('group_list')(
+                {'ignore_auth': True}, {'all_fields': True}
+            )
+            order_priority = {
+                'meteorologi': 1,
+                'klimatologi': 2,
+                'geofisika': 3,
+                'kualitas-udara': 4,
+                'kualitas_udara': 4,
+                'instrumen-mkg': 5,
+                'modifikasi-cuaca': 6
+            }
+            def sort_key(g):
+                name = (g.get('name') or '').lower()
+                return (order_priority.get(name, 99), g.get('title') or name)
+
+            sorted_groups = sorted(group_list, key=sort_key)
+            return [self._get_pillar_meta(g) for g in sorted_groups]
+        except Exception:
+            defaults = ['meteorologi', 'klimatologi', 'geofisika', 'kualitas-udara']
+            return [self._get_pillar_meta(d) for d in defaults]
 
     def _get_dataset_stats(self):
         """Return real portal statistics from the CKAN database."""
@@ -776,9 +902,18 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
         except Exception:
             org_count = 0
 
+        pillars = self._get_pillars()
+        total_pillars = len(pillars)
+        short_names = [p['short_name'] for p in pillars if p.get('short_name')]
+        pillars_summary = ", ".join(short_names) if short_names else "Meteorologi, Iklim, Gempa, Kualitas Udara"
+
         return {
             'total_datasets': total,
             'total_orgs': org_count,
+            'total_pillars': total_pillars,
+            'pillars': pillars,
+            'pillar_names': short_names,
+            'pillars_summary': pillars_summary,
         }
 
     def _get_group_dataset_count(self, group_name):
@@ -893,12 +1028,15 @@ class BMKGThemePlugin(plugins.SingletonPlugin):
             'meteorologi': {'label': 'Meteorologi', 'class': 'met', 'icon': 'fa-solid fa-cloud-sun'},
             'klimatologi': {'label': 'Klimatologi', 'class': 'klim', 'icon': 'fa-solid fa-temperature-half'},
             'geofisika': {'label': 'Geofisika', 'class': 'geo', 'icon': 'fa-solid fa-volcano'},
+            'kualitas-udara': {'label': 'Kualitas Udara', 'class': 'ku', 'icon': 'fa-solid fa-wind'},
+            'kualitas_udara': {'label': 'Kualitas Udara', 'class': 'ku', 'icon': 'fa-solid fa-wind'},
             'instrumen-mkg': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
             'modifikasi-cuaca': {'label': 'Modifikasi Cuaca', 'class': 'mc', 'icon': 'fa-solid fa-cloud-sun-rain'},
-            'kualitas-udara': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
-            'kualitas_udara': {'label': 'Instrumen MKG', 'class': 'ku', 'icon': 'fa-solid fa-gauge-high'},
         }
-        return badges.get(pilar_code, {'label': 'Umum / MKG', 'class': 'met', 'icon': 'fa-solid fa-database'})
+        if pilar_code in badges:
+            return badges[pilar_code]
+        label = str(pilar_code or 'Umum').replace('-', ' ').title()
+        return {'label': label, 'class': 'met', 'icon': 'fa-solid fa-layer-group'}
 
     def _get_format_class(self, format_name):
         fmt = (format_name or '').lower().strip()

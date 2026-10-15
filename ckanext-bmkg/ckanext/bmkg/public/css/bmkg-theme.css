@@ -1089,10 +1089,10 @@
       margin-top: 0.35rem;
     }
 
-    /* 5 Distinct Pillars of BMKG with Symmetrical Grid & Hover Lift */
+    /* Distinct Pillars of BMKG with Dynamic Responsive Grid & Hover Lift */
     .pillars-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 1.15rem;
       margin-bottom: 3.5rem;
     }
@@ -1101,6 +1101,7 @@
       background: var(--canvas-white);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
+      border-top: 4px solid var(--bmkg-blue);
       padding: 1.5rem 1.25rem;
       display: flex;
       flex-direction: column;
@@ -1122,7 +1123,8 @@
     .pillar-box.geofisika { border-top: 4px solid var(--seismic-red); }
     .pillar-box.instrumen-mkg { border-top: 4px solid var(--bmkg-green); }
     .pillar-box.modifikasi-cuaca { border-top: 4px solid #7c3aed; }
-    .pillar-box.kualitas-udara { border-top: 4px solid var(--bmkg-green); }
+    .pillar-box.kualitas-udara,
+    .pillar-box.kualitas_udara { border-top: 4px solid var(--bmkg-green); }
 
     .pillar-header {
       display: flex;
