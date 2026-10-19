@@ -1,7 +1,35 @@
 {% extends "group/base_form_page.html" %}
 
-{% set label = h.humanize_entity_type('group', group_type, 'edit label') or 'Edit Metadata Grup' %}
+{% block subtitle %}
+  {% set cur_title = (group_dict and (group_dict.title or group_dict.display_name or group_dict.name)) or (data and (data.title or data.display_name or data.name)) or '' %}
+  Edit Metadata Grup: {{ cur_title }} — Portal Data BMKG
+{% endblock %}
 
-{% block subtitle %}{{ label }}: {{ group_dict.display_name or group_dict.title or group_dict.name }} — Portal Data BMKG{% endblock %}
+{% block page_heading %}
+  {% set cur_title = (group_dict and (group_dict.title or group_dict.display_name or group_dict.name)) or (data and (data.title or data.display_name or data.name)) or '' %}
+  Edit Grup: {{ cur_title }}
+{% endblock %}
 
-{% block page_heading %}{{ label }}{% endblock %}
+{% block edit_nav %}
+  {% set cur_group_name = (group_dict and group_dict.name) or (data and data.name) or '' %}
+  {% set member_count = (group_dict.users|length) if (group_dict and group_dict.users) else 1 %}
+  {% if cur_group_name %}
+    <div class="bmkg-subnav-container">
+      <div class="bmkg-subnav-inner">
+        <a href="{{ h.url_for(group_type + '.edit', id=cur_group_name) }}" class="bmkg-subnav-item is-active" title="Sunting Informasi &amp; Metadata Grup">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Sunting Metadata Grup</span>
+        </a>
+        <a href="{{ h.url_for(group_type + '.manage_members', id=cur_group_name) }}" class="bmkg-subnav-item" title="Kelola Anggota &amp; Kurator Grup">
+          <i class="fa-solid fa-users-gear"></i>
+          <span>Kelola Anggota &amp; Kurator</span>
+          <span class="subnav-badge">{{ member_count }}</span>
+        </a>
+        <a href="{{ h.url_for(group_type + '.read', id=cur_group_name) }}" target="_blank" class="bmkg-subnav-item is-external" title="Buka Halaman Publik Grup di Tab Baru">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Lihat Halaman Publik</span>
+        </a>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

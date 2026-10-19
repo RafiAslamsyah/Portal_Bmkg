@@ -4,11 +4,14 @@
   <head>
     <meta charset="utf-8" />
       <meta name="csrf_field_name" content="_csrf_token" />
-      <meta name="_csrf_token" content="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s" />
+      <meta name="_csrf_token" content="ImMxYjlhYmQyZDFlOTJmNjc5OWNlZWQzOTJhODFmNmVhN2UyYWY5NGQi.atWhlA.B8KbXbXSyVcedjduM9BMaGZJzxE" />
 
       <meta name="generator" content="ckan 2.11.6" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Metadata Grup: Meteorologi — Portal Data BMKG - CKAN</title>
+    <title>
+  
+  Edit Metadata Grup: Meteorologi — Portal Data BMKG
+ - CKAN</title>
 
     
     <link rel="shortcut icon" href="/base/images/ckan.ico" />
@@ -130,7 +133,7 @@
           </a>
           <form action="/user/_logout" method="post" style="display: inline; margin: 0;">
             
-<input type="hidden" name="_csrf_token" value="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s"/>
+<input type="hidden" name="_csrf_token" value="ImMxYjlhYmQyZDFlOTJmNjc5OWNlZWQzOTJhODFmNmVhN2UyYWY5NGQi.atWhlA.B8KbXbXSyVcedjduM9BMaGZJzxE"/>
             <button type="submit" class="btn-interactive btn-header-logout" title="Keluar">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
               <span>Keluar</span>
@@ -178,6 +181,30 @@
     </div>
   </section>
 
+  
+  
+  
+  
+    <div class="bmkg-subnav-container">
+      <div class="bmkg-subnav-inner">
+        <a href="/group/edit/meteorologi" class="bmkg-subnav-item is-active" title="Sunting Informasi &amp; Metadata Grup">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Sunting Metadata Grup</span>
+        </a>
+        <a href="/group/manage_members/meteorologi" class="bmkg-subnav-item" title="Kelola Anggota &amp; Kurator Grup">
+          <i class="fa-solid fa-users-gear"></i>
+          <span>Kelola Anggota &amp; Kurator</span>
+          <span class="subnav-badge">1</span>
+        </a>
+        <a href="/group/meteorologi" target="_blank" class="bmkg-subnav-item is-external" title="Buka Halaman Publik Grup di Tab Baru">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Lihat Halaman Publik</span>
+        </a>
+      </div>
+    </div>
+  
+
+
   <!-- 2. Main Content Grid (Form + Guidance Sidebar) -->
   <div class="dataset-form-layout-container">
     <div class="dataset-form-main-col">
@@ -189,289 +216,1076 @@
 
 
 
+  
+    
+  
+
+
+
+<style>
+  /* Form Root & Typography */
+  .bmkg-group-form {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: #0f172a;
+  }
+
+  /* Form Cards */
+  .bmkg-group-form .bmkg-form-card {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 1.75rem 2rem !important;
+    margin-bottom: 1.6rem !important;
+    box-shadow: 0 2px 10px rgba(0, 56, 101, 0.03) !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  }
+
+  .bmkg-group-form .bmkg-form-card:focus-within {
+    border-color: rgba(0, 90, 158, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(0, 56, 101, 0.07) !important;
+  }
+
+  .bmkg-group-form .card-section-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    padding-bottom: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+  }
+
+  .bmkg-group-form .section-icon-badge {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bmkg-group-form .section-heading {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 0 0.25rem 0 !important;
+    letter-spacing: -0.015em !important;
+  }
+
+  .bmkg-group-form .section-subheading {
+    font-size: 0.85rem !important;
+    color: #64748b !important;
+    margin: 0 !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Form Groups & Labels */
+  .bmkg-group-form .bmkg-form-group {
+    margin-bottom: 1.4rem !important;
+  }
+
+  .bmkg-group-form .bmkg-form-group:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .bmkg-group-form .bmkg-label {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin-bottom: 0.5rem !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .bmkg-group-form .bmkg-label .required-star {
+    color: #ef4444 !important;
+    margin-left: 3px !important;
+    font-weight: 800 !important;
+  }
+
+  /* Inputs, Selects & Textareas - Full Modern Styling */
+  .bmkg-group-form .bmkg-input,
+  .bmkg-group-form .bmkg-select,
+  .bmkg-group-form select.form-control,
+  .bmkg-group-form input.form-control:not(.slug-input):not([type="file"]) {
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 0.75rem 1.05rem !important;
+    font-size: 0.94rem !important;
+    font-family: inherit !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .bmkg-group-form .bmkg-input:hover,
+  .bmkg-group-form .bmkg-select:hover,
+  .bmkg-group-form select.form-control:hover,
+  .bmkg-group-form input.form-control:not(.slug-input):not([type="file"]):hover {
+    border-color: #94a3b8 !important;
+  }
+
+  .bmkg-group-form .bmkg-input:focus,
+  .bmkg-group-form .bmkg-select:focus,
+  .bmkg-group-form select.form-control:focus,
+  .bmkg-group-form input.form-control:not(.slug-input):not([type="file"]):focus {
+    border-color: #005a9e !important;
+    box-shadow: 0 0 0 3.5px rgba(0, 90, 158, 0.14), 0 1px 3px rgba(0, 56, 101, 0.08) !important;
+    background: #ffffff !important;
+  }
+
+  .bmkg-group-form .bmkg-input.has-error,
+  .bmkg-group-form input.form-control.has-error {
+    border-color: #ef4444 !important;
+    background: #fff5f5 !important;
+  }
+
+  /* Modern Textarea */
+  .bmkg-group-form .bmkg-textarea,
+  .bmkg-group-form textarea.form-control {
+    width: 100% !important;
+    min-height: 130px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 0.85rem 1.05rem !important;
+    font-size: 0.94rem !important;
+    line-height: 1.6 !important;
+    font-family: inherit !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    outline: none !important;
+    resize: vertical !important;
+    box-sizing: border-box !important;
+  }
+
+  .bmkg-group-form .bmkg-textarea:hover,
+  .bmkg-group-form textarea.form-control:hover {
+    border-color: #94a3b8 !important;
+  }
+
+  .bmkg-group-form .bmkg-textarea:focus,
+  .bmkg-group-form textarea.form-control:focus {
+    border-color: #005a9e !important;
+    box-shadow: 0 0 0 3.5px rgba(0, 90, 158, 0.14) !important;
+    background: #ffffff !important;
+  }
+
+  /* Slug Wrapper */
+  .bmkg-group-form .bmkg-slug-input-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    box-sizing: border-box !important;
+  }
+
+  .bmkg-group-form .bmkg-slug-input-wrapper:hover {
+    border-color: #94a3b8 !important;
+  }
+
+  .bmkg-group-form .bmkg-slug-input-wrapper:focus-within {
+    border-color: #005a9e !important;
+    box-shadow: 0 0 0 3.5px rgba(0, 90, 158, 0.14) !important;
+  }
+
+  .bmkg-group-form .bmkg-slug-input-wrapper.is-locked {
+    background: #f8fafc !important;
+  }
+
+  .bmkg-group-form .slug-prefix {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    padding: 0 1rem !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    border-right: 1.5px solid #cbd5e1 !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+  }
+
+  .bmkg-group-form .slug-prefix i {
+    color: #0284c7 !important;
+    font-size: 0.9rem !important;
+  }
+
+  .bmkg-group-form .bmkg-slug-input-wrapper .slug-input {
+    flex: 1 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+    padding: 0 1rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    color: #0f172a !important;
+    background: transparent !important;
+    outline: none !important;
+  }
+
+  .bmkg-group-form .slug-action-btn {
+    background: #ffffff !important;
+    border: none !important;
+    border-left: 1.5px solid #e2e8f0 !important;
+    height: 100% !important;
+    padding: 0 1rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+  }
+
+  .bmkg-group-form .slug-action-btn:hover {
+    background: #f1f5f9 !important;
+    color: #005a9e !important;
+  }
+
+  .bmkg-group-form .slug-warning-note {
+    background: #fffbeb !important;
+    border: 1px solid #fef3c7 !important;
+    border-radius: 8px !important;
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.78rem !important;
+    color: #92400e !important;
+    margin-top: 0.45rem !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .bmkg-group-form .field-helper-text {
+    display: block !important;
+    font-size: 0.78rem !important;
+    color: #64748b !important;
+    margin-top: 0.45rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .bmkg-group-form .field-error-msg {
+    color: #dc2626 !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin-top: 0.35rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Custom Select Container with Chevron */
+  .bmkg-group-form .select-container {
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  .bmkg-group-form .select-container::after {
+    content: "\f078" !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    position: absolute !important;
+    right: 1.15rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #64748b !important;
+    font-size: 0.82rem !important;
+    pointer-events: none !important;
+  }
+
+  .bmkg-group-form .select-container select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-right: 2.5rem !important;
+    cursor: pointer !important;
+  }
+
+  /* Overview Card */
+  .bmkg-group-form .bmkg-group-overview-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 1.4rem 1.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+    margin-bottom: 1.6rem !important;
+    box-shadow: 0 4px 14px rgba(0, 56, 101, 0.04) !important;
+  }
+
+  .bmkg-group-form .overview-avatar {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.8rem !important;
+    color: #005a9e !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bmkg-group-form .overview-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    padding: 4px !important;
+  }
+
+  .bmkg-group-form .overview-title {
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  /* Interactive 6-Pillar Grid */
+  .bmkg-group-form .pilar-selector-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  @media (max-width: 992px) {
+    .bmkg-group-form .pilar-selector-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .bmkg-group-form .pilar-selector-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  .bmkg-group-form .pilar-card {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.15rem 1.1rem !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.9rem !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+  }
+
+  .bmkg-group-form .pilar-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: #94a3b8 !important;
+    box-shadow: 0 6px 16px rgba(0, 56, 101, 0.08) !important;
+  }
+
+  .bmkg-group-form .pilar-card.is-selected {
+    border-color: #005a9e !important;
+    background: #f0f7fc !important;
+    box-shadow: 0 4px 16px rgba(0, 90, 158, 0.12) !important;
+  }
+
+  .bmkg-group-form .pilar-badge-icon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .bmkg-group-form .pilar-card:hover .pilar-badge-icon {
+    transform: scale(1.08) !important;
+  }
+
+  .bmkg-group-form .pilar-badge-icon.met { background: #e0f2fe !important; color: #0284c7 !important; }
+  .bmkg-group-form .pilar-badge-icon.klim { background: #fef3c7 !important; color: #d97706 !important; }
+  .bmkg-group-form .pilar-badge-icon.geo { background: #fee2e2 !important; color: #dc2626 !important; }
+  .bmkg-group-form .pilar-badge-icon.ku { background: #dcfce7 !important; color: #059669 !important; }
+  .bmkg-group-form .pilar-badge-icon.maritim { background: #cffafe !important; color: #0891b2 !important; }
+  .bmkg-group-form .pilar-badge-icon.radar { background: #f3e8ff !important; color: #7c3aed !important; }
+
+  .bmkg-group-form .pilar-title {
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 0 0.25rem 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .bmkg-group-form .pilar-desc {
+    font-size: 0.78rem !important;
+    color: #64748b !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+  }
+
+  .bmkg-group-form .pilar-check {
+    font-size: 1.25rem !important;
+    color: #cbd5e1 !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+  }
+
+  .bmkg-group-form .pilar-card.is-selected .pilar-check {
+    color: #005a9e !important;
+    transform: scale(1.1) !important;
+  }
+
+  /* Live Avatar Status Card */
+  .bmkg-group-form .group-avatar-status-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.35rem !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.25rem 1.4rem !important;
+    margin-bottom: 1.4rem !important;
+  }
+
+  .bmkg-group-form .avatar-preview-box {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.85rem !important;
+    color: #005a9e !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bmkg-group-form .avatar-preview-box img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    padding: 4px !important;
+  }
+
+  .bmkg-group-form .avatar-status-badge {
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
+    padding: 0.22rem 0.7rem !important;
+    border-radius: 999px !important;
+    background: #dcfce7 !important;
+    color: #15803d !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+  }
+
+  .bmkg-group-form .avatar-path-text {
+    font-size: 0.82rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #334155 !important;
+    margin: 0.35rem 0 0.55rem 0 !important;
+    word-break: break-all !important;
+  }
+
+  .bmkg-group-form .btn-clear-avatar {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 0.35rem 0.85rem !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #ef4444 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .bmkg-group-form .btn-clear-avatar:hover {
+    background: #fee2e2 !important;
+    border-color: #fca5a5 !important;
+    color: #b91c1c !important;
+  }
+
+  /* Preset Gallery */
+  .bmkg-group-form .official-preset-gallery {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.25rem !important;
+    margin-bottom: 1.4rem !important;
+  }
+
+  .bmkg-group-form .preset-icon-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 0.85rem !important;
+  }
+
+  @media (max-width: 860px) {
+    .bmkg-group-form .preset-icon-cards-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  .bmkg-group-form .preset-icon-card {
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 0.95rem 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-align: center !important;
+  }
+
+  .bmkg-group-form .preset-icon-card:hover {
+    background: #ffffff !important;
+    border-color: #005a9e !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(0, 90, 158, 0.1) !important;
+  }
+
+  .bmkg-group-form .preset-icon-card.is-active {
+    background: #f0f7fc !important;
+    border-color: #005a9e !important;
+    box-shadow: 0 0 0 2.5px rgba(0, 90, 158, 0.25) !important;
+  }
+
+  .bmkg-group-form .preset-icon-circle {
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .bmkg-group-form .preset-icon-circle.met { background: #e0f2fe !important; color: #0284c7 !important; }
+  .bmkg-group-form .preset-icon-circle.klim { background: #fef3c7 !important; color: #d97706 !important; }
+  .bmkg-group-form .preset-icon-circle.geo { background: #fee2e2 !important; color: #dc2626 !important; }
+  .bmkg-group-form .preset-icon-circle.ku { background: #dcfce7 !important; color: #059669 !important; }
+  .bmkg-group-form .preset-icon-circle.maritim { background: #cffafe !important; color: #0891b2 !important; }
+  .bmkg-group-form .preset-icon-circle.bmkg { background: #003865 !important; color: #ffffff !important; }
+
+  /* Compact Media Upload Box */
+  .bmkg-group-form .media-upload-compact-box {
+    position: relative !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 0.75rem 1rem !important;
+    background: #f8fafc !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .bmkg-group-form .media-upload-compact-box:hover {
+    background: #ffffff !important;
+    border-color: #005a9e !important;
+  }
+
+  .bmkg-group-form .media-upload-compact-box input[type="file"] {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+  }
+
+  .bmkg-group-form .upload-compact-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    color: #475569 !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+  }
+
+  /* Danger Zone Box */
+  .bmkg-group-form .bmkg-danger-zone-card {
+    background: #fff8f8 !important;
+    border: 1.5px solid #fecaca !important;
+    border-radius: 14px !important;
+    padding: 1.4rem 1.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1.5rem !important;
+    margin-bottom: 1.6rem !important;
+  }
+
+  .bmkg-group-form .danger-zone-left {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  .bmkg-group-form .danger-zone-icon-circle {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bmkg-group-form .danger-zone-text h4 {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #991b1b !important;
+    margin: 0 0 0.3rem 0 !important;
+  }
+
+  .bmkg-group-form .danger-zone-text p {
+    font-size: 0.84rem !important;
+    color: #7f1d1d !important;
+    margin: 0 !important;
+    line-height: 1.45 !important;
+  }
+
+  .bmkg-group-form .btn-danger-delete {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    padding: 0.7rem 1.35rem !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .bmkg-group-form .btn-danger-delete:hover {
+    background: #b91c1c !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35) !important;
+    color: #ffffff !important;
+  }
+
+  /* Actions Bar */
+  .bmkg-group-form .bmkg-form-actions-bar {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 1.35rem 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    box-shadow: 0 2px 10px rgba(0, 56, 101, 0.03) !important;
+  }
+
+  .bmkg-group-form .btn-action-cancel {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background: #f1f5f9 !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #334155 !important;
+    font-weight: 700 !important;
+    font-size: 0.92rem !important;
+    padding: 0.75rem 1.4rem !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .bmkg-group-form .btn-action-cancel:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    text-decoration: none !important;
+  }
+
+  .bmkg-group-form .btn-action-submit {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    background: linear-gradient(135deg, #005a9e 0%, #003865 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    padding: 0.8rem 1.85rem !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 14px rgba(0, 56, 101, 0.25) !important;
+    transition: all 0.22s ease !important;
+  }
+
+  .bmkg-group-form .btn-action-submit:hover {
+    background: linear-gradient(135deg, #004b85 0%, #002b4d 100%) !important;
+    transform: translateY(-1.5px) !important;
+    box-shadow: 0 6px 20px rgba(0, 56, 101, 0.35) !important;
+  }
+</style>
 
 
 <form id="group-edit" class="bmkg-group-form" method="post" action="" data-module="basic-form" enctype="multipart/form-data" novalidate>
   
-<input type="hidden" name="_csrf_token" value="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s"/>
+<input type="hidden" name="_csrf_token" value="ImMxYjlhYmQyZDFlOTJmNjc5OWNlZWQzOTJhODFmNmVhN2UyYWY5NGQi.atWhlA.B8KbXbXSyVcedjduM9BMaGZJzxE"/>
 
   <!-- Ringkasan Galat (Error Summary) jika ada validasi yang gagal -->
   
     
   
 
-  <!-- CARD 1: Identitas & Nama Grup Tematik -->
+  
+    <!-- Group Overview Banner Card for Edit Mode -->
+    <div class="bmkg-group-overview-card">
+      <div class="overview-avatar">
+        
+          <img id="overviewAvatarImg" src="/img/pilar-met.png" alt="Meteorologi" onerror="this.style.display='none'; document.getElementById('overviewFallbackIcon').style.display='flex';" />
+          <i class="fa-solid fa-layer-group" id="overviewFallbackIcon" style="display: none;"></i>
+        
+      </div>
+      <div class="overview-meta">
+        <div class="overview-title-row">
+          <h3 class="overview-title">Meteorologi</h3>
+          <span class="overview-badge-edit"><i class="fa-solid fa-pen-to-square"></i> Mode Sunting Aktif</span>
+        </div>
+        <div class="overview-slug-link">
+          <i class="fa-solid fa-globe"></i>
+          <span>https://data.bmkg.go.id/group/meteorologi</span>
+          
+            <a href="/group/meteorologi" target="_blank" title="Buka Halaman Publik" class="overview-external-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          
+        </div>
+        <div class="overview-pills">
+          <span class="meta-pill"><i class="fa-solid fa-database"></i> <strong>4</strong> Dataset Terhubung</span>
+          <span class="meta-pill"><i class="fa-solid fa-users"></i> <strong>1</strong> Anggota / Kurator</span>
+          <span class="meta-pill status-active"><i class="fa-solid fa-circle-check"></i> Status Publik Aktif</span>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- CARD 1: Identitas & Informasi Utama Grup -->
   <div class="bmkg-form-card">
     <div class="card-section-header">
       <div class="section-icon-badge" style="background: rgba(0, 90, 158, 0.1); color: #005a9e;">
-        <i class="fa-solid fa-layer-group"></i>
+        <i class="fa-solid fa-file-pen"></i>
       </div>
-      <div style="flex: 1;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-          <h3 class="section-heading">1. Identitas &amp; Nama Grup Tematik</h3>
-          
-            <span class="bmkg-input-hint-badge" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
-              <i class="fa-solid fa-pen-to-square"></i> Mode Sunting Grup
-            </span>
-          
-        </div>
-        <p class="section-subheading">Informasi nama resmi kelompok dataset, tautan slug permanen, dan ringkasan cakupan tema pengamatan.</p>
+      <div>
+        <h3 class="section-heading">1. Identitas &amp; Deskripsi Grup</h3>
+        <p class="section-subheading">Informasi nama resmi kelompok dataset, tautan slug permanen, dan ringkasan cakupan tema observasi.</p>
       </div>
     </div>
 
     <div class="card-section-body">
-      <!-- Quick Preset Pilar BMKG (Pilihan Cepat) -->
-      <div class="bmkg-preset-box">
-        <div class="bmkg-preset-header">
-          <span class="bmkg-preset-title">
-            <i class="fa-solid fa-sparkles" style="color: #0284c7;"></i>
-            Pilihan Cepat Klaster Pilar BMKG:
-          </span>
-          <span style="font-size: 0.74rem; color: #64748b;">Klik untuk menerapkan template nama &amp; tema</span>
-        </div>
-        <div class="bmkg-preset-chips">
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('meteorologi')">
-            <i class="fa-solid fa-cloud-sun" style="color: #0284c7;"></i> Meteorologi
-          </button>
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('klimatologi')">
-            <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Klimatologi
-          </button>
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('geofisika')">
-            <i class="fa-solid fa-volcano" style="color: #dc2626;"></i> Geofisika
-          </button>
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('kualitas-udara')">
-            <i class="fa-solid fa-wind" style="color: #059669;"></i> Kualitas Udara
-          </button>
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('maritim')">
-            <i class="fa-solid fa-water" style="color: #0891b2;"></i> Maritim &amp; Kelautan
-          </button>
-          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('radar')">
-            <i class="fa-solid fa-satellite-dish" style="color: #7c3aed;"></i> Radar &amp; Citra Satelit
-          </button>
-        </div>
-      </div>
-
-      <!-- Judul / Nama Grup -->
-      <div class="bmkg-form-group">
-        <div class="bmkg-input-header">
-          <label for="field-title" class="bmkg-label required" style="margin-bottom: 0;">
+      <!-- 2-Kolom: Nama Grup & URL Slug -->
+      <div class="form-row-2col">
+        <!-- Judul / Nama Grup -->
+        <div class="bmkg-form-group">
+          <label for="field-title" class="bmkg-label required">
             Nama Grup / Klaster Tematik
             <span class="required-star">*</span>
           </label>
-          <span class="bmkg-input-hint-badge required-badge">
-            <i class="fa-solid fa-asterisk" style="font-size: 0.65rem;"></i> Wajib Diisi
-          </span>
+          <div class="input-container">
+            <input id="field-title" type="text" name="title" value="Meteorologi"
+              placeholder="Contoh: Meteorologi"
+              data-module="slug-preview-target"
+              class="bmkg-input form-control " required autocomplete="off" />
+          </div>
+          
+          <span class="field-helper-text">Nomenklatur kelompok dataset resmi yang komunikatif bagi publik.</span>
         </div>
-        <div class="input-with-icon-wrap">
-          <i class="fa-solid fa-layer-group input-prefix-icon"></i>
-          <input id="field-title" type="text" name="title" value="Meteorologi"
-            placeholder="Contoh: Meteorologi atau Pengamatan Cuaca & Iklim Ekstrem"
-            data-module="slug-preview-target"
-            class="bmkg-input with-prefix-icon form-control " required autocomplete="off" />
-        </div>
-        
-        <span class="field-helper-text">Gunakan nama yang komunikatif dan representatif (misal: <em>Meteorologi</em>, <em>Klimatologi</em>, <em>Gempabumi &amp; Tsunami</em>, <em>Kualitas Udara</em>).</span>
-      </div>
 
-      <!-- URL Slug Permanen -->
-      <div class="bmkg-form-group">
-        
-        
-        <div class="bmkg-input-header">
-          <label for="field-name" class="bmkg-label required" style="margin-bottom: 0;">
+        <!-- URL Slug Permanen -->
+        <div class="bmkg-form-group">
+          
+          
+          <label for="field-name" class="bmkg-label required">
             Tautan URL Permanen (Slug)
             <span class="required-star">*</span>
           </label>
-          <span id="slugBadge" class="bmkg-input-hint-badge auto-badge">
-            <i class="fa-solid fa-link"></i> Ramah SEO
-          </span>
-        </div>
-        <div class="bmkg-slug-input-wrapper is-locked" id="slugWrapper">
-          <span class="slug-prefix">
-            <i class="fa-solid fa-globe"></i>
-            <span>/group/</span>
-          </span>
-          <input id="field-name" type="text" name="name" value="meteorologi"
-            placeholder="meteorologi"
-            data-module="slug-preview-slug" data-module-prefix="localhost:5000/group/" data-module-placeholder="&lt;nama-grup&gt;"
-            class="bmkg-input slug-input form-control " required readonly autocomplete="off" />
+          <div class="bmkg-slug-input-wrapper is-locked" id="slugWrapper">
+            <span class="slug-prefix">
+              <i class="fa-solid fa-globe"></i>
+              <span>/group/</span>
+            </span>
+            <input id="field-name" type="text" name="name" value="meteorologi"
+              placeholder="meteorologi"
+              data-module="slug-preview-slug" data-module-prefix="localhost:5000/group/" data-module-placeholder="&lt;nama-grup&gt;"
+              class="bmkg-input slug-input form-control " required readonly autocomplete="off" />
+            
+              <button type="button" class="slug-action-btn" id="btnToggleSlugLock" onclick="toggleSlugLock(this)" title="Kunci/buka untuk mengedit slug URL">
+                <i class="fa-solid fa-lock" id="slugLockIcon"></i>
+                <span id="slugLockLabel">Terkunci</span>
+              </button>
+            
+          </div>
           
-            <button type="button" class="slug-action-btn" id="btnToggleSlugLock" onclick="toggleSlugLock(this)" title="Kunci/buka untuk mengedit slug URL">
-              <i class="fa-solid fa-lock" id="slugLockIcon"></i>
-              <span id="slugLockLabel">Terkunci</span>
-            </button>
+          
+            <div class="slug-warning-note">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <div><strong>Peringatan Slug:</strong> Mengubah slug URL akan mengubah endpoint API dan tautan bookmark eksternal.</div>
+            </div>
           
         </div>
-        
-        <span class="field-helper-text">Pranala ramah mesin pencari. Hanya gunakan huruf kecil, angka, dan tanda hubung (-). Dihasilkan otomatis dari nama grup.</span>
       </div>
 
       <!-- Deskripsi Grup -->
-      <div class="bmkg-form-group">
-        <div class="bmkg-input-header">
-          <label for="field-description" class="bmkg-label" style="margin-bottom: 0;">
-            Deskripsi &amp; Cakupan Data Grup
-          </label>
-          <span class="bmkg-input-hint-badge">
-            <i class="fa-brands fa-markdown"></i> Markdown Didukung
-          </span>
-        </div>
-        <!-- Markdown Toolbar Helper -->
-        <div class="bmkg-markdown-header">
-          <div class="markdown-tools">
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('**', '**', 'teks tebal')" title="Tebal (Bold)"><i class="fa-solid fa-bold"></i></button>
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('*', '*', 'teks miring')" title="Miring (Italic)"><i class="fa-solid fa-italic"></i></button>
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('### ', '', 'Judul Bagian')" title="Heading 3"><i class="fa-solid fa-heading"></i></button>
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('- ', '', 'Poin daftar')" title="Daftar Berbutir"><i class="fa-solid fa-list-ul"></i></button>
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('[', '](https://bmkg.go.id)', 'Tautan BMKG')" title="Sisipkan Tautan"><i class="fa-solid fa-link"></i></button>
-            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('`', '`', 'parameter_sensor')" title="Format Kode / Satuan"><i class="fa-solid fa-code"></i></button>
-          </div>
-          <span class="markdown-count" id="descCharCount">0 karakter</span>
-        </div>
+      <div class="bmkg-form-group" style="margin-top: 1.25rem;">
+        <label for="field-description" class="bmkg-label">
+          Deskripsi &amp; Cakupan Data Grup
+        </label>
         <div class="textarea-container">
-          <textarea id="field-description" name="description" class="bmkg-textarea form-control has-toolbar" rows="6"
+          <textarea id="field-description" name="description" class="bmkg-textarea form-control" rows="5"
             placeholder="Tuliskan latar belakang grup, ragam parameter observasi yang dihimpun, metodologi pengumpulan, serta pemanfaatan data terbuka ini bagi riset, peringatan dini, dan mitigasi bencana...">Pilar observasi, prediksi cuaca permukaan, angin maritim, radar, citra satelit resolusi tinggi, dan layanan informasi cuaca penerbangan di seluruh wilayah Indonesia.</textarea>
         </div>
         
-        <span class="field-helper-text">Gunakan format Markdown untuk menata teks paragraf, poin spesifikasi teknis, atau tautan portal resmi BMKG.</span>
+        <span class="field-helper-text">Mendukung format Markdown untuk penataan paragraf, poin spesifikasi teknis, atau tautan portal resmi BMKG.</span>
       </div>
     </div>
   </div>
 
-  <!-- CARD 2: Visual & Lambang Identitas Grup -->
+  <!-- CARD 2: Klasifikasi 6 Klaster Pilar Tematik BMKG -->
   <div class="bmkg-form-card">
     <div class="card-section-header">
       <div class="section-icon-badge" style="background: rgba(0, 135, 90, 0.1); color: #00875a;">
-        <i class="fa-solid fa-image"></i>
+        <i class="fa-solid fa-layer-group"></i>
       </div>
       <div>
-        <h3 class="section-heading">2. Logo &amp; Lambang Visual Grup</h3>
-        <p class="section-subheading">Sematkan lambang pilar MKG atau logo proyek riset agar mudah dikenali dalam katalog dan kartu beranda.</p>
+        <h3 class="section-heading">2. Klasifikasi Pilar Layanan BMKG</h3>
+        <p class="section-subheading">Pilih pilar tematik pengamatan BMKG yang merepresentasikan cakupan pengelompokan dataset ini.</p>
       </div>
     </div>
 
     <div class="card-section-body">
-      <div class="bmkg-media-custom-container">
-        <!-- Media Mode Switcher Tabs -->
-        <div class="media-mode-switcher">
-          <button type="button" class="media-mode-btn is-active" id="btnTabUrl" onclick="switchMediaMode('url')">
-            <i class="fa-solid fa-link"></i> Tautan URL Gambar
-          </button>
-          <button type="button" class="media-mode-btn" id="btnTabUpload" onclick="switchMediaMode('upload')">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Berkas
-          </button>
-          <button type="button" class="media-mode-btn" id="btnTabPreset" onclick="switchMediaMode('preset')">
-            <i class="fa-solid fa-shapes"></i> Preset Lambang BMKG
-          </button>
+      <!-- Pilihan Interaktif 6 Klaster Pilar Tematik BMKG -->
+      <div class="pilar-selector-grid">
+        <!-- Meteorologi -->
+        <div class="pilar-card is-selected" data-pilar="meteorologi" onclick="selectGroupTheme('meteorologi', this)">
+          <div class="pilar-badge-icon met"><i class="fa-solid fa-cloud-sun"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Meteorologi</h4>
+            <p class="pilar-desc">Cuaca permukaan, angin maritim, radar, citra satelit, dan penerbangan.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
         </div>
 
-        <!-- Live Preview Strip -->
-        <div class="media-preview-strip">
-          <div class="media-preview-avatar" id="mediaPreviewBox">
-            
-              <img id="mediaPreviewImg" src="http://localhost:5000/uploads/group//img/pilar-met.png" alt="Logo Grup" onerror="this.style.display='none'; document.getElementById('mediaPreviewFallback').style.display='flex';" />
-              <div id="mediaPreviewFallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center;"><i class="fa-solid fa-layer-group"></i></div>
-            
+        <!-- Klimatologi -->
+        <div class="pilar-card " data-pilar="klimatologi" onclick="selectGroupTheme('klimatologi', this)">
+          <div class="pilar-badge-icon klim"><i class="fa-solid fa-temperature-half"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Klimatologi</h4>
+            <p class="pilar-desc">Variabilitas iklim, anomali curah hujan, kekeringan, dan tren suhu global.</p>
           </div>
-          <div class="media-preview-info">
-            <h5 id="mediaPreviewTitle">
-              Citra / Lambang Terpasang
-            </h5>
-            <p id="mediaPreviewDesc">
-              http://localhost:5000/uploads/group//img/pilar-met.png
-            </p>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <button type="button" class="btn-media-clear" id="btnMediaClear" onclick="clearGroupImage()">
-                <i class="fa-solid fa-trash-can"></i> Hapus / Reset Gambar
-              </button>
-              <span style="font-size: 0.74rem; color: #64748b;">(Disarankan rasio 1:1 atau 16:9, PNG transparan)</span>
-            </div>
-          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
         </div>
 
-        <!-- Hidden Input to signal clear upload to CKAN -->
-        <input type="hidden" name="clear_upload" id="field-clear-upload" value="" />
-
-        <!-- Panel 1: URL Input -->
-        <div id="panelMediaUrl" class="media-panel">
-          <div class="bmkg-form-group" style="margin-bottom: 0;">
-            <label for="field-image-url" class="bmkg-label">
-              Tautan URL Gambar / Ikon Online
-            </label>
-            <div class="input-with-icon-wrap">
-              <i class="fa-solid fa-link input-prefix-icon"></i>
-              <input id="field-image-url" type="url" name="image_url" value="/img/pilar-met.png"
-                placeholder="https://bmkg.go.id/asset/img/icons/meteorologi.png"
-                oninput="updateImagePreviewFromUrl(this.value)"
-                class="bmkg-input with-prefix-icon form-control " />
-            </div>
-            <span class="field-helper-text">Masukkan tautan langsung gambar lambang publik berformat PNG, SVG, atau WebP.</span>
+        <!-- Geofisika -->
+        <div class="pilar-card " data-pilar="geofisika" onclick="selectGroupTheme('geofisika', this)">
+          <div class="pilar-badge-icon geo"><i class="fa-solid fa-volcano"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Geofisika</h4>
+            <p class="pilar-desc">Seismisitas gempa bumi, sistem InaTEWS, geomagnet, gravitasi, dan petir.</p>
           </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
         </div>
 
-        <!-- Panel 2: File Upload (Dropzone) -->
-        <div id="panelMediaUpload" class="media-panel" style="display: none;">
-          <div class="media-dropzone" id="mediaDropzone">
-            <input id="field-image-upload" type="file" name="image_upload" accept="image/png, image/jpeg, image/svg+xml, image/webp" onchange="handleFileSelect(this)" />
-            <div class="dropzone-inner-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-            <div class="dropzone-inner-title" id="dropzoneTitle">Klik atau Seret Berkas Gambar ke Sini</div>
-            <div class="dropzone-inner-subtitle">Mendukung format PNG, SVG, JPG, WebP hingga ukuran 2 MB</div>
+        <!-- Kualitas Udara -->
+        <div class="pilar-card " data-pilar="kualitas-udara" onclick="selectGroupTheme('kualitas-udara', this)">
+          <div class="pilar-badge-icon ku"><i class="fa-solid fa-wind"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Kualitas Udara</h4>
+            <p class="pilar-desc">Konsentrasi aerosol PM2.5, PM10, gas rumah kaca, dan stasiun GAW.</p>
           </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
         </div>
 
-        <!-- Panel 3: BMKG Official Preset Icons -->
-        <div id="panelMediaPreset" class="media-panel" style="display: none;">
-          <div class="preset-icon-gallery">
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-met.png', 'Meteorologi')">
-              <div class="preset-icon-circle" style="background: #e0f2fe; color: #0284c7;">
-                <i class="fa-solid fa-cloud-sun"></i>
-              </div>
-              <span class="preset-icon-label">Meteorologi</span>
-            </div>
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-klim.png', 'Klimatologi')">
-              <div class="preset-icon-circle" style="background: #fef3c7; color: #d97706;">
-                <i class="fa-solid fa-temperature-half"></i>
-              </div>
-              <span class="preset-icon-label">Klimatologi</span>
-            </div>
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-geo.png', 'Geofisika')">
-              <div class="preset-icon-circle" style="background: #fee2e2; color: #dc2626;">
-                <i class="fa-solid fa-volcano"></i>
-              </div>
-              <span class="preset-icon-label">Geofisika</span>
-            </div>
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-ku.png', 'Kualitas Udara')">
-              <div class="preset-icon-circle" style="background: #dcfce7; color: #059669;">
-                <i class="fa-solid fa-wind"></i>
-              </div>
-              <span class="preset-icon-label">Kualitas Udara</span>
-            </div>
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-maritim.png', 'Maritim')">
-              <div class="preset-icon-circle" style="background: #cffafe; color: #0891b2;">
-                <i class="fa-solid fa-water"></i>
-              </div>
-              <span class="preset-icon-label">Maritim</span>
-            </div>
-            <div class="preset-icon-card" onclick="selectPresetIcon('/img/logo-bmkg.png', 'Logo Resmi BMKG')">
-              <div class="preset-icon-circle" style="background: #f1f5f9; color: #003865;">
-                <i class="fa-solid fa-shield-halved"></i>
-              </div>
-              <span class="preset-icon-label">BMKG Resmi</span>
-            </div>
+        <!-- Maritim & Kelautan -->
+        <div class="pilar-card " data-pilar="maritim" onclick="selectGroupTheme('maritim', this)">
+          <div class="pilar-badge-icon maritim"><i class="fa-solid fa-water"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Maritim &amp; Kelautan</h4>
+            <p class="pilar-desc">Gelombang laut, arus perairan, pasang surut, dan keselamatan pelayaran.</p>
           </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+        <!-- Radar & Satelit -->
+        <div class="pilar-card " data-pilar="radar" onclick="selectGroupTheme('radar', this)">
+          <div class="pilar-badge-icon radar"><i class="fa-solid fa-satellite-dish"></i></div>
+          <div class="pilar-info">
+            <h4 class="pilar-title">Radar &amp; Satelit</h4>
+            <p class="pilar-desc">Komposit radar cuaca C/S-Band, citra Himawari, dan sel konvektif.</p>
+          </div>
+          <div class="pilar-check"><i class="fa-solid fa-circle-check"></i></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- CARD 3: Kontak Pengelola & Status Visibilitas -->
+  <!-- CARD 3: Logo & Lambang Visual Grup -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">
+        <i class="fa-solid fa-image"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">3. Visual Lambang &amp; Logo Grup</h3>
+        <p class="section-subheading">Sematkan lambang pilar MKG atau logo proyek riset agar mudah dikenali dalam katalog dan kartu publik.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <!-- Live Preview Card -->
+      <div class="group-avatar-status-card">
+        <div class="avatar-preview-box">
+          
+            <img id="mediaPreviewImg" src="/img/pilar-met.png" alt="Logo Grup" onerror="this.style.display='none'; document.getElementById('mediaPreviewFallback').style.display='flex';" />
+            <div id="mediaPreviewFallback" style="display: none;"><i class="fa-solid fa-layer-group"></i></div>
+          
+        </div>
+        <div class="avatar-details">
+          <div class="avatar-badge-row">
+            <span class="avatar-status-badge" id="mediaPreviewBadge">
+              <i class="fa-solid fa-circle-check"></i>
+              Lambang Terpasang
+            </span>
+            <span class="avatar-format-hint">Rasio 1:1 atau 16:9 • Format PNG transparan / SVG disarankan</span>
+          </div>
+          <div class="avatar-path-text" id="mediaPreviewDesc">
+            /img/pilar-met.png
+          </div>
+          <button type="button" class="btn-clear-avatar" onclick="clearGroupImage()">
+            <i class="fa-solid fa-trash-can"></i> Hapus / Reset Lambang
+          </button>
+        </div>
+      </div>
+
+      <!-- Hidden Input to signal clear upload to CKAN -->
+      <input type="hidden" name="clear_upload" id="field-clear-upload" value="" />
+
+      <!-- Official BMKG Icon Gallery -->
+      <div class="official-preset-gallery">
+        <span class="gallery-label" style="display: block; font-size: 0.82rem; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.85rem;">
+          <i class="fa-solid fa-shapes"></i> Pilih Lambang Resmi Pilar BMKG:
+        </span>
+        <div class="preset-icon-cards-grid">
+          <div class="preset-icon-card is-active" onclick="selectPresetIcon('/img/pilar-met.png', 'Meteorologi', this)">
+            <div class="preset-icon-circle met"><i class="fa-solid fa-cloud-sun"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">Meteorologi</span>
+          </div>
+          <div class="preset-icon-card " onclick="selectPresetIcon('/img/pilar-klim.png', 'Klimatologi', this)">
+            <div class="preset-icon-circle klim"><i class="fa-solid fa-temperature-half"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">Klimatologi</span>
+          </div>
+          <div class="preset-icon-card " onclick="selectPresetIcon('/img/pilar-geo.png', 'Geofisika', this)">
+            <div class="preset-icon-circle geo"><i class="fa-solid fa-volcano"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">Geofisika</span>
+          </div>
+          <div class="preset-icon-card " onclick="selectPresetIcon('/img/pilar-ku.png', 'Kualitas Udara', this)">
+            <div class="preset-icon-circle ku"><i class="fa-solid fa-wind"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">Kualitas Udara</span>
+          </div>
+          <div class="preset-icon-card " onclick="selectPresetIcon('/img/pilar-maritim.png', 'Maritim', this)">
+            <div class="preset-icon-circle maritim"><i class="fa-solid fa-water"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">Maritim</span>
+          </div>
+          <div class="preset-icon-card " onclick="selectPresetIcon('/img/logo-bmkg.png', 'Logo Resmi BMKG', this)">
+            <div class="preset-icon-circle bmkg"><i class="fa-solid fa-shield-halved"></i></div>
+            <span class="preset-icon-label" style="font-size: 0.78rem; font-weight: 700; color: #334155;">BMKG Resmi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opsi Kustom: URL Input & File Upload -->
+      <div class="form-row-2col">
+        <!-- URL Input -->
+        <div class="bmkg-form-group">
+          <label for="field-image-url" class="bmkg-label">Tautan URL Gambar Online</label>
+          <div class="input-container">
+            <input id="field-image-url" type="url" name="image_url" value="/img/pilar-met.png"
+              placeholder="https://bmkg.go.id/asset/img/icons/meteorologi.png"
+              oninput="updateImagePreviewFromUrl(this.value)"
+              class="bmkg-input form-control " />
+          </div>
+          <span class="field-helper-text">Masukkan tautan langsung gambar lambang eksternal (PNG, SVG, atau WebP).</span>
+        </div>
+
+        <!-- File Upload Box -->
+        <div class="bmkg-form-group">
+          <label for="field-image-upload" class="bmkg-label">Atau Unggah Berkas Baru</label>
+          <div class="media-upload-compact-box">
+            <input id="field-image-upload" type="file" name="image_upload" accept="image/png, image/jpeg, image/svg+xml, image/webp" onchange="handleFileSelect(this)" />
+            <div class="upload-compact-content">
+              <i class="fa-solid fa-cloud-arrow-up" style="color: #005a9e; font-size: 1.15rem;"></i>
+              <span id="dropzoneTitle">Klik atau seret berkas gambar ke sini (maks. 2 MB)</span>
+            </div>
+          </div>
+          <span class="field-helper-text">Berkas yang diunggah akan otomatis disimpan ke direktori server BMKG.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4: Penanggung Jawab & Metadata Klaster -->
   <div class="bmkg-form-card">
     <div class="card-section-header">
       <div class="section-icon-badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
         <i class="fa-solid fa-address-card"></i>
       </div>
       <div>
-        <h3 class="section-heading">3. Penanggung Jawab &amp; Metadata Tematik</h3>
+        <h3 class="section-heading">4. Penanggung Jawab &amp; Metadata Klaster</h3>
         <p class="section-subheading">Informasi penanggung jawab teknis, surat elektronik koordinasi, dan status taksonomi grup.</p>
       </div>
     </div>
@@ -481,26 +1295,30 @@
       
       
       
+        
+          
+            
+              
+              
+              
+            
+          
+            
+              
+              
+              
+            
+          
+            
+              
+              
+              
+            
+          
+        
       
-        
-          
-            
-            
-            
-          
-        
-          
-            
-            
-            
-          
-        
-          
-            
-            
-            
-          
-        
+      
+      
       
 
       <div class="form-row-3col">
@@ -508,10 +1326,9 @@
         <div class="bmkg-form-group">
           <input type="hidden" name="extras__0__key" value="penanggung_jawab" />
           <label for="field-pic" class="bmkg-label">Koordinator / Tim Teknis</label>
-          <div class="input-with-icon-wrap">
-            <i class="fa-solid fa-user-tie input-prefix-icon"></i>
-            <input id="field-pic" type="text" name="extras__0__value" value=""
-              placeholder="Contoh: Kedeputian Bidang Meteorologi" class="bmkg-input with-prefix-icon form-control" />
+          <div class="input-container">
+            <input id="field-pic" type="text" name="extras__0__value" value="Kedeputian Bidang Meteorologi"
+              placeholder="Contoh: Kedeputian Bidang Meteorologi" class="bmkg-input form-control" />
           </div>
           <span class="field-helper-text">Kedeputian, Balai Besar, atau Tim Pokja pengampu data.</span>
         </div>
@@ -520,10 +1337,9 @@
         <div class="bmkg-form-group">
           <input type="hidden" name="extras__1__key" value="email_kontak" />
           <label for="field-email-kontak" class="bmkg-label">Email Dinas Koordinasi</label>
-          <div class="input-with-icon-wrap">
-            <i class="fa-solid fa-envelope input-prefix-icon"></i>
-            <input id="field-email-kontak" type="email" name="extras__1__value" value=""
-              placeholder="Contoh: data.mkg@bmkg.go.id" class="bmkg-input with-prefix-icon form-control" />
+          <div class="input-container">
+            <input id="field-email-kontak" type="email" name="extras__1__value" value="info.cuaca@bmkg.go.id"
+              placeholder="Contoh: info.cuaca@bmkg.go.id" class="bmkg-input form-control" />
           </div>
           <span class="field-helper-text">Alamat surat elektronik untuk korespondensi kurasi dataset.</span>
         </div>
@@ -547,25 +1363,42 @@
   </div>
 
   
+    
   
 
+  <!-- DANGER ZONE: Khusus Mode Edit Grup -->
+  
+    <div class="bmkg-danger-zone-card">
+      <div class="danger-zone-left">
+        <div class="danger-zone-icon-circle">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="danger-zone-text">
+          <h4>Zona Berbahaya: Hapus Grup Tematik</h4>
+          <p>Menghapus grup <strong>Meteorologi</strong> akan melepaskan seluruh asosiasi dataset dan kurator dari klaster ini. Dataset individual tidak akan terhapus dari katalog portal terbuka.</p>
+        </div>
+      </div>
+      <div class="danger-zone-action">
+        <a class="btn-danger-delete" href="/group/delete/e3781d3a-b8c0-480f-aabc-b73a7dd8a065" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin menghapus grup ini? Tindakan ini tidak dapat dibatalkan dan akan melepaskan asosiasi seluruh dataset dari grup ini.">
+          <i class="fa-solid fa-trash-can"></i> Hapus Grup Ini
+        </a>
+      </div>
+    </div>
+  
 
-  <!-- CARD 4: Tombol Aksi Formulir (Batal / Hapus / Simpan) -->
+  <!-- CARD 5: Tombol Aksi Formulir (Batal / Simpan) -->
   <div class="bmkg-form-actions-bar">
     <div class="actions-left">
       
       <a href="/group/meteorologi" class="btn-action-cancel">
         <i class="fa-solid fa-arrow-left"></i> Batal &amp; Kembali
       </a>
-      
-  
-
     </div>
 
     <div class="actions-right">
       <button class="btn-action-submit" name="save" type="submit" id="btnSubmitGroup">
         <i class="fa-solid fa-floppy-disk"></i>
-        <span>Create Group</span>
+        <span>Simpan Perubahan Grup</span>
       </button>
     </div>
   </div>
@@ -624,7 +1457,7 @@
     });
   }
 
-  // 2. Preset Pilar BMKG (Quick Fill)
+  // 2. Interactive Pillar Preset Dictionary
   var bmkgPilarPresets = {
     'meteorologi': {
       title: 'Meteorologi',
@@ -664,69 +1497,97 @@
     }
   };
 
-  function applyBmkgThemePreset(key) {
+  function selectGroupTheme(key, cardEl) {
     var p = bmkgPilarPresets[key];
     if (!p) return;
 
-    if (titleInput) {
-      titleInput.value = p.title;
-      titleInput.dispatchEvent(new Event('input'));
+    // 1. Highlight clicked pillar card
+    var allPilarCards = document.querySelectorAll('.pilar-card');
+    allPilarCards.forEach(function(card) {
+      card.classList.remove('is-selected');
+    });
+    if (cardEl) {
+      cardEl.classList.add('is-selected');
     }
-    if (slugInput && !isSlugLocked) {
-      slugInput.value = p.slug;
-    }
-    var descEl = document.getElementById('field-description');
-    if (descEl) {
-      descEl.value = p.desc;
-      updateDescCount();
-    }
+
+    // 2. Only autofill title/slug/desc if in new mode or if user intentionally unlocked
+    
+
+    // 3. Highlight icon preset card and set image url
     selectPresetIcon(p.icon, p.title);
   }
 
-  // 3. Media Mode Switcher (URL vs Upload vs Preset)
-  function switchMediaMode(mode) {
-    var btnUrl = document.getElementById('btnTabUrl');
-    var btnUpload = document.getElementById('btnTabUpload');
-    var btnPreset = document.getElementById('btnTabPreset');
+  // 3. Live Image Preview & Selection
+  function selectPresetIcon(iconUrl, label, cardEl) {
+    var urlInput = document.getElementById('field-image-url');
+    if (urlInput) {
+      urlInput.value = iconUrl;
+    }
+    updateImagePreviewFromUrl(iconUrl);
 
-    var panelUrl = document.getElementById('panelMediaUrl');
-    var panelUpload = document.getElementById('panelMediaUpload');
-    var panelPreset = document.getElementById('panelMediaPreset');
-
-    if (btnUrl) btnUrl.classList.toggle('is-active', mode === 'url');
-    if (btnUpload) btnUpload.classList.toggle('is-active', mode === 'upload');
-    if (btnPreset) btnPreset.classList.toggle('is-active', mode === 'preset');
-
-    if (panelUrl) panelUrl.style.display = (mode === 'url') ? 'block' : 'none';
-    if (panelUpload) panelUpload.style.display = (mode === 'upload') ? 'block' : 'none';
-    if (panelPreset) panelPreset.style.display = (mode === 'preset') ? 'block' : 'none';
+    // Highlight card if clicked
+    var allCards = document.querySelectorAll('.preset-icon-card');
+    allCards.forEach(function(c) { c.classList.remove('is-active'); });
+    if (cardEl) {
+      cardEl.classList.add('is-active');
+    } else {
+      // Find matching preset card
+      allCards.forEach(function(c) {
+        if (c.getAttribute('onclick') && c.getAttribute('onclick').indexOf(iconUrl) !== -1) {
+          c.classList.add('is-active');
+        }
+      });
+    }
   }
 
   function updateImagePreviewFromUrl(url) {
     var previewImg = document.getElementById('mediaPreviewImg');
     var fallback = document.getElementById('mediaPreviewFallback');
-    var title = document.getElementById('mediaPreviewTitle');
+    var badge = document.getElementById('mediaPreviewBadge');
     var desc = document.getElementById('mediaPreviewDesc');
     var clearInput = document.getElementById('field-clear-upload');
+    var overviewImg = document.getElementById('overviewAvatarImg');
+    var overviewFallback = document.getElementById('overviewFallbackIcon');
 
     if (clearInput) clearInput.value = '';
 
     if (url && url.trim().length > 0) {
+      var cleanUrl = url.trim();
       if (previewImg) {
-        previewImg.src = url.trim();
+        previewImg.src = cleanUrl;
         previewImg.style.display = 'block';
       }
       if (fallback) fallback.style.display = 'none';
-      if (title) title.textContent = 'Citra dari Tautan URL';
-      if (desc) desc.textContent = url.trim();
+      if (badge) {
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Lambang Terpasang';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#15803d';
+      }
+      if (desc) desc.textContent = cleanUrl;
+
+      if (overviewImg) {
+        overviewImg.src = cleanUrl;
+        overviewImg.style.display = 'block';
+      }
+      if (overviewFallback) overviewFallback.style.display = 'none';
     } else {
       if (previewImg) {
         previewImg.src = '';
         previewImg.style.display = 'none';
       }
       if (fallback) fallback.style.display = 'flex';
-      if (title) title.textContent = 'Belum Ada Lambang';
-      if (desc) desc.textContent = 'Masukkan URL atau unggah berkas citra.';
+      if (badge) {
+        badge.innerHTML = '<i class="fa-solid fa-circle-info"></i> Belum Ada Lambang';
+        badge.style.background = '#f1f5f9';
+        badge.style.color = '#64748b';
+      }
+      if (desc) desc.textContent = 'Pilih dari preset resmi BMKG di atas atau masukkan URL / unggah berkas.';
+
+      if (overviewImg) {
+        overviewImg.src = '';
+        overviewImg.style.display = 'none';
+      }
+      if (overviewFallback) overviewFallback.style.display = 'flex';
     }
   }
 
@@ -740,9 +1601,11 @@
       reader.onload = function(e) {
         var previewImg = document.getElementById('mediaPreviewImg');
         var fallback = document.getElementById('mediaPreviewFallback');
-        var title = document.getElementById('mediaPreviewTitle');
+        var badge = document.getElementById('mediaPreviewBadge');
         var desc = document.getElementById('mediaPreviewDesc');
         var clearInput = document.getElementById('field-clear-upload');
+        var overviewImg = document.getElementById('overviewAvatarImg');
+        var overviewFallback = document.getElementById('overviewFallbackIcon');
 
         if (clearInput) clearInput.value = '';
         if (previewImg) {
@@ -750,23 +1613,21 @@
           previewImg.style.display = 'block';
         }
         if (fallback) fallback.style.display = 'none';
-        if (title) title.textContent = 'Berkas Siap Diunggah';
-        if (desc) desc.textContent = file.name + ' — ' + (file.size / 1024).toFixed(1) + ' KB';
+        if (badge) {
+          badge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Berkas Siap Diunggah';
+          badge.style.background = '#e0f2fe';
+          badge.style.color = '#0369a1';
+        }
+        if (desc) desc.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+
+        if (overviewImg) {
+          overviewImg.src = e.target.result;
+          overviewImg.style.display = 'block';
+        }
+        if (overviewFallback) overviewFallback.style.display = 'none';
       };
       reader.readAsDataURL(file);
     }
-  }
-
-  function selectPresetIcon(iconUrl, label) {
-    var urlInput = document.getElementById('field-image-url');
-    if (urlInput) {
-      urlInput.value = iconUrl;
-    }
-    updateImagePreviewFromUrl(iconUrl);
-    var title = document.getElementById('mediaPreviewTitle');
-    var desc = document.getElementById('mediaPreviewDesc');
-    if (title) title.textContent = 'Preset BMKG: ' + label;
-    if (desc) desc.textContent = iconUrl;
   }
 
   function clearGroupImage() {
@@ -775,9 +1636,11 @@
     var clearInput = document.getElementById('field-clear-upload');
     var previewImg = document.getElementById('mediaPreviewImg');
     var fallback = document.getElementById('mediaPreviewFallback');
-    var title = document.getElementById('mediaPreviewTitle');
+    var badge = document.getElementById('mediaPreviewBadge');
     var desc = document.getElementById('mediaPreviewDesc');
     var dropTitle = document.getElementById('dropzoneTitle');
+    var overviewImg = document.getElementById('overviewAvatarImg');
+    var overviewFallback = document.getElementById('overviewFallbackIcon');
 
     if (urlInput) urlInput.value = '';
     if (fileInput) fileInput.value = '';
@@ -788,42 +1651,23 @@
       previewImg.style.display = 'none';
     }
     if (fallback) fallback.style.display = 'flex';
-    if (title) title.textContent = 'Citra Dihapus';
-    if (desc) desc.textContent = 'Perubahan akan diterapkan saat Anda menekan tombol Simpan.';
-    if (dropTitle) dropTitle.textContent = 'Klik atau Seret Berkas Gambar ke Sini';
-  }
-
-  // 4. Markdown Toolbar Insert Helper
-  function insertMarkdownTag(startTag, endTag, defaultText) {
-    var textarea = document.getElementById('field-description');
-    if (!textarea) return;
-
-    var start = textarea.selectionStart;
-    var end = textarea.selectionEnd;
-    var text = textarea.value;
-    var selected = text.substring(start, end) || defaultText;
-    var replacement = startTag + selected + endTag;
-
-    textarea.value = text.substring(0, start) + replacement + text.substring(end);
-    textarea.focus();
-    textarea.selectionStart = start + startTag.length;
-    textarea.selectionEnd = start + startTag.length + selected.length;
-    updateDescCount();
-  }
-
-  function updateDescCount() {
-    var descEl = document.getElementById('field-description');
-    var countEl = document.getElementById('descCharCount');
-    if (descEl && countEl) {
-      var len = (descEl.value || '').length;
-      countEl.textContent = len + ' karakter';
+    if (badge) {
+      badge.innerHTML = '<i class="fa-solid fa-trash-can"></i> Lambang Dihapus';
+      badge.style.background = '#fee2e2';
+      badge.style.color = '#dc2626';
     }
-  }
+    if (desc) desc.textContent = 'Perubahan akan diterapkan setelah menekan tombol Simpan.';
+    if (dropTitle) dropTitle.textContent = 'Klik atau seret berkas gambar ke sini (maks. 2 MB)';
 
-  var descTextarea = document.getElementById('field-description');
-  if (descTextarea) {
-    descTextarea.addEventListener('input', updateDescCount);
-    updateDescCount();
+    if (overviewImg) {
+      overviewImg.src = '';
+      overviewImg.style.display = 'none';
+    }
+    if (overviewFallback) overviewFallback.style.display = 'flex';
+
+    // Deselect preset gallery cards
+    var allCards = document.querySelectorAll('.preset-icon-card');
+    allCards.forEach(function(c) { c.classList.remove('is-active'); });
   }
 </script>
       

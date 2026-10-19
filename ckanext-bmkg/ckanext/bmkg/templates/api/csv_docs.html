@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/bmkg-theme.css?v=2.1.0">
   <style>
     :root {
       --bmkg-blue-deep: #003865;
@@ -41,68 +42,119 @@
       line-height: 1.6;
     }
 
-    /* Top Identity Bar */
-    .gov-bar {
-      background-color: var(--bmkg-blue-deep);
-      color: #ffffff;
-      font-size: 0.8rem;
-      padding: 0.5rem 1.5rem;
-      border-bottom: 2px solid var(--bmkg-green);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .gov-bar a { color: #cbd5e1; text-decoration: none; margin-left: 1rem; }
-    .gov-bar a:hover { color: #ffffff; text-decoration: underline; }
-
-    /* Header */
-    .api-header {
+    /* API Developer Action Sub-Navbar (Di Bawah Navbar Resmi BMKG) */
+    .api-docs-subnav {
       background: #ffffff;
       border-bottom: 1px solid var(--border-light);
-      padding: 1rem 2rem;
+      position: relative;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      padding: 0.65rem 2rem;
+    }
+    .api-docs-subnav-inner {
+      max-width: 1440px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-    .brand-box {
+    .api-subnav-left {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      text-decoration: none;
-      color: inherit;
+      gap: 0.85rem;
+      flex-wrap: wrap;
     }
-    .brand-logo { width: 40px; height: 48px; object-fit: contain; }
-    .brand-title { font-size: 1.15rem; font-weight: 800; color: var(--bmkg-blue-deep); }
-    .brand-subtitle { font-size: 0.78rem; color: var(--text-muted); }
-
-    .header-nav { display: flex; align-items: center; gap: 0.75rem; }
-    .btn-nav {
+    .api-subnav-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.45rem 0.9rem;
+      gap: 0.5rem;
+      background: var(--bmkg-blue-subtle);
+      border: 1px solid #bfdbfe;
+      color: var(--bmkg-blue-deep);
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.02em;
+    }
+    .api-subnav-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: #059669;
+      font-weight: 700;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+    }
+    .status-indicator-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+      animation: subnavDotPulse 2s infinite;
+    }
+    @keyframes subnavDotPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .api-subnav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .subnav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.42rem 0.85rem;
       font-size: 0.82rem;
-      font-weight: 600;
+      font-weight: 700;
       border-radius: var(--radius-sm);
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
     }
-    .btn-nav-primary {
-      background: var(--bmkg-blue-deep);
-      color: #ffffff;
-      border: 1px solid var(--bmkg-blue-deep);
-    }
-    .btn-nav-primary:hover { background: var(--bmkg-blue); }
-    .btn-nav-secondary {
+    .subnav-btn-secondary {
       background: #ffffff;
       color: var(--bmkg-blue-deep);
       border: 1px solid var(--border-medium);
     }
-    .btn-nav-secondary:hover { background: var(--bmkg-blue-subtle); }
+    .subnav-btn-secondary:hover {
+      background: var(--bmkg-blue-subtle);
+      border-color: var(--bmkg-blue-light);
+      transform: translateY(-1px);
+    }
+    .subnav-btn-accent {
+      background: #eff6ff;
+      color: #0284c7;
+      border: 1px solid #93c5fd;
+    }
+    .subnav-btn-accent:hover {
+      background: #dbeafe;
+      color: #0369a1;
+      border-color: #60a5fa;
+      transform: translateY(-1px);
+    }
+    .subnav-btn-primary {
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      border: 1px solid var(--bmkg-blue-deep);
+      box-shadow: 0 1px 2px rgba(0, 56, 101, 0.15);
+    }
+    .subnav-btn-primary:hover {
+      background: var(--bmkg-blue);
+      border-color: var(--bmkg-blue);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0, 56, 101, 0.25);
+    }
 
     /* Hero Banner */
     .hero-banner {
@@ -493,39 +545,42 @@
 </head>
 <body>
 
-  <!-- 1. Top Government Identity Bar -->
-  <div class="gov-bar">
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <i class="fa-solid fa-landmark"></i>
-      <span>Portal Resmi Terbuka BMKG • Satu Data Indonesia</span>
-    </div>
-    <div>
-      <a href="/dataset"><i class="fa-solid fa-database"></i> Katalog Dataset</a>
-      <a href="https://www.bmkg.go.id" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Portal BMKG</a>
-    </div>
-  </div>
+  <!-- 1. Official Portal BMKG Navbar (Identik dengan Seluruh Halaman Portal) -->
+  {% include "header.html" %}
 
-  <!-- 2. Header -->
-  <header class="api-header">
-    <a href="/api/csv/docs" class="brand-box">
-      <img src="/img/logo-bmkg.png" alt="Logo BMKG" class="brand-logo" onerror="this.src='https://www.bmkg.go.id/asset/img/logo/logo-bmkg.png'">
-      <div>
-        <div class="brand-title">Public CSV REST API</div>
-        <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+  <!-- 2. Developer Action Sub-Navbar (Fitur Eksisting OpenAPI, Postman, Live Tester & Kembali ke Portal) -->
+  <nav class="api-docs-subnav" aria-label="Aksi Dokumentasi API">
+    <div class="api-docs-subnav-inner">
+      <div class="api-subnav-left">
+        <div class="api-subnav-badge">
+          <i class="fa-solid fa-code"></i>
+          <span>Public CSV REST API</span>
+        </div>
+        <div class="api-subnav-status">
+          <span class="status-indicator-dot"></span>
+          <span>Live v1.0.0 Online • CORS Aktif • Tanpa Token</span>
+        </div>
       </div>
-    </a>
-    <div class="header-nav">
-      <a href="/api/csv/openapi.json" target="_blank" class="btn-nav btn-nav-secondary" title="Unduh Spesifikasi OpenAPI 3.0">
-        <i class="fa-solid fa-file-code"></i> OpenAPI 3.0
-      </a>
-      <a href="/docs/BMKG_Public_CSV_REST_API.postman_collection.json" download class="btn-nav btn-nav-secondary" title="Unduh Koleksi Postman v2.1">
-        <i class="fa-solid fa-box-archive"></i> Postman Collection
-      </a>
-      <a href="/dataset" class="btn-nav btn-nav-primary">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Portal
-      </a>
+      <div class="api-subnav-right">
+        <a href="/api/csv/openapi.json" target="_blank" class="subnav-btn subnav-btn-secondary" title="Unduh Spesifikasi OpenAPI 3.0 (JSON)">
+          <i class="fa-solid fa-file-code"></i>
+          <span>OpenAPI 3.0</span>
+        </a>
+        <a href="/docs/BMKG_Public_CSV_REST_API.postman_collection.json" download class="subnav-btn subnav-btn-secondary" title="Unduh Postman Collection v2.1">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Postman Collection</span>
+        </a>
+        <a href="#tester" class="subnav-btn subnav-btn-accent" title="Langsung Coba di Live API Tester Console">
+          <i class="fa-solid fa-terminal"></i>
+          <span>Live Tester</span>
+        </a>
+        <a href="{{ h.url_for('dataset.search') }}" class="subnav-btn subnav-btn-primary" title="Kembali ke Katalog Dataset Utama Portal BMKG">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Portal</span>
+        </a>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <!-- 3. Hero Section -->
   <section class="hero-banner">
@@ -872,6 +927,9 @@ curl -X GET "http://localhost:5000/api/csv/cuaca-harian-cengkareng.csv" -o cuaca
 
     </div>
   </main>
+
+  <!-- 5. Official BMKG Institutional Footer -->
+  {% include "footer.html" %}
 
   <!-- Toast Notification -->
   <div class="toast-msg" id="toastMsg">

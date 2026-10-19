@@ -1,0 +1,3 @@
+{% extends "group/snippets/group_form.html" %}
+
+{% block save_text %}{{ 'Simpan Perubahan Grup' if (action == 'edit' or is_edit) else 'Buat Grup Tematik Baru' }}{% endblock %}

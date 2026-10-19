@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumentasi Public CSV to REST API — Portal Open Data BMKG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/bmkg-theme.css?v=2.1.0">
+  <style>
+    :root {
+      --bmkg-blue-deep: #003865;
+      --bmkg-blue: #005a9e;
+      --bmkg-blue-light: #0284c7;
+      --bmkg-blue-subtle: #f0f7ff;
+      --bmkg-green: #059669;
+      --bmkg-green-light: #ecfdf5;
+      --bmkg-orange: #d97706;
+      --bmkg-purple: #7c3aed;
+      --canvas-bg: #f8fafc;
+      --canvas-card: #ffffff;
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--canvas-bg);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* API Developer Action Sub-Navbar (Di Bawah Navbar Resmi BMKG) */
+    .api-docs-subnav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-light);
+      position: relative;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      padding: 0.65rem 2rem;
+    }
+    .api-docs-subnav-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .api-subnav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .api-subnav-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bmkg-blue-subtle);
+      border: 1px solid #bfdbfe;
+      color: var(--bmkg-blue-deep);
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.02em;
+    }
+    .api-subnav-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: #059669;
+      font-weight: 700;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+    }
+    .status-indicator-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+      animation: subnavDotPulse 2s infinite;
+    }
+    @keyframes subnavDotPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .api-subnav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .subnav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.42rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .subnav-btn-secondary {
+      background: #ffffff;
+      color: var(--bmkg-blue-deep);
+      border: 1px solid var(--border-medium);
+    }
+    .subnav-btn-secondary:hover {
+      background: var(--bmkg-blue-subtle);
+      border-color: var(--bmkg-blue-light);
+      transform: translateY(-1px);
+    }
+    .subnav-btn-accent {
+      background: #eff6ff;
+      color: #0284c7;
+      border: 1px solid #93c5fd;
+    }
+    .subnav-btn-accent:hover {
+      background: #dbeafe;
+      color: #0369a1;
+      border-color: #60a5fa;
+      transform: translateY(-1px);
+    }
+    .subnav-btn-primary {
+      background: var(--bmkg-blue-deep);
+      color: #ffffff;
+      border: 1px solid var(--bmkg-blue-deep);
+      box-shadow: 0 1px 2px rgba(0, 56, 101, 0.15);
+    }
+    .subnav-btn-primary:hover {
+      background: var(--bmkg-blue);
+      border-color: var(--bmkg-blue);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0, 56, 101, 0.25);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, #002244 0%, #003865 50%, #005a9e 100%);
+      color: #ffffff;
+      padding: 3rem 2rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+    }
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+    }
+    .hero-desc {
+      font-size: 1rem;
+      color: #e2e8f0;
+      max-width: 820px;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .hero-meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+    }
+    .meta-pill {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Layout Main */
+    .docs-layout {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-sticky {
+      position: sticky;
+      top: 5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .sidebar-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .sidebar-menu { list-style: none; }
+    .sidebar-menu li { margin-bottom: 0.35rem; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      color: var(--bmkg-blue-deep);
+      background: var(--bmkg-blue-subtle);
+      font-weight: 700;
+    }
+    .method-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .method-get { background: #dbeafe; color: #1e40af; }
+    .method-post { background: #dcfce7; color: #166534; }
+
+    /* Content Area */
+    .content-area { display: flex; flex-direction: column; gap: 2rem; }
+
+    .card-section {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .section-heading {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--bmkg-blue-deep);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-sub {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Endpoint Box */
+    .endpoint-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .endpoint-card:hover {
+      border-color: var(--bmkg-blue-light);
+      box-shadow: var(--shadow-md);
+    }
+    .endpoint-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.25rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+    }
+    .endpoint-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .endpoint-body {
+      padding: 1.25rem;
+    }
+    .endpoint-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    /* Params Table */
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+    }
+    .params-table th {
+      background: #f1f5f9;
+      color: var(--text-main);
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-medium);
+    }
+    .params-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+    .param-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--bmkg-blue-deep);
+    }
+    .param-type {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: #e2e8f0;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* Code Box */
+    .code-box-wrapper {
+      position: relative;
+      background: #0f172a;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-top: 0.75rem;
+    }
+    .code-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .code-content {
+      padding: 1rem;
+      color: #f8fafc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* Interactive Live Tester Console */
+    .tester-console {
+      background: #ffffff;
+      border: 2px solid var(--bmkg-blue-light);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--bmkg-blue-deep);
+      margin-bottom: 0.35rem;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus {
+      border-color: var(--bmkg-blue-light);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+    .btn-execute {
+      background: linear-gradient(135deg, var(--bmkg-blue-deep), var(--bmkg-blue));
+      color: #ffffff;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-execute:hover { opacity: 0.95; transform: translateY(-1px); }
+    .btn-execute:active { transform: translateY(0); }
+
+    /* Live Response Panel */
+    .response-panel {
+      margin-top: 1.25rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 1.25rem;
+    }
+    .response-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      font-size: 0.82rem;
+    }
+    .status-badge {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .latency-tag {
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+    }
+
+    /* Tabs for Code Snippets */
+    .tab-nav {
+      display: flex;
+      gap: 0.4rem;
+      border-bottom: 2px solid var(--border-light);
+      margin-bottom: 1rem;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab-btn.active {
+      color: var(--bmkg-blue-deep);
+      border-bottom-color: var(--bmkg-blue-deep);
+      font-weight: 700;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    .toast-msg.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 900px) {
+      .docs-layout { grid-template-columns: 1fr; }
+      .sidebar-sticky { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Official Portal BMKG Navbar (Identik dengan Seluruh Halaman Portal) -->
+    <!-- 1. Top Identity Bar -->
+  <div class="gov-identity-bar">
+    <div class="gov-identity-inner">
+      <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
+        <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
+        <span id="liveClockDate" style="color: #cbd5e1;"></span>
+        <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
+        <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
+      </div>
+      <script>
+        (function() {
+          function renderBmkgClock() {
+            var tElem = document.getElementById('liveClockTime');
+            var dElem = document.getElementById('liveClockDate');
+            if (!tElem || !dElem) return;
+            var now = new Date();
+            var dOpts = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+            dElem.textContent = now.toLocaleDateString('id-ID', dOpts);
+            var hh = String(now.getHours()).padStart(2, '0');
+            var mm = String(now.getMinutes()).padStart(2, '0');
+            var ss = String(now.getSeconds()).padStart(2, '0');
+            var offset = -now.getTimezoneOffset() / 60;
+            var tz = 'WIB';
+            if (offset === 8) tz = 'WITA';
+            else if (offset === 9) tz = 'WIT';
+            else if (offset !== 7) tz = (offset >= 0 ? 'UTC+' : 'UTC') + offset;
+            tElem.textContent = hh + ':' + mm + ':' + ss + ' ' + tz;
+          }
+          renderBmkgClock();
+          if (!window._bmkgClockInterval) {
+            window._bmkgClockInterval = setInterval(renderBmkgClock, 1000);
+          }
+        })();
+      </script>
+      <div class="gov-links">
+        <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
+        <a href="#kontak">Layanan Bantuan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Site Header with Official BMKG Logo -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="brand-section">
+        <div class="bmkg-official-logo">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-names">
+          <div class="brand-title">
+            Portal Data BMKG
+          </div>
+          <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+        </div>
+      </a>
+
+      <nav class="primary-nav">
+        <a href="/" class="">Beranda</a>
+        <a href="/dataset/" class="">Katalog Data</a>
+        <a href="/api/csv/docs" class="active" title="Akses Dokumentasi &amp; Endpoint Public REST API BMKG">
+          <i class="fa-solid fa-code"></i> REST API Publik
+        </a>
+        <a href="/#pilar">5 Pilar MKG</a>
+        <a href="/#peta">Peta Observasi</a>
+      </nav>
+
+      <div class="header-right-actions">
+        
+        
+          <button class="btn-interactive btn-header-login" onclick="openLoginModal()" title="Login Administrator / Pengelola Data BMKG">
+            <i class="fa-solid fa-lock"></i>
+            <span>Login</span>
+          </button>
+          <a href="/dataset/" class="btn-interactive btn-header-catalog" title="Jelajahi Katalog Data">
+            <i class="fa-solid fa-database"></i>
+            <span>Akses Data</span>
+          </a>
+        
+      </div>
+    </div>
+  </header>
+
+  
+    <!-- Modal Dialog Login Administrator BMKG (Khusus Pengelola Data / CRUD) -->
+<div class="bmkg-modal-overlay" id="loginModal" onclick="handleModalBackdropClick(event)">
+  <div class="login-dialog-card" onclick="event.stopPropagation()">
+    <div class="login-card-header">
+      <div style="width: 34px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+        <img src="/img/logo-bmkg.png" alt="Logo BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: #ffffff; line-height: 1.2;" id="modalHeaderTitle">Portal Data BMKG</h3>
+        <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 2px;" id="modalHeaderSubtitle">Login Administrator &amp; Pengelola Data (CRUD)</div>
+      </div>
+      <button class="login-close-btn" onclick="closeLoginModal()" title="Tutup Dialog">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="login-card-body">
+      <!-- Banner Informasi Hak Akses Publik vs Admin (Ringkas & Informatif) -->
+      <div class="login-info-banner">
+        <i class="fa-solid fa-circle-info" style="color: var(--bmkg-blue); font-size: 1rem; margin-top: 2px; flex-shrink: 0;"></i>
+        <div>
+          <strong style="color: var(--bmkg-blue-deep); display: block; margin-bottom: 2px; font-size: 0.78rem;">Data Terbuka untuk Publik (Bebas Akses):</strong>
+          Unduh dataset &amp; API publik <strong>tidak memerlukan login</strong>. Form ini khusus bagi <strong>Administrator / Pengelola Data BMKG</strong>.
+        </div>
+      </div>
+
+      <form id="loginForm" action="/user/login" method="post" onsubmit="handleLoginSubmit(event)">
+        
+<input type="hidden" name="_csrf_token" value="IjllNjYyMWEyMzk0ODRiZDUyY2M1YjUyODg3M2JlMzI3M2M1YTAwMmMi.atW45g.YhkiQdSmxg7vgxLoY_X6ctQLEfA"/>
+        <input type="hidden" name="came_from" value="/ckan-admin/">
+
+        <div class="form-group" id="formGroupIdentifier">
+          <label id="labelIdentifier">Username / NIP Pegawai BMKG</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user-shield input-icon"></i>
+            <input type="text" name="login" id="loginIdentifier" class="form-control-input with-icon"
+              placeholder="contoh: admin_bmkg atau NIP" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Kata Sandi Administrator</label>
+          <div class="password-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" name="password" id="loginPassword" class="form-control-input with-icon with-eye"
+              placeholder="Masukkan kata sandi akun" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Sandi">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; font-size: 0.78rem;">
+          <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); cursor: pointer; user-select: none;">
+            <input type="checkbox" name="remember" value="63072000" checked> Ingat sesi login
+          </label>
+          <a href="#" onclick="alert('Silakan hubungi Administrator Pusdatin BMKG untuk pemulihan akun'); return false;" style="color: var(--bmkg-blue); text-decoration: none; font-weight: 600;">Lupa Sandi?</a>
+        </div>
+
+        <button type="submit" class="btn-interactive btn-login-submit">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span id="btnLoginText">Masuk sebagai Administrator</span>
+        </button>
+      </form>
+
+      <div class="login-footer-security">
+        <i class="fa-solid fa-shield-halved" style="color: var(--bmkg-green);"></i>
+        Terproteksi Single Sign-On (SSO) Pusdatin BMKG &amp; Enkripsi TLS 1.3
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      var idInput = document.getElementById('loginIdentifier');
+      if (idInput) idInput.focus();
+    }, 80);
+  }
+
+  function closeLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function handleModalBackdropClick(e) {
+    if (e.target.id === 'loginModal') {
+      closeLoginModal();
+    }
+  }
+
+  function togglePasswordVisibility(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    } else {
+      input.type = 'password';
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  }
+
+  function handleLoginSubmit(e) {
+    return true;
+  }
+</script>
+  
+
+  <!-- 2. Developer Action Sub-Navbar (Fitur Eksisting OpenAPI, Postman, Live Tester & Kembali ke Portal) -->
+  <nav class="api-docs-subnav" aria-label="Aksi Dokumentasi API">
+    <div class="api-docs-subnav-inner">
+      <div class="api-subnav-left">
+        <div class="api-subnav-badge">
+          <i class="fa-solid fa-code"></i>
+          <span>Public CSV REST API</span>
+        </div>
+        <div class="api-subnav-status">
+          <span class="status-indicator-dot"></span>
+          <span>Live v1.0.0 Online • CORS Aktif • Tanpa Token</span>
+        </div>
+      </div>
+      <div class="api-subnav-right">
+        <a href="/api/csv/openapi.json" target="_blank" class="subnav-btn subnav-btn-secondary" title="Unduh Spesifikasi OpenAPI 3.0 (JSON)">
+          <i class="fa-solid fa-file-code"></i>
+          <span>OpenAPI 3.0</span>
+        </a>
+        <a href="/docs/BMKG_Public_CSV_REST_API.postman_collection.json" download class="subnav-btn subnav-btn-secondary" title="Unduh Postman Collection v2.1">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Postman Collection</span>
+        </a>
+        <a href="#tester" class="subnav-btn subnav-btn-accent" title="Langsung Coba di Live API Tester Console">
+          <i class="fa-solid fa-terminal"></i>
+          <span>Live Tester</span>
+        </a>
+        <a href="/dataset/" class="subnav-btn subnav-btn-primary" title="Kembali ke Katalog Dataset Utama Portal BMKG">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Portal</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 3. Hero Section -->
+  <section class="hero-banner">
+    <div class="hero-container">
+      <div class="hero-badge">
+        <i class="fa-solid fa-bolt"></i> Open Data API v1.0.0
+      </div>
+      <h1 class="hero-title">CSV to Public REST API Engine</h1>
+      <p class="hero-desc">
+        Akses programmatic bebas hambatan ke seluruh dataset berformat CSV di 5 Pilar Layanan BMKG (Meteorologi, Klimatologi, Geofisika, Instrumen MKG, Modifikasi Cuaca). Mendukung format JSON terstruktur, stream CSV murni (RFC 4180), penyaringan kolom spesifik, pencarian teks bebas, sortir, paginasi, dan skema statistik otomatis tanpa memerlukan API key / login.
+      </p>
+      <div class="hero-meta-pills">
+        <div class="meta-pill"><i class="fa-solid fa-unlock-keyhole" style="color: #4ade80;"></i> Autentikasi: Terbuka Bebas (Tanpa Token)</div>
+        <div class="meta-pill"><i class="fa-solid fa-globe" style="color: #38bdf8;"></i> CORS: Aktif (*)</div>
+        <div class="meta-pill"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i> Format: JSON &amp; CSV Stream</div>
+        <div class="meta-pill"><i class="fa-solid fa-scale-balanced" style="color: #cbd5e1;"></i> Lisensi: CC-BY 4.0 / SDI Perpres 39/2019</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Layout Documentation & Live Tester -->
+  <main class="docs-layout">
+
+    <!-- Sidebar Sticky Navigation -->
+    <aside>
+      <div class="sidebar-sticky">
+        <div class="sidebar-title">Daftar Endpoint API</div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#katalog-csv" class="sidebar-link">
+              <span class="method-badge method-get">GET</span> /api/csv/datasets
+            </a>
+          </li>
+          <li>
+            <a href="#data-json" class="sidebar-link">
+              <span class="method-badge method-get">GET</span> /api/csv/{slug}
+            </a>
+          </li>
+          <li>
+            <a href="#stream-csv" class="sidebar-link">
+              <span class="method-badge method-get">GET</span> /api/csv/{slug}.csv
+            </a>
+          </li>
+          <li>
+            <a href="#skema-kolom" class="sidebar-link">
+              <span class="method-badge method-get">GET</span> /api/csv/{slug}/schema
+            </a>
+          </li>
+          <li>
+            <a href="#remote-csv" class="sidebar-link">
+              <span class="method-badge method-get">GET</span> /api/csv/remote
+            </a>
+          </li>
+          <li>
+            <a href="#convert-csv" class="sidebar-link">
+              <span class="method-badge method-post">POST</span> /api/csv/convert
+            </a>
+          </li>
+          <li>
+            <a href="#live-tester" class="sidebar-link active">
+              <i class="fa-solid fa-play" style="color: var(--bmkg-blue-light);"></i> Konsol Uji Coba Langsung
+            </a>
+          </li>
+          <li>
+            <a href="#code-snippets" class="sidebar-link">
+              <i class="fa-solid fa-code"></i> Contoh Script Integrasi
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="content-area">
+
+      <!-- Interactive Live Console -->
+      <section class="tester-console" id="live-tester">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--bmkg-blue-deep); display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-flask-vial" style="color: var(--bmkg-blue-light);"></i>
+              Konsol Interaktif Uji Coba API (Live Playground)
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Kirim permintaan HTTP secara nyata ke server dan periksa keluaran respons JSON / CSV secara langsung.
+            </p>
+          </div>
+          <span style="font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 700;">
+            CORS Enabled
+          </span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: span 2;">
+            <label for="testerDataset">Pilih Dataset CSV BMKG:</label>
+            <select id="testerDataset" class="form-control" onchange="updateTesterUrl()">
+              <option value="cuaca-harian-cengkareng">cuaca-harian-cengkareng (Meteorologi - Observasi Harian Soetta)</option>
+              <option value="curah-hujan-dasarian">curah-hujan-dasarian (Klimatologi - Curah Hujan Dasarian)</option>
+              <option value="kualitas-udara-pm25">kualitas-udara-pm25 (Kualitas Udara - PM2.5 Kemayoran)</option>
+              <option value="kerapatan-petir-jabar">kerapatan-petir-jabar (Geofisika - Petir CG Jawa Barat)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="testerFormat">Sub-Endpoint / Format:</label>
+            <select id="testerFormat" class="form-control" onchange="updateTesterUrl()">
+              <option value="json">JSON Data (/api/csv/{slug})</option>
+              <option value="csv">Stream CSV (/api/csv/{slug}.csv)</option>
+              <option value="schema">Metadata Skema (/api/csv/{slug}/schema)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="testerLimit">Limit Baris (?limit=):</label>
+            <input type="number" id="testerLimit" class="form-control" value="5" min="1" max="1000" oninput="updateTesterUrl()">
+          </div>
+
+          <div class="form-group">
+            <label for="testerOffset">Offset Paginasi (?offset=):</label>
+            <input type="number" id="testerOffset" class="form-control" value="0" min="0" oninput="updateTesterUrl()">
+          </div>
+
+          <div class="form-group">
+            <label for="testerQ">Pencarian Teks (?q=):</label>
+            <input type="text" id="testerQ" class="form-control" placeholder="kata kunci pencarian..." oninput="updateTesterUrl()">
+          </div>
+
+          <div class="form-group">
+            <label for="testerSort">Pengurutan (?sort=):</label>
+            <input type="text" id="testerSort" class="form-control" placeholder="contoh: tanggal desc" oninput="updateTesterUrl()">
+          </div>
+        </div>
+
+        <!-- URL Preview -->
+        <div style="background: #f1f5f9; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 0.65rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #0f172a; word-break: break-all;">
+            <strong style="color: #0284c7;">GET</strong> <span id="testerTargetUrl">/api/csv/cuaca-harian-cengkareng?limit=5</span>
+          </div>
+          <button type="button" class="btn-copy" onclick="copyCurrentTargetUrl()" style="background: #ffffff; color: var(--text-main); border-color: var(--border-medium); margin-left: 0.5rem;">
+            <i class="fa-regular fa-copy"></i> Salin URL
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn-execute" onclick="executeTesterQuery()" id="btnRunQuery">
+            <i class="fa-solid fa-play"></i> Jalankan Permintaan (Send Request)
+          </button>
+          <a href="#" id="testerDirectLink" target="_blank" class="btn-nav btn-nav-secondary" style="padding: 0.7rem 1rem;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka di Tab Baru
+          </a>
+        </div>
+
+        <!-- Live Response Viewer -->
+        <div class="response-panel" id="responsePanel" style="display: none;">
+          <div class="response-status-bar">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span class="status-badge" id="responseStatusBadge">200 OK</span>
+              <span style="font-size: 0.78rem; color: var(--text-muted);" id="responseContentType">application/json</span>
+            </div>
+            <div class="latency-tag" id="responseLatencyTag"><i class="fa-regular fa-clock"></i> 24 ms</div>
+          </div>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>RESPON OUTPUT DATA</span>
+              <button class="btn-copy" onclick="copySnippetText('liveResponseOutput')">
+                <i class="fa-regular fa-copy"></i> Salin JSON
+              </button>
+            </div>
+            <pre class="code-content" id="liveResponseOutput" style="max-height: 380px;">Memuat data...</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1. Endpoint: Katalog Dataset CSV -->
+      <section class="card-section" id="katalog-csv">
+        <h2 class="section-heading">
+          <span class="method-badge method-get" style="font-size: 0.85rem;">GET</span>
+          /api/csv/datasets &amp; /api/csv/list
+        </h2>
+        <p class="section-sub">
+          Mengembalikan daftar seluruh dataset CSV terbuka yang terdaftar di Portal Open Data BMKG beserta metadata spesifik, pilar, dan URL endpoint masing-masing.
+        </p>
+
+        <h4 style="font-size: 0.88rem; font-weight: 700; margin-bottom: 0.5rem;">Parameter Query:</h4>
+        <table class="params-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Tipe</th>
+              <th>Wajib</th>
+              <th>Deskripsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="param-name">q</span></td>
+              <td><span class="param-type">string</span></td>
+              <td>Opsional</td>
+              <td>Kata kunci pencarian untuk memfilter judul atau deskripsi dataset.</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">pillar</span></td>
+              <td><span class="param-type">string</span></td>
+              <td>Opsional</td>
+              <td>Filter berdasarkan 5 pilar BMKG: <code>meteorologi</code>, <code>klimatologi</code>, <code>geofisika</code>, <code>instrumen-mkg</code>, <code>modifikasi-cuaca</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="code-box-wrapper">
+          <div class="code-box-header">
+            <span>CONTOH RESPON JSON</span>
+            <button class="btn-copy" onclick="copySnippetText('codeRespDatasets')"><i class="fa-regular fa-copy"></i> Salin</button>
+          </div>
+          <pre class="code-content" id="codeRespDatasets">{
+  "success": true,
+  "total_datasets": 4,
+  "datasets": [
+    {
+      "name": "cuaca-harian-cengkareng",
+      "title": "Data Observasi Cuaca Harian Permukaan Stasiun Soekarno-Hatta",
+      "pilar": "meteorologi",
+      "organization": "BBMKG Wilayah II",
+      "endpoints": {
+        "json": "https://data.bmkg.go.id/api/csv/cuaca-harian-cengkareng",
+        "csv_stream": "https://data.bmkg.go.id/api/csv/cuaca-harian-cengkareng.csv",
+        "schema": "https://data.bmkg.go.id/api/csv/cuaca-harian-cengkareng/schema"
+      }
+    }
+  ]
+}</pre>
+        </div>
+      </section>
+
+      <!-- 2. Endpoint: JSON Data -->
+      <section class="card-section" id="data-json">
+        <h2 class="section-heading">
+          <span class="method-badge method-get" style="font-size: 0.85rem;">GET</span>
+          /api/csv/{dataset_slug}
+        </h2>
+        <p class="section-sub">
+          Mengambil baris observasi data CSV dalam bentuk JSON berstruktur lengkap dengan informasi pagination, total record, dan metadata filter.
+        </p>
+
+        <h4 style="font-size: 0.88rem; font-weight: 700; margin-bottom: 0.5rem;">Parameter Query:</h4>
+        <table class="params-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Tipe</th>
+              <th>Default</th>
+              <th>Deskripsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="param-name">limit</span></td>
+              <td><span class="param-type">integer</span></td>
+              <td>100</td>
+              <td>Jumlah baris data yang dikembalikan (maksimal 10.000 baris per panggilan). Set 0 untuk semua.</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">offset</span></td>
+              <td><span class="param-type">integer</span></td>
+              <td>0</td>
+              <td>Indeks data awal untuk mendukung paginasi data berskala besar.</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">q</span></td>
+              <td><span class="param-type">string</span></td>
+              <td>-</td>
+              <td>Pencarian teks bebas yang dicocokkan ke semua kolom data.</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">sort</span></td>
+              <td><span class="param-type">string</span></td>
+              <td>-</td>
+              <td>Pengurutan data berdasarkan nama kolom, contoh: <code>tanggal desc</code> atau <code>suhu_max asc</code>.</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">&lt;nama_kolom&gt;</span></td>
+              <td><span class="param-type">string</span></td>
+              <td>-</td>
+              <td>Penyaringan langsung pada nilai kolom spesifik, contoh: <code>?provinsi=Jawa+Barat</code> atau <code>?stasiun_id=96749</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 3. Endpoint: CSV Stream & Schema -->
+      <section class="card-section" id="stream-csv">
+        <h2 class="section-heading">
+          <span class="method-badge method-get" style="font-size: 0.85rem;">GET</span>
+          /api/csv/{dataset_slug}.csv &amp; /api/csv/{dataset_slug}/schema
+        </h2>
+        <p class="section-sub">
+          <strong>Stream CSV:</strong> Mengalirkan berkas CSV murni standar RFC 4180 (sangat ramah untuk pembacaan langsung di Python Pandas, R <code>read.csv</code>, dan Excel). Tambahkan <code>?download=1</code> untuk memicu unduhan file.<br>
+          <strong>Skema Kolom:</strong> Menghasilkan tipe data terinferensi (numeric/text), ringkasan statistik (min, max, mean), jumlah nilai non-null, dan sampel data.
+        </p>
+      </section>
+
+      <!-- 4. Endpoint: Remote CSV Proxy & Converter -->
+      <section class="card-section" id="remote-csv">
+        <h2 class="section-heading">
+          <span class="method-badge method-get" style="font-size: 0.85rem;">GET</span> /api/csv/remote &nbsp;&bull;&nbsp;
+          <span class="method-badge method-post" style="font-size: 0.85rem;">POST</span> /api/csv/convert
+        </h2>
+        <p class="section-sub">
+          Fitur konversi mandiri publik. Konversikan berkas CSV apa pun (melalui URL publik atau payload upload) menjadi REST API endpoint terstruktur seketika dengan filter, sorting, dan kalkulasi skema otomatis.
+        </p>
+      </section>
+
+      <!-- 5. Multi-Language Code Snippets -->
+      <section class="card-section" id="code-snippets">
+        <h2 class="section-heading">
+          <i class="fa-solid fa-code" style="color: var(--bmkg-blue-light);"></i>
+          Cuplikan Kode Pemanggilan API (Siap Pakai)
+        </h2>
+        <p class="section-sub">
+          Gunakan cuplikan kode di bawah ini untuk mengintegrasikan data BMKG secara langsung ke dalam sistem atau aplikasi Anda:
+        </p>
+
+        <div class="tab-nav">
+          <button type="button" class="tab-btn active" onclick="switchSnippetTab('curl', this)">cURL</button>
+          <button type="button" class="tab-btn" onclick="switchSnippetTab('python-req', this)">Python (Requests)</button>
+          <button type="button" class="tab-btn" onclick="switchSnippetTab('python-pandas', this)">Python (Pandas)</button>
+          <button type="button" class="tab-btn" onclick="switchSnippetTab('js-fetch', this)">JavaScript (Fetch)</button>
+          <button type="button" class="tab-btn" onclick="switchSnippetTab('php', this)">PHP</button>
+          <button type="button" class="tab-btn" onclick="switchSnippetTab('r', this)">R</button>
+        </div>
+
+        <div class="code-box-wrapper">
+          <div class="code-box-header">
+            <span id="activeSnippetLangLabel">cURL Terminal Command</span>
+            <button class="btn-copy" onclick="copySnippetText('activeCodeSnippet')"><i class="fa-regular fa-copy"></i> Salin Kode</button>
+          </div>
+          <pre class="code-content" id="activeCodeSnippet"># Ambil 10 baris observasi cuaca dalam format JSON
+curl -X GET "http://localhost:5000/api/csv/cuaca-harian-cengkareng?limit=10"
+
+# Unduh langsung berkas stream CSV
+curl -X GET "http://localhost:5000/api/csv/cuaca-harian-cengkareng.csv" -o cuaca_cengkareng.csv</pre>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 5. Official BMKG Institutional Footer -->
+  <!-- 6. Institutional Footer with Official Logo -->
+<footer class="gov-footer" id="kontak">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-brand-header">
+        <div class="footer-logo-svg">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div>
+          <h4 style="margin-bottom: 2px;">Portal Data BMKG</h4>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
+        </div>
+      </div>
+      <p>
+        Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)<br>
+        Jl. Angkasa I No. 2, Kemayoran, Jakarta Pusat 10610<br>
+        Email: portaldata@bmkg.go.id • Call Center: 196
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>5 Pilar Layanan</h4>
+      <ul>
+        <li><a href="/dataset/?groups=meteorologi">Katalog Meteorologi</a></li>
+        <li><a href="/dataset/?groups=klimatologi">Katalog Klimatologi</a></li>
+        <li><a href="/dataset/?groups=geofisika">Katalog Geofisika</a></li>
+        <li><a href="/dataset/?groups=instrumen-mkg">Katalog Instrumen MKG</a></li>
+        <li><a href="/dataset/?groups=modifikasi-cuaca">Katalog Modifikasi Cuaca</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Akses Pengembang</h4>
+      <ul>
+        <li><a href="/api/csv/docs" target="_blank" style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-code"></i> Public CSV REST API</a></li>
+        <li><a href="/api/csv/datasets" target="_blank">Katalog API Dataset CSV</a></li>
+        <li><a href="/api/3/action/package_list" target="_blank">CKAN 2.12 Action API</a></li>
+        <li><a href="/api/3/action/help_show?name=datastore_search" target="_blank">DataStore SQL Query</a></li>
+        <li><a href="/api/gempa/realtime" target="_blank">Real-time Seismik API</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Kepatuhan &amp; Regulasi</h4>
+      <ul>
+        <li><a href="https://data.go.id" target="_blank">Perpres No. 39 Tahun 2019 (SDI)</a></li>
+        <li><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Lisensi Terbuka CC-BY 4.0</a></li>
+        <li><a href="https://wmo.int" target="_blank">Prinsip Data Terbuka WMO</a></li>
+        <li><a href="#">Standar Metadata Nasional</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom-bar">
+    <div>&copy; 2026 Badan Meteorologi, Klimatologi, dan Geofisika. Hak Cipta Dilindungi Undang-Undang.</div>
+    <div>Platform CKAN 2.12 Stable • Native Ubuntu 22.04 LTS Stack</div>
+  </div>
+</footer>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsg">
+    <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+    <span id="toastText">Tersalin ke papan klip!</span>
+  </div>
+
+  <script>
+    // Inisialisasi URL Target
+    function getBaseApiUrl() {
+      return window.location.origin;
+    }
+
+    function buildCurrentTesterUrl() {
+      const base = getBaseApiUrl();
+      const ds = document.getElementById('testerDataset').value;
+      const fmt = document.getElementById('testerFormat').value;
+      const limit = document.getElementById('testerLimit').value;
+      const offset = document.getElementById('testerOffset').value;
+      const q = document.getElementById('testerQ').value.trim();
+      const sort = document.getElementById('testerSort').value.trim();
+
+      let path = `/api/csv/${ds}`;
+      if (fmt === 'csv') path += '.csv';
+      else if (fmt === 'schema') path += '/schema';
+
+      const params = new URLSearchParams();
+      if (fmt !== 'csv' && fmt !== 'schema') {
+        if (limit) params.set('limit', limit);
+        if (offset && offset !== '0') params.set('offset', offset);
+        if (q) params.set('q', q);
+        if (sort) params.set('sort', sort);
+      } else if (fmt === 'csv') {
+        if (limit) params.set('limit', limit);
+      }
+
+      const qs = params.toString();
+      return path + (qs ? '?' + qs : '');
+    }
+
+    function updateTesterUrl() {
+      const relUrl = buildCurrentTesterUrl();
+      document.getElementById('testerTargetUrl').textContent = relUrl;
+      const fullUrl = getBaseApiUrl() + relUrl;
+      document.getElementById('testerDirectLink').href = fullUrl;
+      updateCodeSnippets(fullUrl);
+    }
+
+    function copyCurrentTargetUrl() {
+      const fullUrl = getBaseApiUrl() + buildCurrentTesterUrl();
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        showToast('URL Endpoint berhasil disalin!');
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      document.getElementById('toastText').textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function copySnippetText(elemId) {
+      const txt = document.getElementById(elemId).textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        showToast('Teks berhasil disalin ke papan klip!');
+      });
+    }
+
+    // Eksekusi Live Request ke Server
+    async function executeTesterQuery() {
+      const relUrl = buildCurrentTesterUrl();
+      const fullUrl = getBaseApiUrl() + relUrl;
+      const btn = document.getElementById('btnRunQuery');
+      const panel = document.getElementById('responsePanel');
+      const output = document.getElementById('liveResponseOutput');
+      const badge = document.getElementById('responseStatusBadge');
+      const cType = document.getElementById('responseContentType');
+      const latencyTag = document.getElementById('responseLatencyTag');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengambil Data...';
+      panel.style.display = 'block';
+      output.textContent = 'Menghubungkan ke endpoint BMKG...';
+
+      const t0 = performance.now();
+      try {
+        const resp = await fetch(fullUrl);
+        const t1 = performance.now();
+        const duration = Math.round(t1 - t0);
+
+        badge.textContent = `${resp.status} ${resp.statusText || 'OK'}`;
+        badge.style.background = resp.ok ? '#ecfdf5' : '#fef2f2';
+        badge.style.color = resp.ok ? '#065f46' : '#991b1b';
+        badge.style.borderColor = resp.ok ? '#a7f3d0' : '#fecaca';
+
+        const contentType = resp.headers.get('content-type') || 'text/plain';
+        cType.textContent = contentType.split(';')[0];
+        latencyTag.innerHTML = `<i class="fa-regular fa-clock"></i> ${duration} ms`;
+
+        if (contentType.includes('application/json')) {
+          const json = await resp.json();
+          output.textContent = JSON.stringify(json, null, 2);
+        } else {
+          const text = await resp.text();
+          output.textContent = text;
+        }
+      } catch (err) {
+        badge.textContent = 'Gagal';
+        badge.style.background = '#fef2f2';
+        badge.style.color = '#991b1b';
+        output.textContent = 'Error koneksi: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Jalankan Permintaan (Send Request)';
+      }
+    }
+
+    // Code Snippets Manager
+    let _activeTab = 'curl';
+    const SNIPPETS = {
+      'curl': (url) => `# Request cURL Terminal
+curl -X GET "${url}"`,
+      'python-req': (url) => `import requests
+
+# Pemanggilan endpoint JSON
+url = "${url}"
+response = requests.get(url)
+data = response.json()
+
+if data.get("success"):
+    meta = data["meta"]
+    print(f"Total baris tersedia: {meta['total_records']}")
+    print("Contoh record:", data["data"][:2])`,
+      'python-pandas': (url) => `import pandas as pd
+
+# Baca data CSV langsung ke DataFrame melalui endpoint BMKG
+csv_url = "${url.replace(/\?.*$/, '')}.csv"
+df = pd.read_csv(csv_url)
+
+print("Dimensi dataset:", df.shape)
+print(df.head())`,
+      'js-fetch': (url) => `// JavaScript (Browser & Node.js 18+)
+fetch("${url}")
+  .then(res => res.json())
+  .then(json => {
+    console.log("Status:", json.success);
+    console.log("Meta:", json.meta);
+    console.table(json.data);
+  })
+  .catch(err => console.error("Error:", err));`,
+      'php': (url) => `<?php
+$url = "${url}";
+$response = file_get_contents($url);
+$data = json_decode($response, true);
+
+if ($data && $data['success']) {
+    echo "Total Data: " . $data['meta']['total_records'] . "\\n";
+    print_r($data['data']);
+}`,
+      'r': (url) => `# Membaca Stream CSV langsung ke R DataFrame
+csv_url <- "${url.replace(/\?.*$/, '')}.csv"
+df <- read.csv(csv_url)
+summary(df)`
+    };
+
+    function updateCodeSnippets(url) {
+      const codeElem = document.getElementById('activeCodeSnippet');
+      if (codeElem && SNIPPETS[_activeTab]) {
+        codeElem.textContent = SNIPPETS[_activeTab](url);
+      }
+    }
+
+    function switchSnippetTab(tabKey, btn) {
+      _activeTab = tabKey;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const labels = {
+        'curl': 'cURL Terminal Command',
+        'python-req': 'Python Requests (JSON)',
+        'python-pandas': 'Python Pandas (DataFrame)',
+        'js-fetch': 'JavaScript Modern Fetch API',
+        'php': 'PHP file_get_contents',
+        'r': 'R Data Science Script'
+      };
+      document.getElementById('activeSnippetLangLabel').textContent = labels[tabKey] || tabKey;
+      const fullUrl = getBaseApiUrl() + buildCurrentTesterUrl();
+      updateCodeSnippets(fullUrl);
+    }
+
+    // Init pada pemuatan halaman
+    window.addEventListener('DOMContentLoaded', () => {
+      updateTesterUrl();
+    });
+  </script>
+</body>
+</html>
