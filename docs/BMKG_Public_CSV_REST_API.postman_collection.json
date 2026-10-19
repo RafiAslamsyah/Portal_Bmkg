@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "bmkg-public-csv-rest-api-v1",
+		"name": "BMKG - Public CSV REST API Collection",
+		"description": "Koleksi lengkap REST API resmi terbuka Portal Data BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) untuk seluruh dataset observasi CSV 5 pilar (Perpres No. 39/2019 Satu Data Indonesia & WMO Open Data Policy).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Dokumentasi & Spek API",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/csv/docs",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "docs"]
+				},
+				"description": "Mengambil deskripsi layanan, daftar endpoint resmi, dan contoh pemanggilan kode."
+			}
+		},
+		{
+			"name": "2. Spesifikasi Standar OpenAPI 3.0",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/csv/openapi.json",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "openapi.json"]
+				},
+				"description": "Mengambil spesifikasi OpenAPI 3.0 resmi untuk integrasi Swagger UI, Postman, atau SDK generator."
+			}
+		},
+		{
+			"name": "3. Katalog Seluruh Dataset CSV Terbuka",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/datasets",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "datasets"]
+				},
+				"description": "Daftar seluruh paket dataset CSV publik yang tersedia di BMKG."
+			}
+		},
+		{
+			"name": "4. Filter Dataset Pilar Klimatologi",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/datasets?pillar=klimatologi",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "datasets"],
+					"query": [
+						{
+							"key": "pillar",
+							"value": "klimatologi"
+						}
+					]
+				},
+				"description": "Memfilter katalog dataset hanya untuk pilar Klimatologi."
+			}
+		},
+		{
+			"name": "5. Data Observasi Cuaca JSON (Limit)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/cuaca-harian-cengkareng?limit=5",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "cuaca-harian-cengkareng"],
+					"query": [
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				},
+				"description": "Mengambil 5 baris observasi cuaca dalam format JSON terstruktur."
+			}
+		},
+		{
+			"name": "6. Stream Berkas Mentah CSV (RFC 4180)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/cuaca-harian-cengkareng.csv",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "cuaca-harian-cengkareng.csv"]
+				},
+				"description": "Mengalirkan data mentah format CSV siap pakai untuk Pandas read_csv atau R."
+			}
+		},
+		{
+			"name": "7. Metadata Skema & Statistik Kolom",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/cuaca-harian-cengkareng/schema",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "cuaca-harian-cengkareng", "schema"]
+				},
+				"description": "Menganalisis tipe data tiap kolom dan menghitung ringkasan statistik (min, max, mean)."
+			}
+		},
+		{
+			"name": "8. Filter Kolom Spesifik (Curah Hujan Dasarian)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/curah-hujan-dasarian?provinsi=Jawa+Barat",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "curah-hujan-dasarian"],
+					"query": [
+						{
+							"key": "provinsi",
+							"value": "Jawa Barat"
+						}
+					]
+				},
+				"description": "Menyaring baris data berdasarkan nilai kolom spesifik (misal provinsi)."
+			}
+		},
+		{
+			"name": "9. Pencarian Kata Kunci Teks Bebas (Kerapatan Petir)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/kerapatan-petir-jabar?q=Bandung",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "kerapatan-petir-jabar"],
+					"query": [
+						{
+							"key": "q",
+							"value": "Bandung"
+						}
+					]
+				},
+				"description": "Mencari kata kunci bebas di semua kolom tabel data."
+			}
+		},
+		{
+			"name": "10. Pengurutan Data (Sort Column)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/cuaca-harian-cengkareng?sort=suhu_max desc&limit=5",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "cuaca-harian-cengkareng"],
+					"query": [
+						{
+							"key": "sort",
+							"value": "suhu_max desc"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				},
+				"description": "Mengurutkan data berdasarkan nilai kolom tertentu secara descending."
+			}
+		},
+		{
+			"name": "11. Konversi URL CSV Eksternal ke API (Remote Proxy)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/csv/remote?url=https://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv&limit=5",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "remote"],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				},
+				"description": "Mengonversi berkas CSV publik mana pun di internet menjadi REST API endpoint seketika."
+			}
+		},
+		{
+			"name": "12. Upload & Konversi Teks CSV ke API",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"filename\": \"observasi_lapangan.csv\",\n  \"csv_data\": \"Tanggal,Lokasi,Suhu_C,Kelembapan\\n2026-08-01,Stasiun A,28.5,80\\n2026-08-02,Stasiun B,29.1,75\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/csv/convert",
+					"host": ["{{base_url}}"],
+					"path": ["api", "csv", "convert"]
+				},
+				"description": "Mengirimkan teks data CSV untuk dikonversi menjadi data JSON berstruktur dan skema statistik otomatis."
+			}
+		}
+	]
+}

@@ -136,6 +136,11 @@ function renderDatasetCards() {
           <div class="format-pills-group">${formatBadges}${datastoreBadge}</div>
           <div class="temporal-range-tag"><i class="fa-regular fa-calendar"></i> ${escapeHtml(ds.temporalRange || '-')}</div>
           <div class="card-action-links">
+            ${formats.includes('csv') ? `
+              <button class="btn-interactive card-sub-btn" style="background:#e0f2fe; color:#0284c7; border-color:#bae6fd; font-weight:700;" onclick="if(window.openCsvApiModal){openCsvApiModal('${escapeHtml(ds.id)}')}else{alert('Akses REST API: /api/csv/${escapeHtml(ds.id)}')}" title="Akses Public REST API">
+                <i class="fa-solid fa-code"></i> API Endpoint
+              </button>
+            ` : ''}
             <button class="${previewBtnClass}" ${previewBtnStyle} title="${previewBtnTitle}" onclick="openPreviewModal('${escapeHtml(ds.id)}')">
               <i class="fa-solid ${previewBtnIcon}" style="${isGeoJSON ? 'color: #38bdf8;' : ''}"></i> ${previewBtnLabel}
             </button>

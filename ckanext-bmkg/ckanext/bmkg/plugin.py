@@ -439,9 +439,297 @@ def get_csv_api_docs():
             'r': f"df <- read.csv('{base_url}/api/csv/cuaca-harian-cengkareng.csv')"
         }
     }
+    # Jika diakses dari peramban web (Accept: text/html) dan tidak meminta format=json, tampilkan portal dokumentasi interaktif
+    accept = request.headers.get('Accept', '')
+    req_format = request.args.get('format', '').lower().strip()
+    is_html_browser = ('text/html' in accept) and (req_format != 'json') and ('format' not in request.args)
+    if is_html_browser:
+        try:
+            return toolkit.render('api/csv_docs.html', extra_vars={'doc_data': doc_data, 'base_url': base_url})
+        except Exception:
+            pass
+
     resp = jsonify(doc_data)
     resp.headers['Cache-Control'] = 'public, max-age=300'
     return _with_cors(resp)
+
+
+# ----------------------------------------------------------------------------
+# 1.1 SPESIFIKASI OPENAPI 3.0: GET /api/csv/openapi.json
+# ----------------------------------------------------------------------------
+@bmkg_api_blueprint.route('/api/csv/openapi.json', methods=['GET', 'OPTIONS'])
+def get_csv_openapi_spec():
+    """Mengembalikan spesifikasi standar OpenAPI 3.0 untuk ekosistem integrasi publik."""
+    if request.method == 'OPTIONS':
+        return _with_cors(make_response('', 204))
+
+    base_url = request.host_url.rstrip('/')
+    openapi_data = {
+        "openapi": "3.0.3",
+        "info": {
+            "title": "Portal Open Data BMKG - Public CSV REST API",
+            "description": "Endpoint REST API resmi BMKG untuk akses publik terhadap dataset observasi cuaca, iklim, geofisika, dan kualitas udara berformat CSV (Perpres 39/2019 Satu Data Indonesia & WMO Open Data Policy).",
+            "version": "1.0.0",
+            "contact": {
+                "name": "Pusat Data dan Informasi (Pusdatin) BMKG",
+                "email": "portaldata@bmkg.go.id",
+                "url": "https://www.bmkg.go.id"
+            },
+            "license": {
+                "name": "Creative Commons Attribution 4.0 International (CC-BY 4.0)",
+                "url": "https://creativecommons.org/licenses/by/4.0/"
+            }
+        },
+        "servers": [
+            {"url": f"{base_url}/api/csv", "description": "Server Utama Open Data BMKG"}
+        ],
+        "paths": {
+            "/datasets": {
+                "get": {
+                    "summary": "Katalog Seluruh Dataset CSV",
+                    "description": "Daftar seluruh dataset CSV terbuka yang tersedia di BMKG.",
+                    "parameters": [
+                        {"name": "q", "in": "query", "schema": {"type": "string"}, "description": "Pencarian kata kunci"},
+                        {"name": "pillar", "in": "query", "schema": {"type": "string"}, "description": "Filter 5 pilar MKG"}
+                    ],
+                    "responses": {"200": {"description": "Katalog dataset berhasil diambil"}}
+                }
+            },
+            "/{dataset_name}": {
+                "get": {
+                    "summary": "Data Observasi Berstruktur (JSON)",
+                    "description": "Mengambil isi dataset CSV dalam format JSON lengkap dengan filter dan paginasi.",
+                    "parameters": [
+                        {"name": "dataset_name", "in": "path", "required": True, "schema": {"type": "string"}, "description": "Slug atau ID dataset"},
+                        {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 100}, "description": "Jumlah record data"},
+                        {"name": "offset", "in": "query", "schema": {"type": "integer", "default": 0}, "description": "Offset awal paginasi"},
+                        {"name": "q", "in": "query", "schema": {"type": "string"}, "description": "Pencarian teks bebas"},
+                        {"name": "sort", "in": "query", "schema": {"type": "string"}, "description": "Pengurutan kolom"}
+                    ],
+                    "responses": {"200": {"description": "Record data berhasil diambil"}, "404": {"description": "Dataset tidak ditemukan"}}
+                }
+            },
+            "/{dataset_name}.csv": {
+                "get": {
+                    "summary": "Stream Berkas Mentah CSV (RFC 4180)",
+                    "description": "Mengalirkan file CSV mentah siap baca oleh Pandas, R, dan Excel.",
+                    "parameters": [
+                        {"name": "dataset_name", "in": "path", "required": True, "schema": {"type": "string"}},
+                        {"name": "download", "in": "query", "schema": {"type": "string"}, "description": "Set 1 untuk download attachment"}
+                    ],
+                    "responses": {"200": {"description": "Stream berkas CSV"}}
+                }
+            },
+            "/{dataset_name}/schema": {
+                "get": {
+                    "summary": "Skema Tipe Data dan Statistik Kolom",
+                    "description": "Ringkasan statistik min/max/mean, deteksi tipe data, dan sampel nilai kolom.",
+                    "parameters": [
+                        {"name": "dataset_name", "in": "path", "required": True, "schema": {"type": "string"}}
+                    ],
+                    "responses": {"200": {"description": "Skema kolom dataset"}}
+                }
+            },
+            "/remote": {
+                "get": {
+                    "summary": "Proxy & Konverter CSV Publik dari URL",
+                    "description": "Mengonversi berkas CSV dari URL publik mana pun menjadi REST API endpoint terstruktur seketika.",
+                    "parameters": [
+                        {"name": "url", "in": "query", "required": True, "schema": {"type": "string"}, "description": "URL berkas CSV publik"},
+                        {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 100}},
+                        {"name": "offset", "in": "query", "schema": {"type": "integer", "default": 0}},
+                        {"name": "q", "in": "query", "schema": {"type": "string"}},
+                        {"name": "sort", "in": "query", "schema": {"type": "string"}}
+                    ],
+                    "responses": {"200": {"description": "Hasil konversi CSV ke API JSON"}}
+                }
+            },
+            "/convert": {
+                "post": {
+                    "summary": "Konversi Berkas / Teks CSV ke API",
+                    "description": "Mengunggah berkas CSV atau teks CSV untuk dikonversi menjadi struktur API JSON beserta skemanya.",
+                    "responses": {"200": {"description": "Hasil konversi CSV"}}
+                }
+            }
+        }
+    }
+    resp = jsonify(openapi_data)
+    resp.headers['Cache-Control'] = 'public, max-age=3600'
+    return _with_cors(resp)
+
+
+# ----------------------------------------------------------------------------
+# 1.2 REMOTE CSV TO API PROXY: GET /api/csv/remote
+# ----------------------------------------------------------------------------
+@bmkg_api_blueprint.route('/api/csv/remote', methods=['GET', 'OPTIONS'])
+def query_remote_csv_to_api():
+    """Mengonversi berkas CSV dari URL publik mana pun menjadi REST API JSON seketika."""
+    if request.method == 'OPTIONS':
+        return _with_cors(make_response('', 204))
+
+    csv_url = request.args.get('url', '').strip()
+    if not csv_url:
+        return _with_cors(jsonify({
+            'success': False,
+            'error': 'Parameter ?url=<url_csv> wajib disertakan.',
+            'hint': 'Contoh: /api/csv/remote?url=https://example.com/data.csv&limit=10'
+        })), 400
+
+    if not (csv_url.startswith('http://') or csv_url.startswith('https://')):
+        return _with_cors(jsonify({
+            'success': False,
+            'error': 'URL harus diawali dengan http:// atau https://'
+        })), 400
+
+    try:
+        req = urllib.request.Request(csv_url, headers={'User-Agent': 'BMKG-OpenData-API/1.0'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            content = resp.read().decode('utf-8', errors='replace')
+
+        reader = csv.DictReader(io.StringIO(content))
+        fieldnames = reader.fieldnames or []
+        rows = list(reader)
+    except Exception as e:
+        return _with_cors(jsonify({
+            'success': False,
+            'error': f'Gagal mengunduh atau membaca CSV dari URL: {str(e)}'
+        })), 502
+
+    # Filter parameter
+    try:
+        limit = int(request.args.get('limit', 100))
+    except ValueError:
+        limit = 100
+    try:
+        offset = int(request.args.get('offset', 0))
+    except ValueError:
+        offset = 0
+
+    q_filter = request.args.get('q', '').strip()
+    sort_param = request.args.get('sort', '').strip()
+    standard_params = {'url', 'limit', 'offset', 'q', 'sort', 'format', '_'}
+    col_filters = {k: v for k, v in request.args.items() if k not in standard_params and v}
+
+    filtered = rows
+    if col_filters:
+        for col, val in col_filters.items():
+            val_clean = str(val).strip().lower()
+            filtered = [r for r in filtered if str(r.get(col, '')).strip().lower() == val_clean]
+
+    if q_filter:
+        q_clean = q_filter.lower()
+        filtered = [r for r in filtered if any(q_clean in str(v).lower() for v in r.values())]
+
+    if sort_param:
+        parts = sort_param.strip().split()
+        sort_col = parts[0]
+        sort_desc = len(parts) > 1 and parts[1].lower() == 'desc'
+        try:
+            filtered.sort(
+                key=lambda x: (
+                    float(x.get(sort_col, 0))
+                    if str(x.get(sort_col, '')).replace('.', '', 1).isdigit()
+                    else str(x.get(sort_col, ''))
+                ),
+                reverse=sort_desc
+            )
+        except Exception:
+            pass
+
+    total = len(filtered)
+    sliced = filtered[offset : offset + limit] if limit > 0 else filtered[offset:]
+    fields_meta = [{'id': fn, 'type': 'text'} for fn in fieldnames]
+
+    if request.args.get('schema') in ['1', 'true', 'yes']:
+        schema_summary = _compute_schema_summary(sliced, fields_meta)
+        return _with_cors(jsonify({
+            'success': True,
+            'source_url': csv_url,
+            'total_columns': len(schema_summary),
+            'columns': schema_summary
+        }))
+
+    resp_payload = {
+        'success': True,
+        'meta': {
+            'source_url': csv_url,
+            'engine': 'BMKG CSV to API Remote Converter',
+            'total_records': total,
+            'returned_records': len(sliced),
+            'limit': limit,
+            'offset': offset,
+            'fields': fieldnames,
+            'filters_applied': {
+                'q': q_filter or None,
+                'sort': sort_param or None,
+                'columns': col_filters or None
+            }
+        },
+        'data': sliced
+    }
+    resp = jsonify(resp_payload)
+    resp.headers['Cache-Control'] = 'public, max-age=60'
+    return _with_cors(resp)
+
+
+# ----------------------------------------------------------------------------
+# 1.3 CSV UPLOAD / STRING TO API CONVERTER: POST /api/csv/convert
+# ----------------------------------------------------------------------------
+@bmkg_api_blueprint.route('/api/csv/convert', methods=['POST', 'OPTIONS'])
+def convert_csv_to_api():
+    """Mengonversi file CSV yang diunggah atau teks mentah CSV menjadi struktur API JSON."""
+    if request.method == 'OPTIONS':
+        return _with_cors(make_response('', 204))
+
+    csv_text = ''
+    filename = 'uploaded.csv'
+
+    # 1. Cek unggahan file multipart
+    if 'file' in request.files:
+        f = request.files['file']
+        filename = f.filename or filename
+        csv_text = f.read().decode('utf-8', errors='replace')
+    # 2. Cek JSON payload { "csv_data": "..." }
+    elif request.is_json and request.json and 'csv_data' in request.json:
+        csv_text = request.json['csv_data']
+        filename = request.json.get('filename', filename)
+    # 3. Cek form data
+    elif request.form and 'csv_data' in request.form:
+        csv_text = request.form['csv_data']
+        filename = request.form.get('filename', filename)
+    # 4. Cek raw data di body
+    elif request.data:
+        csv_text = request.data.decode('utf-8', errors='replace')
+
+    if not csv_text.strip():
+        return _with_cors(jsonify({
+            'success': False,
+            'error': 'Data CSV tidak ditemukan. Kirimkan berkas multipart dengan key "file" atau form/JSON dengan key "csv_data".'
+        })), 400
+
+    try:
+        reader = csv.DictReader(io.StringIO(csv_text))
+        fieldnames = reader.fieldnames or []
+        rows = list(reader)
+    except Exception as e:
+        return _with_cors(jsonify({
+            'success': False,
+            'error': f'Gagal mengurai teks CSV: {str(e)}'
+        })), 400
+
+    fields_meta = [{'id': fn, 'type': 'text'} for fn in fieldnames]
+    schema_summary = _compute_schema_summary(rows, fields_meta)
+
+    return _with_cors(jsonify({
+        'success': True,
+        'filename': filename,
+        'total_records': len(rows),
+        'total_columns': len(fieldnames),
+        'fields': fieldnames,
+        'schema': schema_summary,
+        'sample_data': rows[:10],
+        'data': rows[:100]
+    }))
 
 
 # ----------------------------------------------------------------------------

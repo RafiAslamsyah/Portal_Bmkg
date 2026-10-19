@@ -488,6 +488,122 @@ Klimatologi, dan Geofisika' %}
           </div>
         </div>
 
+        <!-- Interactive Live Endpoint Tester Console -->
+        <div style="background: #ffffff; border: 2px solid var(--bmkg-blue-light); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: #e0f2fe; color: #0284c7; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                <i class="fa-solid fa-play"></i>
+              </span>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--bmkg-blue-deep); margin: 0;">Uji Coba Endpoint Langsung (Live API Playground)</h4>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Kirim request HTTP secara langsung dan lihat respon data JSON real-time dari server</div>
+              </div>
+            </div>
+            <span style="font-size: 0.72rem; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+              <i class="fa-solid fa-check"></i> CORS Aktif
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div>
+              <label style="display: block; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 0.25rem;">Limit Baris (?limit=):</label>
+              <input type="number" id="liveTesterLimit" value="5" min="1" max="1000" class="bmkg-input" style="padding: 0.4rem 0.6rem; font-size: 0.82rem;" oninput="updateLiveApiUrl()">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 0.25rem;">Offset Data (?offset=):</label>
+              <input type="number" id="liveTesterOffset" value="0" min="0" class="bmkg-input" style="padding: 0.4rem 0.6rem; font-size: 0.82rem;" oninput="updateLiveApiUrl()">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 0.25rem;">Pencarian Teks (?q=):</label>
+              <input type="text" id="liveTesterQ" placeholder="kata kunci..." class="bmkg-input" style="padding: 0.4rem 0.6rem; font-size: 0.82rem;" oninput="updateLiveApiUrl()">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 0.25rem;">Pengurutan (?sort=):</label>
+              <input type="text" id="liveTesterSort" placeholder="contoh: tanggal desc" class="bmkg-input" style="padding: 0.4rem 0.6rem; font-size: 0.82rem;" oninput="updateLiveApiUrl()">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.85rem;">
+            <div style="flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.45rem 0.75rem; color: #0f172a; word-break: break-all;">
+              <strong style="color: #0284c7;">GET</strong> <span id="liveTesterUrlPreview">/api/csv/{{ pkg.name }}?limit=5</span>
+            </div>
+            <button type="button" class="btn-interactive card-sub-btn" onclick="executeDatasetLiveApi('{{ pkg.name }}')" id="btnExecLiveApi" style="background: var(--bmkg-blue-deep); color: #ffffff; border-color: var(--bmkg-blue-deep); padding: 0.5rem 1rem; font-size: 0.82rem; white-space: nowrap;">
+              <i class="fa-solid fa-bolt"></i> Kirim Query
+            </button>
+          </div>
+
+          <!-- Live Output Panel -->
+          <div id="liveTesterResultBox" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 0.75rem; margin-top: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.78rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span id="liveTesterStatus" style="font-weight: 800; font-family: 'JetBrains Mono', monospace; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 4px;">200 OK</span>
+                <span id="liveTesterLatency" style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">18 ms</span>
+              </div>
+              <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('liveTesterOutputJson')" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+                <i class="fa-solid fa-copy"></i> Salin JSON
+              </button>
+            </div>
+            <pre class="code-snippet-box" id="liveTesterOutputJson" style="max-height: 260px; overflow-y: auto; font-size: 0.78rem; margin: 0;"></pre>
+          </div>
+        </div>
+
+        <script>
+          function updateLiveApiUrl() {
+            var limit = document.getElementById('liveTesterLimit').value;
+            var offset = document.getElementById('liveTesterOffset').value;
+            var q = document.getElementById('liveTesterQ').value.trim();
+            var sort = document.getElementById('liveTesterSort').value.trim();
+            var params = [];
+            if (limit) params.push('limit=' + encodeURIComponent(limit));
+            if (offset && offset !== '0') params.push('offset=' + encodeURIComponent(offset));
+            if (q) params.push('q=' + encodeURIComponent(q));
+            if (sort) params.push('sort=' + encodeURIComponent(sort));
+            var qs = params.length ? '?' + params.join('&') : '';
+            var url = '/api/csv/{{ pkg.name }}' + qs;
+            document.getElementById('liveTesterUrlPreview').textContent = url;
+            return url;
+          }
+
+          function executeDatasetLiveApi(pkgName) {
+            var url = updateLiveApiUrl();
+            var btn = document.getElementById('btnExecLiveApi');
+            var box = document.getElementById('liveTesterResultBox');
+            var out = document.getElementById('liveTesterOutputJson');
+            var statusEl = document.getElementById('liveTesterStatus');
+            var latEl = document.getElementById('liveTesterLatency');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            box.style.display = 'block';
+            out.textContent = 'Menghubungkan ke API...';
+
+            var t0 = performance.now();
+            fetch(url)
+              .then(function(res) {
+                var t1 = performance.now();
+                latEl.textContent = Math.round(t1 - t0) + ' ms';
+                statusEl.textContent = res.status + ' ' + (res.statusText || 'OK');
+                statusEl.style.background = res.ok ? '#ecfdf5' : '#fef2f2';
+                statusEl.style.color = res.ok ? '#065f46' : '#991b1b';
+                return res.json();
+              })
+              .then(function(json) {
+                out.textContent = JSON.stringify(json, null, 2);
+              })
+              .catch(function(err) {
+                statusEl.textContent = 'Error';
+                statusEl.style.background = '#fef2f2';
+                statusEl.style.color = '#991b1b';
+                out.textContent = 'Gagal memuat API: ' + err.message;
+              })
+              .finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Kirim Query';
+              });
+          }
+        </script>
+
         <!-- Panduan Parameter Kueri -->
         <div style="background: #f1f5f9; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
           <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--bmkg-blue-deep); margin-bottom: 0.5rem;">
@@ -516,7 +632,7 @@ Klimatologi, dan Geofisika' %}
           <pre class="code-snippet-box" id="pySnippetPandas">import pandas as pd
 
 # Baca data CSV langsung ke DataFrame melalui endpoint BMKG
-url = "http://localhost:5000/api/csv/{{ pkg.name }}.csv"
+url = "{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}.csv"
 df = pd.read_csv(url)
 
 print("Dimensi dataset:", df.shape)
@@ -530,7 +646,7 @@ print(df.head())</pre>
           </div>
           <pre class="code-snippet-box" id="pySnippetRequests">import requests
 
-url = "http://localhost:5000/api/csv/{{ pkg.name }}"
+url = "{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}"
 params = {"limit": 20}
 response = requests.get(url, params=params)
 data = response.json()
@@ -549,7 +665,7 @@ if data.get("success"):
             <span style="font-size: 0.8rem; font-weight: 700; color: var(--bmkg-blue-deep);"><i class="fa-brands fa-js" style="color: #eab308;"></i> 3. JavaScript (Modern Fetch API / Node.js):</span>
             <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('jsSnippetFetch')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
           </div>
-          <pre class="code-snippet-box" id="jsSnippetFetch">fetch("http://localhost:5000/api/csv/{{ pkg.name }}?limit=10")
+          <pre class="code-snippet-box" id="jsSnippetFetch">fetch("{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}?limit=10")
   .then(res => res.json())
   .then(json => {
     console.log("Status API:", json.success);
@@ -565,10 +681,10 @@ if data.get("success"):
             <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('curlSnippet')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
           </div>
           <pre class="code-snippet-box" id="curlSnippet"># Format JSON
-curl -X GET "http://localhost:5000/api/csv/{{ pkg.name }}?limit=10"
+curl -X GET "{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}?limit=10"
 
 # Format CSV Langsung
-curl -X GET "http://localhost:5000/api/csv/{{ pkg.name }}.csv" -o {{ pkg.name }}.csv</pre>
+curl -X GET "{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}.csv" -o {{ pkg.name }}.csv</pre>
         </div>
 
         <div>
@@ -577,7 +693,7 @@ curl -X GET "http://localhost:5000/api/csv/{{ pkg.name }}.csv" -o {{ pkg.name }}
             <button type="button" class="btn-interactive card-sub-btn" onclick="copySnippetText('rSnippet')" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Salin</button>
           </div>
           <pre class="code-snippet-box" id="rSnippet"># Baca CSV ke R Dataframe
-df <- read.csv("http://localhost:5000/api/csv/{{ pkg.name }}.csv")
+df <- read.csv("{{ request.host_url.rstrip('/') }}/api/csv/{{ pkg.name }}.csv")
 summary(df)</pre>
         </div>
       </div>

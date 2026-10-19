@@ -57,6 +57,9 @@
       <nav class="primary-nav">
         <a href="{{ h.url_for('home.index') }}" class="{% if request.endpoint == 'home.index' %}active{% endif %}">Beranda</a>
         <a href="{{ h.url_for('dataset.search') }}" class="{% if request.endpoint == 'dataset.search' %}active{% endif %}">Katalog Data</a>
+        <a href="/api/csv/docs" class="{% if request.path.startswith('/api/csv') %}active{% endif %}" title="Akses Dokumentasi &amp; Endpoint Public REST API BMKG">
+          <i class="fa-solid fa-code"></i> REST API Publik
+        </a>
         <a href="{{ h.url_for('home.index') }}#pilar">5 Pilar MKG</a>
         <a href="{{ h.url_for('home.index') }}#peta">Peta Observasi</a>
       </nav>
