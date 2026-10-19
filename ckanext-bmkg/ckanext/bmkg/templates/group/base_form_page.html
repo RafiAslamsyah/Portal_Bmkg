@@ -1,6 +1,9 @@
 {% extends "page.html" %}
 
-{% block subtitle %}{{ 'Edit Grup Tematik' if (form_style == 'edit' or (data and data.id)) else 'Buat Grup / Klaster Tematik Baru' }} — Portal Data BMKG{% endblock %}
+{% set cur_title = (data and (data.title or data.display_name or data.name)) or (group_dict and (group_dict.title or group_dict.display_name or group_dict.name)) or '' %}
+{% set is_edit_mode = form_style == 'edit' or (data and data.id) or group_dict %}
+
+{% block subtitle %}{{ ('Edit Grup: ' ~ cur_title) if is_edit_mode else 'Buat Grup / Klaster Tematik Baru' }} — Portal Data BMKG{% endblock %}
 
 {% block content %}
 <div class="dataset-form-page-wrapper">
@@ -12,16 +15,24 @@
         <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
         <a href="{{ h.url_for('group.index') }}">Grup Tematik &amp; Pilar</a>
         <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
-        <span>{{ 'Edit Grup: ' ~ (data.title or data.name) if (form_style == 'edit' or (data and data.id)) else 'Buat Grup Baru' }}</span>
+        <span>{{ ('Edit Grup: ' ~ cur_title) if is_edit_mode else 'Buat Grup Baru' }}</span>
       </div>
 
       <div class="dataset-form-hero-content">
-        <div class="dataset-form-hero-badge">
-          <i class="fa-solid fa-layer-group"></i>
-          <span>Portal Administrasi Data BMKG</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div class="dataset-form-hero-badge">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Portal Administrasi Data BMKG</span>
+          </div>
+          {% if is_edit_mode and (data.name or (group_dict and group_dict.name)) %}
+            {% set pub_slug = data.name or group_dict.name %}
+            <a href="{{ h.url_for('group.read', id=pub_slug) }}" target="_blank" class="btn-action-cancel" style="background: rgba(255, 255, 255, 0.12); color: #ffffff; border-color: rgba(255, 255, 255, 0.3); font-size: 0.82rem; padding: 0.45rem 0.95rem;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Halaman Publik Grup
+            </a>
+          {% endif %}
         </div>
         <h1 class="dataset-form-hero-title">
-          {{ 'Edit Metadata & Pengaturan Grup' if (form_style == 'edit' or (data and data.id)) else 'Buat Grup / Klaster Tematik Baru' }}
+          {{ ('Edit Metadata & Pengaturan: ' ~ cur_title) if is_edit_mode else 'Buat Grup / Klaster Tematik Baru' }}
         </h1>
         <p class="dataset-form-hero-lead">
           Kategorikan koleksi dataset BMKG berdasarkan pilar keilmuan, topik pengamatan khusus, atau proyek strategis nasional untuk mempermudah navigasi katalog data terbuka bagi publik dan periset.

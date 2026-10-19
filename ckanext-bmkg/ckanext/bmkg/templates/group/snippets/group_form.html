@@ -1,7 +1,18 @@
-{% import 'macros/form.html' as form %}
-
 {% set action = g.form_action or '' %}
 {% set is_edit = form_style == 'edit' or (data and data.id) %}
+{% set group_name = data.name or '' %}
+{% set group_title = data.title or '' %}
+
+{% set current_image = '' %}
+{% if data.image_url %}
+  {% if data.image_url.startswith('http') or data.image_url.startswith('/') %}
+    {% set current_image = data.image_url %}
+  {% else %}
+    {% set current_image = data.image_display_url or ('/uploads/group/' ~ data.image_url) %}
+  {% endif %}
+{% elif data.image_display_url %}
+  {% set current_image = data.image_display_url %}
+{% endif %}
 
 {# Form Modern Tambah / Edit Grup Tematik BMKG #}
 <form id="group-edit" class="bmkg-group-form" method="post" action="{{ action }}" data-module="basic-form" enctype="multipart/form-data" novalidate>
@@ -24,49 +35,118 @@
     {% endif %}
   {% endblock %}
 
-  <!-- CARD 1: Identitas & Deskripsi Utama Grup -->
+  <!-- CARD 1: Identitas & Nama Grup Tematik -->
   <div class="bmkg-form-card">
     <div class="card-section-header">
       <div class="section-icon-badge" style="background: rgba(0, 90, 158, 0.1); color: #005a9e;">
         <i class="fa-solid fa-layer-group"></i>
       </div>
-      <div>
-        <h3 class="section-heading">1. Identitas &amp; Nama Grup Tematik</h3>
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <h3 class="section-heading">1. Identitas &amp; Nama Grup Tematik</h3>
+          {% if is_edit %}
+            <span class="bmkg-input-hint-badge" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+              <i class="fa-solid fa-pen-to-square"></i> Mode Sunting Grup
+            </span>
+          {% else %}
+            <span class="bmkg-input-hint-badge" style="background: #dcfce7; color: #15803d; border-color: #bbf7d0;">
+              <i class="fa-solid fa-plus"></i> Grup Baru
+            </span>
+          {% endif %}
+        </div>
         <p class="section-subheading">Informasi nama resmi kelompok dataset, tautan slug permanen, dan ringkasan cakupan tema pengamatan.</p>
       </div>
     </div>
 
     <div class="card-section-body">
+      <!-- Quick Preset Pilar BMKG (Pilihan Cepat) -->
+      <div class="bmkg-preset-box">
+        <div class="bmkg-preset-header">
+          <span class="bmkg-preset-title">
+            <i class="fa-solid fa-sparkles" style="color: #0284c7;"></i>
+            Pilihan Cepat Klaster Pilar BMKG:
+          </span>
+          <span style="font-size: 0.74rem; color: #64748b;">Klik untuk menerapkan template nama &amp; tema</span>
+        </div>
+        <div class="bmkg-preset-chips">
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('meteorologi')">
+            <i class="fa-solid fa-cloud-sun" style="color: #0284c7;"></i> Meteorologi
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('klimatologi')">
+            <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Klimatologi
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('geofisika')">
+            <i class="fa-solid fa-volcano" style="color: #dc2626;"></i> Geofisika
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('kualitas-udara')">
+            <i class="fa-solid fa-wind" style="color: #059669;"></i> Kualitas Udara
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('maritim')">
+            <i class="fa-solid fa-water" style="color: #0891b2;"></i> Maritim &amp; Kelautan
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('radar')">
+            <i class="fa-solid fa-satellite-dish" style="color: #7c3aed;"></i> Radar &amp; Citra Satelit
+          </button>
+        </div>
+      </div>
+
       <!-- Judul / Nama Grup -->
       <div class="bmkg-form-group">
-        <label for="field-name" class="bmkg-label required">
-          Nama Grup / Klaster Tematik
-          <span class="required-star">*</span>
-        </label>
-        <div class="input-container">
-          <input id="field-name" type="text" name="title" value="{{ data.title or '' }}"
-            placeholder="Contoh: Pengamatan Cuaca & Iklim Ekstrem"
-            class="bmkg-input form-control {% if errors.title %}has-error{% endif %}" required />
+        <div class="bmkg-input-header">
+          <label for="field-title" class="bmkg-label required" style="margin-bottom: 0;">
+            Nama Grup / Klaster Tematik
+            <span class="required-star">*</span>
+          </label>
+          <span class="bmkg-input-hint-badge required-badge">
+            <i class="fa-solid fa-asterisk" style="font-size: 0.65rem;"></i> Wajib Diisi
+          </span>
+        </div>
+        <div class="input-with-icon-wrap">
+          <i class="fa-solid fa-layer-group input-prefix-icon"></i>
+          <input id="field-title" type="text" name="title" value="{{ data.title or '' }}"
+            placeholder="Contoh: Meteorologi atau Pengamatan Cuaca & Iklim Ekstrem"
+            data-module="slug-preview-target"
+            class="bmkg-input with-prefix-icon form-control {% if errors.title %}has-error{% endif %}" required autocomplete="off" />
         </div>
         {% if errors.title %}
           <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.title }}</div>
         {% endif %}
-        <span class="field-helper-text">Gunakan nama yang komunikatif dan representatif (misal: <em>Hidrometeorologi</em>, <em>Gempabumi &amp; Tsunami</em>, <em>Kualitas Udara</em>).</span>
+        <span class="field-helper-text">Gunakan nama yang komunikatif dan representatif (misal: <em>Meteorologi</em>, <em>Klimatologi</em>, <em>Gempabumi &amp; Tsunami</em>, <em>Kualitas Udara</em>).</span>
       </div>
 
       <!-- URL Slug Permanen -->
       <div class="bmkg-form-group">
         {% set prefix = h.url_for(group_type + '.read', id='') if group_type else '/group/' %}
         {% set domain = h.url_for(group_type + '.read', id='', qualified=true)|replace("http://", "")|replace("https://", "") if group_type else 'localhost:5000/group/' %}
-        <label for="field-url" class="bmkg-label required">
-          Tautan URL Permanen (Slug)
-          <span class="required-star">*</span>
-        </label>
-        <div class="bmkg-slug-input-wrapper">
-          <span class="slug-prefix">{{ prefix }}</span>
-          <input id="field-url" type="text" name="name" value="{{ data.name or '' }}"
-            placeholder="pengamatan-cuaca-iklim-ekstrem"
-            class="bmkg-input slug-input form-control {% if errors.name %}has-error{% endif %}" required />
+        <div class="bmkg-input-header">
+          <label for="field-name" class="bmkg-label required" style="margin-bottom: 0;">
+            Tautan URL Permanen (Slug)
+            <span class="required-star">*</span>
+          </label>
+          <span id="slugBadge" class="bmkg-input-hint-badge auto-badge">
+            <i class="fa-solid fa-link"></i> Ramah SEO
+          </span>
+        </div>
+        <div class="bmkg-slug-input-wrapper {% if is_edit %}is-locked{% endif %}" id="slugWrapper">
+          <span class="slug-prefix">
+            <i class="fa-solid fa-globe"></i>
+            <span>{{ prefix }}</span>
+          </span>
+          <input id="field-name" type="text" name="name" value="{{ data.name or '' }}"
+            placeholder="meteorologi"
+            data-module="slug-preview-slug" data-module-prefix="{{ domain }}" data-module-placeholder="&lt;nama-grup&gt;"
+            class="bmkg-input slug-input form-control {% if errors.name %}has-error{% endif %}" required {% if is_edit %}readonly{% endif %} autocomplete="off" />
+          {% if is_edit %}
+            <button type="button" class="slug-action-btn" id="btnToggleSlugLock" onclick="toggleSlugLock(this)" title="Kunci/buka untuk mengedit slug URL">
+              <i class="fa-solid fa-lock" id="slugLockIcon"></i>
+              <span id="slugLockLabel">Terkunci</span>
+            </button>
+          {% else %}
+            <button type="button" class="slug-action-btn" onclick="syncSlugFromTitle()" title="Regenerasi slug dari nama grup">
+              <i class="fa-solid fa-rotate"></i>
+              <span>Sinkron</span>
+            </button>
+          {% endif %}
         </div>
         {% if errors.name %}
           <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.name }}</div>
@@ -76,22 +156,39 @@
 
       <!-- Deskripsi Grup -->
       <div class="bmkg-form-group">
-        <label for="field-description" class="bmkg-label">
-          Deskripsi &amp; Cakupan Data
-        </label>
+        <div class="bmkg-input-header">
+          <label for="field-description" class="bmkg-label" style="margin-bottom: 0;">
+            Deskripsi &amp; Cakupan Data Grup
+          </label>
+          <span class="bmkg-input-hint-badge">
+            <i class="fa-brands fa-markdown"></i> Markdown Didukung
+          </span>
+        </div>
+        <!-- Markdown Toolbar Helper -->
+        <div class="bmkg-markdown-header">
+          <div class="markdown-tools">
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('**', '**', 'teks tebal')" title="Tebal (Bold)"><i class="fa-solid fa-bold"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('*', '*', 'teks miring')" title="Miring (Italic)"><i class="fa-solid fa-italic"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('### ', '', 'Judul Bagian')" title="Heading 3"><i class="fa-solid fa-heading"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('- ', '', 'Poin daftar')" title="Daftar Berbutir"><i class="fa-solid fa-list-ul"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('[', '](https://bmkg.go.id)', 'Tautan BMKG')" title="Sisipkan Tautan"><i class="fa-solid fa-link"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('`', '`', 'parameter_sensor')" title="Format Kode / Satuan"><i class="fa-solid fa-code"></i></button>
+          </div>
+          <span class="markdown-count" id="descCharCount">0 karakter</span>
+        </div>
         <div class="textarea-container">
-          <textarea id="field-description" name="description" class="bmkg-textarea form-control" rows="5"
-            placeholder="Tuliskan latar belakang grup, ragam parameter observasi yang dihimpun, metodologi pengumpulan, serta pemanfaatan data terbuka ini bagi riset dan mitigasi bencana...">{{ data.description or '' }}</textarea>
+          <textarea id="field-description" name="description" class="bmkg-textarea form-control has-toolbar" rows="6"
+            placeholder="Tuliskan latar belakang grup, ragam parameter observasi yang dihimpun, metodologi pengumpulan, serta pemanfaatan data terbuka ini bagi riset, peringatan dini, dan mitigasi bencana...">{{ data.description or '' }}</textarea>
         </div>
         {% if errors.description %}
           <div class="field-error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ errors.description }}</div>
         {% endif %}
-        <span class="field-helper-text">Mendukung format Markdown untuk penataan teks, poin berbutir, dan tautan dokumen spesifikasi teknis.</span>
+        <span class="field-helper-text">Gunakan format Markdown untuk menata teks paragraf, poin spesifikasi teknis, atau tautan portal resmi BMKG.</span>
       </div>
     </div>
   </div>
 
-  <!-- CARD 2: Visual & Identitas Media -->
+  <!-- CARD 2: Visual & Lambang Identitas Grup -->
   <div class="bmkg-form-card">
     <div class="card-section-header">
       <div class="section-icon-badge" style="background: rgba(0, 135, 90, 0.1); color: #00875a;">
@@ -99,36 +196,209 @@
       </div>
       <div>
         <h3 class="section-heading">2. Logo &amp; Lambang Visual Grup</h3>
-        <p class="section-subheading">Sematkan lambang pilar MKG atau logo proyek riset agar mudah dikenali dalam katalog.</p>
+        <p class="section-subheading">Sematkan lambang pilar MKG atau logo proyek riset agar mudah dikenali dalam katalog dan kartu beranda.</p>
       </div>
     </div>
 
     <div class="card-section-body">
-      {% set is_upload = data.image_url and not data.image_url.startswith('http') %}
-      {% set is_url = data.image_url and data.image_url.startswith('http') %}
+      <div class="bmkg-media-custom-container">
+        <!-- Media Mode Switcher Tabs -->
+        <div class="media-mode-switcher">
+          <button type="button" class="media-mode-btn is-active" id="btnTabUrl" onclick="switchMediaMode('url')">
+            <i class="fa-solid fa-link"></i> Tautan URL Gambar
+          </button>
+          <button type="button" class="media-mode-btn" id="btnTabUpload" onclick="switchMediaMode('upload')">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Berkas
+          </button>
+          <button type="button" class="media-mode-btn" id="btnTabPreset" onclick="switchMediaMode('preset')">
+            <i class="fa-solid fa-shapes"></i> Preset Lambang BMKG
+          </button>
+        </div>
 
-      <div class="bmkg-image-upload-wrapper">
-        {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label='Unggah Berkas Gambar', url_label='Tautan URL Gambar') }}
+        <!-- Live Preview Strip -->
+        <div class="media-preview-strip">
+          <div class="media-preview-avatar" id="mediaPreviewBox">
+            {% if current_image %}
+              <img id="mediaPreviewImg" src="{{ current_image }}" alt="Logo Grup" onerror="this.style.display='none'; document.getElementById('mediaPreviewFallback').style.display='flex';" />
+              <div id="mediaPreviewFallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center;"><i class="fa-solid fa-layer-group"></i></div>
+            {% else %}
+              <i class="fa-solid fa-layer-group" id="mediaPreviewFallback"></i>
+              <img id="mediaPreviewImg" src="" alt="Logo Grup" style="display: none;" />
+            {% endif %}
+          </div>
+          <div class="media-preview-info">
+            <h5 id="mediaPreviewTitle">
+              {% if current_image %}Citra / Lambang Terpasang{% else %}Belum Ada Lambang Kustom{% endif %}
+            </h5>
+            <p id="mediaPreviewDesc">
+              {% if current_image %}{{ current_image }}{% else %}Pilih URL gambar, unggah dari komputer, atau pilih preset lambang BMKG di bawah.{% endif %}
+            </p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <button type="button" class="btn-media-clear" id="btnMediaClear" onclick="clearGroupImage()">
+                <i class="fa-solid fa-trash-can"></i> Hapus / Reset Gambar
+              </button>
+              <span style="font-size: 0.74rem; color: #64748b;">(Disarankan rasio 1:1 atau 16:9, PNG transparan)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Input to signal clear upload to CKAN -->
+        <input type="hidden" name="clear_upload" id="field-clear-upload" value="" />
+
+        <!-- Panel 1: URL Input -->
+        <div id="panelMediaUrl" class="media-panel">
+          <div class="bmkg-form-group" style="margin-bottom: 0;">
+            <label for="field-image-url" class="bmkg-label">
+              Tautan URL Gambar / Ikon Online
+            </label>
+            <div class="input-with-icon-wrap">
+              <i class="fa-solid fa-link input-prefix-icon"></i>
+              <input id="field-image-url" type="url" name="image_url" value="{{ data.image_url or '' }}"
+                placeholder="https://bmkg.go.id/asset/img/icons/meteorologi.png"
+                oninput="updateImagePreviewFromUrl(this.value)"
+                class="bmkg-input with-prefix-icon form-control {% if errors.image_url %}has-error{% endif %}" />
+            </div>
+            <span class="field-helper-text">Masukkan tautan langsung gambar lambang publik berformat PNG, SVG, atau WebP.</span>
+          </div>
+        </div>
+
+        <!-- Panel 2: File Upload (Dropzone) -->
+        <div id="panelMediaUpload" class="media-panel" style="display: none;">
+          <div class="media-dropzone" id="mediaDropzone">
+            <input id="field-image-upload" type="file" name="image_upload" accept="image/png, image/jpeg, image/svg+xml, image/webp" onchange="handleFileSelect(this)" />
+            <div class="dropzone-inner-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="dropzone-inner-title" id="dropzoneTitle">Klik atau Seret Berkas Gambar ke Sini</div>
+            <div class="dropzone-inner-subtitle">Mendukung format PNG, SVG, JPG, WebP hingga ukuran 2 MB</div>
+          </div>
+        </div>
+
+        <!-- Panel 3: BMKG Official Preset Icons -->
+        <div id="panelMediaPreset" class="media-panel" style="display: none;">
+          <div class="preset-icon-gallery">
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-met.png', 'Meteorologi')">
+              <div class="preset-icon-circle" style="background: #e0f2fe; color: #0284c7;">
+                <i class="fa-solid fa-cloud-sun"></i>
+              </div>
+              <span class="preset-icon-label">Meteorologi</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-klim.png', 'Klimatologi')">
+              <div class="preset-icon-circle" style="background: #fef3c7; color: #d97706;">
+                <i class="fa-solid fa-temperature-half"></i>
+              </div>
+              <span class="preset-icon-label">Klimatologi</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-geo.png', 'Geofisika')">
+              <div class="preset-icon-circle" style="background: #fee2e2; color: #dc2626;">
+                <i class="fa-solid fa-volcano"></i>
+              </div>
+              <span class="preset-icon-label">Geofisika</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-ku.png', 'Kualitas Udara')">
+              <div class="preset-icon-circle" style="background: #dcfce7; color: #059669;">
+                <i class="fa-solid fa-wind"></i>
+              </div>
+              <span class="preset-icon-label">Kualitas Udara</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-maritim.png', 'Maritim')">
+              <div class="preset-icon-circle" style="background: #cffafe; color: #0891b2;">
+                <i class="fa-solid fa-water"></i>
+              </div>
+              <span class="preset-icon-label">Maritim</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/logo-bmkg.png', 'Logo Resmi BMKG')">
+              <div class="preset-icon-circle" style="background: #f1f5f9; color: #003865;">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <span class="preset-icon-label">BMKG Resmi</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <span class="field-helper-text" style="margin-top: 0.65rem;">
-        Format gambar disarankan: PNG, SVG, atau JPG rasio 1:1 atau 16:9, dengan latar transparan atau cerah. Maksimum ukuran 2 MB.
-      </span>
+    </div>
+  </div>
+
+  <!-- CARD 3: Kontak Pengelola & Status Visibilitas -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+        <i class="fa-solid fa-address-card"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">3. Penanggung Jawab &amp; Metadata Tematik</h3>
+        <p class="section-subheading">Informasi penanggung jawab teknis, surat elektronik koordinasi, dan status taksonomi grup.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      {# Parse existing extras safely using Jinja2 namespace #}
+      {% set ns = namespace(pic='', email='', kategori='Pilar Utama') %}
+      {% if data.extras %}
+        {% for ex in data.extras %}
+          {% if ex is mapping %}
+            {% if ex.get('key') == 'penanggung_jawab' %}{% set ns.pic = ex.get('value') %}{% endif %}
+            {% if ex.get('key') == 'email_kontak' %}{% set ns.email = ex.get('value') %}{% endif %}
+            {% if ex.get('key') == 'kategori_tematik' %}{% set ns.kategori = ex.get('value') %}{% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <div class="form-row-3col">
+        <!-- PIC Penanggung Jawab -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__0__key" value="penanggung_jawab" />
+          <label for="field-pic" class="bmkg-label">Koordinator / Tim Teknis</label>
+          <div class="input-with-icon-wrap">
+            <i class="fa-solid fa-user-tie input-prefix-icon"></i>
+            <input id="field-pic" type="text" name="extras__0__value" value="{{ ns.pic or '' }}"
+              placeholder="Contoh: Kedeputian Bidang Meteorologi" class="bmkg-input with-prefix-icon form-control" />
+          </div>
+          <span class="field-helper-text">Kedeputian, Balai Besar, atau Tim Pokja pengampu data.</span>
+        </div>
+
+        <!-- Email Kontak -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__1__key" value="email_kontak" />
+          <label for="field-email-kontak" class="bmkg-label">Email Dinas Koordinasi</label>
+          <div class="input-with-icon-wrap">
+            <i class="fa-solid fa-envelope input-prefix-icon"></i>
+            <input id="field-email-kontak" type="email" name="extras__1__value" value="{{ ns.email or '' }}"
+              placeholder="Contoh: data.mkg@bmkg.go.id" class="bmkg-input with-prefix-icon form-control" />
+          </div>
+          <span class="field-helper-text">Alamat surat elektronik untuk korespondensi kurasi dataset.</span>
+        </div>
+
+        <!-- Klasifikasi Taksonomi -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__2__key" value="kategori_tematik" />
+          <label for="field-kategori-tematik" class="bmkg-label">Kategori Klaster</label>
+          <div class="select-container">
+            <select id="field-kategori-tematik" name="extras__2__value" class="bmkg-select form-control">
+              <option value="Pilar Utama" {% if ns.kategori == 'Pilar Utama' %}selected="selected"{% endif %}>🏛️ Pilar Utama BMKG</option>
+              <option value="Proyek Strategis" {% if ns.kategori == 'Proyek Strategis' %}selected="selected"{% endif %}>🎯 Proyek Strategis Nasional</option>
+              <option value="Inisiatif Riset" {% if ns.kategori == 'Inisiatif Riset' %}selected="selected"{% endif %}>🔬 Inisiatif Riset &amp; Inovasi</option>
+              <option value="Mitigasi Bencana" {% if ns.kategori == 'Mitigasi Bencana' %}selected="selected"{% endif %}>🚨 Mitigasi Kebencanaan Khusus</option>
+            </select>
+          </div>
+          <span class="field-helper-text">Pengelompokan dalam direktori taksonomi portal terbuka.</span>
+        </div>
+      </div>
     </div>
   </div>
 
   {% block custom_fields %}
-    {% snippet 'snippets/custom_form_fields.html', extras=data.extras, errors=errors, limit=3 %}
+    {# Block hook for extensions #}
   {% endblock %}
 
-  <!-- CARD 3: Tombol Aksi Formulir (Batal / Hapus / Simpan) -->
+  <!-- CARD 4: Tombol Aksi Formulir (Batal / Hapus / Simpan) -->
   <div class="bmkg-form-actions-bar">
     <div class="actions-left">
-      <a href="{{ h.url_for(group_type + '.index') if group_type else '/group/' }}" class="btn-action-cancel">
+      {% set back_url = h.url_for(group_type + '.read', id=data.name) if (is_edit and data.name) else (h.url_for(group_type + '.index') if group_type else '/group/') %}
+      <a href="{{ back_url }}" class="btn-action-cancel">
         <i class="fa-solid fa-arrow-left"></i> Batal &amp; Kembali
       </a>
       {% block delete_button %}
         {% if data.id and h.check_access('group_delete', {'id': data.id}) %}
-          <a class="btn-action-delete" href="{% url_for group_type + '.delete', id=data.id %}" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin menghapus grup ini? Tindakan ini tidak dapat dibatalkan.">
+          <a class="btn-action-delete" href="{% url_for group_type + '.delete', id=data.id %}" data-module="confirm-action" data-module-content="Apakah Anda yakin ingin menghapus grup ini? Tindakan ini tidak dapat dibatalkan dan akan melepaskan asosiasi seluruh dataset dari grup ini.">
             <i class="fa-solid fa-trash"></i> Hapus Grup
           </a>
         {% endif %}
@@ -136,36 +406,266 @@
     </div>
 
     <div class="actions-right">
-      <button class="btn-action-submit" name="save" type="submit">
-        <i class="fa-solid fa-check"></i>
-        <span>{% block save_text %}{{ 'Simpan Perubahan' if (form_style == 'edit' or (data and data.id)) else 'Buat Grup Baru' }}{% endblock %}</span>
+      <button class="btn-action-submit" name="save" type="submit" id="btnSubmitGroup">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>{% block save_text %}{{ 'Simpan Perubahan Grup' if is_edit else 'Buat Grup Tematik Baru' }}{% endblock %}</span>
       </button>
     </div>
   </div>
 </form>
 
 <script>
-  (function() {
-    var titleInput = document.getElementById('field-name');
-    var slugInput = document.getElementById('field-url');
-    if (!titleInput || !slugInput) return;
+  // 1. Slug Generator & Lock Controller
+  var isSlugLocked = {{ 'true' if is_edit else 'false' }};
+  var titleInput = document.getElementById('field-title');
+  var slugInput = document.getElementById('field-name');
+  var slugWrapper = document.getElementById('slugWrapper');
+  var slugLockIcon = document.getElementById('slugLockIcon');
+  var slugLockLabel = document.getElementById('slugLockLabel');
 
-    var slugEdited = (slugInput.value && slugInput.value.trim().length > 0);
+  function generateSlugString(str) {
+    if (!str) return '';
+    return str.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
-    slugInput.addEventListener('input', function() {
-      slugEdited = (this.value.trim().length > 0);
-    });
+  function syncSlugFromTitle() {
+    if (titleInput && slugInput) {
+      slugInput.value = generateSlugString(titleInput.value);
+    }
+  }
 
+  function toggleSlugLock(btn) {
+    isSlugLocked = !isSlugLocked;
+    if (slugInput) {
+      slugInput.readOnly = isSlugLocked;
+    }
+    if (slugWrapper) {
+      if (isSlugLocked) {
+        slugWrapper.classList.add('is-locked');
+      } else {
+        slugWrapper.classList.remove('is-locked');
+        slugInput.focus();
+      }
+    }
+    if (slugLockIcon) {
+      slugLockIcon.className = isSlugLocked ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open';
+    }
+    if (slugLockLabel) {
+      slugLockLabel.textContent = isSlugLocked ? 'Terkunci' : 'Terbuka';
+    }
+  }
+
+  if (titleInput && slugInput) {
     titleInput.addEventListener('input', function() {
-      if (!slugEdited) {
-        var str = this.value || '';
-        var slug = str.toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .trim()
-          .replace(/[\s_-]+/g, '-')
-          .replace(/^-+|-+$/g, '');
-        slugInput.value = slug;
+      if (!isSlugLocked) {
+        slugInput.value = generateSlugString(this.value);
       }
     });
-  })();
+  }
+
+  // 2. Preset Pilar BMKG (Quick Fill)
+  var bmkgPilarPresets = {
+    'meteorologi': {
+      title: 'Meteorologi',
+      slug: 'meteorologi',
+      desc: 'Pilar observasi, prediksi cuaca permukaan, angin maritim, radar, citra satelit resolusi tinggi, dan layanan informasi cuaca penerbangan di seluruh wilayah Indonesia.',
+      icon: '/img/pilar-met.png'
+    },
+    'klimatologi': {
+      title: 'Klimatologi',
+      slug: 'klimatologi',
+      desc: 'Data analisis variabilitas iklim, tren suhu udara global, anomali curah hujan dasarian, indeks kekeringan hidrometeorologi, dan prediksi dinamika musim kepulauan Nusantara.',
+      icon: '/img/pilar-klim.png'
+    },
+    'geofisika': {
+      title: 'Geofisika',
+      slug: 'geofisika',
+      desc: 'Pemantauan seismisitas gempabumi real-time, sistem peringatan dini tsunami (InaTEWS), anomali geomagnet, gravitasi bumi, serta rekaman petir atmosferik.',
+      icon: '/img/pilar-geo.png'
+    },
+    'kualitas-udara': {
+      title: 'Kualitas Udara',
+      slug: 'kualitas-udara',
+      desc: 'Pengukuran konsentrasi partikulat aerosol PM2.5, PM10, sulfur dioksida, ozon permukaan, dan gas rumah kaca melalui jaringan stasiun Global Atmosphere Watch (GAW) BMKG.',
+      icon: '/img/pilar-ku.png'
+    },
+    'maritim': {
+      title: 'Maritim & Kelautan',
+      slug: 'maritim-kelautan',
+      desc: 'Informasi tinggi gelombang laut, kecepatan arus perairan, angin permukaan maritim, pasang surut, dan keselamatan pelayaran di perairan Indonesia.',
+      icon: '/img/pilar-maritim.png'
+    },
+    'radar': {
+      title: 'Radar & Citra Satelit',
+      slug: 'radar-citra-satelit',
+      desc: 'Produk komposit radar cuaca pita-C/S, citra satelit Himawari saluran inframerah, estimasi liputan awan, dan pergerakan sel konvektif awan cumulonimbus.',
+      icon: '/img/pilar-met.png'
+    }
+  };
+
+  function applyBmkgThemePreset(key) {
+    var p = bmkgPilarPresets[key];
+    if (!p) return;
+
+    if (titleInput) {
+      titleInput.value = p.title;
+      titleInput.dispatchEvent(new Event('input'));
+    }
+    if (slugInput && !isSlugLocked) {
+      slugInput.value = p.slug;
+    }
+    var descEl = document.getElementById('field-description');
+    if (descEl) {
+      descEl.value = p.desc;
+      updateDescCount();
+    }
+    selectPresetIcon(p.icon, p.title);
+  }
+
+  // 3. Media Mode Switcher (URL vs Upload vs Preset)
+  function switchMediaMode(mode) {
+    var btnUrl = document.getElementById('btnTabUrl');
+    var btnUpload = document.getElementById('btnTabUpload');
+    var btnPreset = document.getElementById('btnTabPreset');
+
+    var panelUrl = document.getElementById('panelMediaUrl');
+    var panelUpload = document.getElementById('panelMediaUpload');
+    var panelPreset = document.getElementById('panelMediaPreset');
+
+    if (btnUrl) btnUrl.classList.toggle('is-active', mode === 'url');
+    if (btnUpload) btnUpload.classList.toggle('is-active', mode === 'upload');
+    if (btnPreset) btnPreset.classList.toggle('is-active', mode === 'preset');
+
+    if (panelUrl) panelUrl.style.display = (mode === 'url') ? 'block' : 'none';
+    if (panelUpload) panelUpload.style.display = (mode === 'upload') ? 'block' : 'none';
+    if (panelPreset) panelPreset.style.display = (mode === 'preset') ? 'block' : 'none';
+  }
+
+  function updateImagePreviewFromUrl(url) {
+    var previewImg = document.getElementById('mediaPreviewImg');
+    var fallback = document.getElementById('mediaPreviewFallback');
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    var clearInput = document.getElementById('field-clear-upload');
+
+    if (clearInput) clearInput.value = '';
+
+    if (url && url.trim().length > 0) {
+      if (previewImg) {
+        previewImg.src = url.trim();
+        previewImg.style.display = 'block';
+      }
+      if (fallback) fallback.style.display = 'none';
+      if (title) title.textContent = 'Citra dari Tautan URL';
+      if (desc) desc.textContent = url.trim();
+    } else {
+      if (previewImg) {
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+      }
+      if (fallback) fallback.style.display = 'flex';
+      if (title) title.textContent = 'Belum Ada Lambang';
+      if (desc) desc.textContent = 'Masukkan URL atau unggah berkas citra.';
+    }
+  }
+
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      var file = input.files[0];
+      var dropTitle = document.getElementById('dropzoneTitle');
+      if (dropTitle) dropTitle.textContent = 'Berkas dipilih: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var previewImg = document.getElementById('mediaPreviewImg');
+        var fallback = document.getElementById('mediaPreviewFallback');
+        var title = document.getElementById('mediaPreviewTitle');
+        var desc = document.getElementById('mediaPreviewDesc');
+        var clearInput = document.getElementById('field-clear-upload');
+
+        if (clearInput) clearInput.value = '';
+        if (previewImg) {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        }
+        if (fallback) fallback.style.display = 'none';
+        if (title) title.textContent = 'Berkas Siap Diunggah';
+        if (desc) desc.textContent = file.name + ' — ' + (file.size / 1024).toFixed(1) + ' KB';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function selectPresetIcon(iconUrl, label) {
+    var urlInput = document.getElementById('field-image-url');
+    if (urlInput) {
+      urlInput.value = iconUrl;
+    }
+    updateImagePreviewFromUrl(iconUrl);
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    if (title) title.textContent = 'Preset BMKG: ' + label;
+    if (desc) desc.textContent = iconUrl;
+  }
+
+  function clearGroupImage() {
+    var urlInput = document.getElementById('field-image-url');
+    var fileInput = document.getElementById('field-image-upload');
+    var clearInput = document.getElementById('field-clear-upload');
+    var previewImg = document.getElementById('mediaPreviewImg');
+    var fallback = document.getElementById('mediaPreviewFallback');
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    var dropTitle = document.getElementById('dropzoneTitle');
+
+    if (urlInput) urlInput.value = '';
+    if (fileInput) fileInput.value = '';
+    if (clearInput) clearInput.value = '1';
+
+    if (previewImg) {
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+    }
+    if (fallback) fallback.style.display = 'flex';
+    if (title) title.textContent = 'Citra Dihapus';
+    if (desc) desc.textContent = 'Perubahan akan diterapkan saat Anda menekan tombol Simpan.';
+    if (dropTitle) dropTitle.textContent = 'Klik atau Seret Berkas Gambar ke Sini';
+  }
+
+  // 4. Markdown Toolbar Insert Helper
+  function insertMarkdownTag(startTag, endTag, defaultText) {
+    var textarea = document.getElementById('field-description');
+    if (!textarea) return;
+
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var text = textarea.value;
+    var selected = text.substring(start, end) || defaultText;
+    var replacement = startTag + selected + endTag;
+
+    textarea.value = text.substring(0, start) + replacement + text.substring(end);
+    textarea.focus();
+    textarea.selectionStart = start + startTag.length;
+    textarea.selectionEnd = start + startTag.length + selected.length;
+    updateDescCount();
+  }
+
+  function updateDescCount() {
+    var descEl = document.getElementById('field-description');
+    var countEl = document.getElementById('descCharCount');
+    if (descEl && countEl) {
+      var len = (descEl.value || '').length;
+      countEl.textContent = len + ' karakter';
+    }
+  }
+
+  var descTextarea = document.getElementById('field-description');
+  if (descTextarea) {
+    descTextarea.addEventListener('input', updateDescCount);
+    updateDescCount();
+  }
 </script>

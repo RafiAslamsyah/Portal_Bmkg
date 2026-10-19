@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"  > <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+      <meta name="csrf_field_name" content="_csrf_token" />
+      <meta name="_csrf_token" content="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s" />
+
+      <meta name="generator" content="ckan 2.11.6" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Metadata Grup: Meteorologi — Portal Data BMKG - CKAN</title>
+
+    
+    <link rel="shortcut icon" href="/base/images/ckan.ico" />
+    
+  
+      
+      
+      
+    
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Theme CSS BMKG -->
+  <link rel="stylesheet" href="/css/bmkg-theme.css?v=2.1.0">
+
+
+    
+    <link href="/webassets/base/51d427fe_main.css" rel="stylesheet"/>
+    
+    
+
+  </head>
+
+  
+  <body data-site-root="http://localhost:5000/" data-locale-root="http://localhost:5000/" >
+
+    
+    <div class="visually-hidden-focusable"><a href="#content">Skip to main content</a></div>
+  
+
+  
+      <!-- 1. Top Identity Bar -->
+  <div class="gov-identity-bar">
+    <div class="gov-identity-inner">
+      <div class="gov-title" id="govRealtimeClock" title="Waktu Nyata (Real-time Clock)">
+        <i class="fa-regular fa-clock" style="color: #38bdf8;"></i>
+        <span id="liveClockDate" style="color: #cbd5e1;"></span>
+        <span style="color: rgba(255, 255, 255, 0.4); margin: 0 1px;">•</span>
+        <span id="liveClockTime" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;"></span>
+      </div>
+      <script>
+        (function() {
+          function renderBmkgClock() {
+            var tElem = document.getElementById('liveClockTime');
+            var dElem = document.getElementById('liveClockDate');
+            if (!tElem || !dElem) return;
+            var now = new Date();
+            var dOpts = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+            dElem.textContent = now.toLocaleDateString('id-ID', dOpts);
+            var hh = String(now.getHours()).padStart(2, '0');
+            var mm = String(now.getMinutes()).padStart(2, '0');
+            var ss = String(now.getSeconds()).padStart(2, '0');
+            var offset = -now.getTimezoneOffset() / 60;
+            var tz = 'WIB';
+            if (offset === 8) tz = 'WITA';
+            else if (offset === 9) tz = 'WIT';
+            else if (offset !== 7) tz = (offset >= 0 ? 'UTC+' : 'UTC') + offset;
+            tElem.textContent = hh + ':' + mm + ':' + ss + ' ' + tz;
+          }
+          renderBmkgClock();
+          if (!window._bmkgClockInterval) {
+            window._bmkgClockInterval = setInterval(renderBmkgClock, 1000);
+          }
+        })();
+      </script>
+      <div class="gov-links">
+        <a href="https://www.bmkg.go.id" target="_blank" rel="noreferrer">Website Utama BMKG</a>
+        <a href="#kontak">Layanan Bantuan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Site Header with Official BMKG Logo -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="brand-section">
+        <div class="bmkg-official-logo">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-names">
+          <div class="brand-title">
+            Portal Data BMKG
+          </div>
+          <div class="brand-subtitle">Badan Meteorologi, Klimatologi, dan Geofisika</div>
+        </div>
+      </a>
+
+      <nav class="primary-nav">
+        <a href="/" class="">Beranda</a>
+        <a href="/dataset/" class="">Katalog Data</a>
+        <a href="/api/csv/docs" class="" title="Akses Dokumentasi &amp; Endpoint Public REST API BMKG">
+          <i class="fa-solid fa-code"></i> REST API Publik
+        </a>
+        <a href="/#pilar">5 Pilar MKG</a>
+        <a href="/#peta">Peta Observasi</a>
+      </nav>
+
+      <div class="header-right-actions">
+        
+        
+          <a href="/dashboard/datasets" class="btn-interactive btn-header-nav-link" title="Dashboard Dataset Saya">
+            <i class="fa-solid fa-gauge-high" style="color: var(--bmkg-blue);"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/user/edit/admin" class="btn-interactive btn-header-nav-link" title="Kelola Profil Pengguna">
+            <i class="fa-solid fa-user-gear" style="color: var(--bmkg-blue);"></i>
+            <span>Profil</span>
+          </a>
+          
+          <a href="/ckan-admin/" class="btn-interactive header-user-badge" title="Akses Panel Admin BMKG">
+            <i class="fa-solid fa-circle-user"></i>
+            <span>admin</span>
+            <span class="badge-admin-tag">SYSADMIN</span>
+          </a>
+          <form action="/user/_logout" method="post" style="display: inline; margin: 0;">
+            
+<input type="hidden" name="_csrf_token" value="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s"/>
+            <button type="submit" class="btn-interactive btn-header-logout" title="Keluar">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Keluar</span>
+            </button>
+          </form>
+        
+      </div>
+    </div>
+  </header>
+
+  
+  
+<div class="dataset-form-page-wrapper">
+  <!-- 1. Hero Header Section -->
+  <section class="dataset-form-hero">
+    <div class="dataset-form-hero-inner">
+      <div class="breadcrumbs">
+        <a href="/"><i class="fa-solid fa-house"></i> Beranda</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <a href="/group/">Grup Tematik &amp; Pilar</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; opacity: 0.6;"></i>
+        <span>Edit Grup: Meteorologi</span>
+      </div>
+
+      <div class="dataset-form-hero-content">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div class="dataset-form-hero-badge">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Portal Administrasi Data BMKG</span>
+          </div>
+          
+            
+            <a href="/group/meteorologi" target="_blank" class="btn-action-cancel" style="background: rgba(255, 255, 255, 0.12); color: #ffffff; border-color: rgba(255, 255, 255, 0.3); font-size: 0.82rem; padding: 0.45rem 0.95rem;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Halaman Publik Grup
+            </a>
+          
+        </div>
+        <h1 class="dataset-form-hero-title">
+          Edit Metadata &amp; Pengaturan: Meteorologi
+        </h1>
+        <p class="dataset-form-hero-lead">
+          Kategorikan koleksi dataset BMKG berdasarkan pilar keilmuan, topik pengamatan khusus, atau proyek strategis nasional untuk mempermudah navigasi katalog data terbuka bagi publik dan periset.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Main Content Grid (Form + Guidance Sidebar) -->
+  <div class="dataset-form-layout-container">
+    <div class="dataset-form-main-col">
+      
+        
+
+
+
+
+
+
+
+
+<form id="group-edit" class="bmkg-group-form" method="post" action="" data-module="basic-form" enctype="multipart/form-data" novalidate>
+  
+<input type="hidden" name="_csrf_token" value="Ijc2ODMyM2Y0YWVkZTU5ZWExMTBmYWQ5ZjM5ZjlmYzA2NDRlM2NlMTEi.atWH4g.yluQuV4WklIiN4mKw7uh68PvN0s"/>
+
+  <!-- Ringkasan Galat (Error Summary) jika ada validasi yang gagal -->
+  
+    
+  
+
+  <!-- CARD 1: Identitas & Nama Grup Tematik -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(0, 90, 158, 0.1); color: #005a9e;">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <h3 class="section-heading">1. Identitas &amp; Nama Grup Tematik</h3>
+          
+            <span class="bmkg-input-hint-badge" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+              <i class="fa-solid fa-pen-to-square"></i> Mode Sunting Grup
+            </span>
+          
+        </div>
+        <p class="section-subheading">Informasi nama resmi kelompok dataset, tautan slug permanen, dan ringkasan cakupan tema pengamatan.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <!-- Quick Preset Pilar BMKG (Pilihan Cepat) -->
+      <div class="bmkg-preset-box">
+        <div class="bmkg-preset-header">
+          <span class="bmkg-preset-title">
+            <i class="fa-solid fa-sparkles" style="color: #0284c7;"></i>
+            Pilihan Cepat Klaster Pilar BMKG:
+          </span>
+          <span style="font-size: 0.74rem; color: #64748b;">Klik untuk menerapkan template nama &amp; tema</span>
+        </div>
+        <div class="bmkg-preset-chips">
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('meteorologi')">
+            <i class="fa-solid fa-cloud-sun" style="color: #0284c7;"></i> Meteorologi
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('klimatologi')">
+            <i class="fa-solid fa-temperature-half" style="color: #d97706;"></i> Klimatologi
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('geofisika')">
+            <i class="fa-solid fa-volcano" style="color: #dc2626;"></i> Geofisika
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('kualitas-udara')">
+            <i class="fa-solid fa-wind" style="color: #059669;"></i> Kualitas Udara
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('maritim')">
+            <i class="fa-solid fa-water" style="color: #0891b2;"></i> Maritim &amp; Kelautan
+          </button>
+          <button type="button" class="preset-chip" onclick="applyBmkgThemePreset('radar')">
+            <i class="fa-solid fa-satellite-dish" style="color: #7c3aed;"></i> Radar &amp; Citra Satelit
+          </button>
+        </div>
+      </div>
+
+      <!-- Judul / Nama Grup -->
+      <div class="bmkg-form-group">
+        <div class="bmkg-input-header">
+          <label for="field-title" class="bmkg-label required" style="margin-bottom: 0;">
+            Nama Grup / Klaster Tematik
+            <span class="required-star">*</span>
+          </label>
+          <span class="bmkg-input-hint-badge required-badge">
+            <i class="fa-solid fa-asterisk" style="font-size: 0.65rem;"></i> Wajib Diisi
+          </span>
+        </div>
+        <div class="input-with-icon-wrap">
+          <i class="fa-solid fa-layer-group input-prefix-icon"></i>
+          <input id="field-title" type="text" name="title" value="Meteorologi"
+            placeholder="Contoh: Meteorologi atau Pengamatan Cuaca & Iklim Ekstrem"
+            data-module="slug-preview-target"
+            class="bmkg-input with-prefix-icon form-control " required autocomplete="off" />
+        </div>
+        
+        <span class="field-helper-text">Gunakan nama yang komunikatif dan representatif (misal: <em>Meteorologi</em>, <em>Klimatologi</em>, <em>Gempabumi &amp; Tsunami</em>, <em>Kualitas Udara</em>).</span>
+      </div>
+
+      <!-- URL Slug Permanen -->
+      <div class="bmkg-form-group">
+        
+        
+        <div class="bmkg-input-header">
+          <label for="field-name" class="bmkg-label required" style="margin-bottom: 0;">
+            Tautan URL Permanen (Slug)
+            <span class="required-star">*</span>
+          </label>
+          <span id="slugBadge" class="bmkg-input-hint-badge auto-badge">
+            <i class="fa-solid fa-link"></i> Ramah SEO
+          </span>
+        </div>
+        <div class="bmkg-slug-input-wrapper is-locked" id="slugWrapper">
+          <span class="slug-prefix">
+            <i class="fa-solid fa-globe"></i>
+            <span>/group/</span>
+          </span>
+          <input id="field-name" type="text" name="name" value="meteorologi"
+            placeholder="meteorologi"
+            data-module="slug-preview-slug" data-module-prefix="localhost:5000/group/" data-module-placeholder="&lt;nama-grup&gt;"
+            class="bmkg-input slug-input form-control " required readonly autocomplete="off" />
+          
+            <button type="button" class="slug-action-btn" id="btnToggleSlugLock" onclick="toggleSlugLock(this)" title="Kunci/buka untuk mengedit slug URL">
+              <i class="fa-solid fa-lock" id="slugLockIcon"></i>
+              <span id="slugLockLabel">Terkunci</span>
+            </button>
+          
+        </div>
+        
+        <span class="field-helper-text">Pranala ramah mesin pencari. Hanya gunakan huruf kecil, angka, dan tanda hubung (-). Dihasilkan otomatis dari nama grup.</span>
+      </div>
+
+      <!-- Deskripsi Grup -->
+      <div class="bmkg-form-group">
+        <div class="bmkg-input-header">
+          <label for="field-description" class="bmkg-label" style="margin-bottom: 0;">
+            Deskripsi &amp; Cakupan Data Grup
+          </label>
+          <span class="bmkg-input-hint-badge">
+            <i class="fa-brands fa-markdown"></i> Markdown Didukung
+          </span>
+        </div>
+        <!-- Markdown Toolbar Helper -->
+        <div class="bmkg-markdown-header">
+          <div class="markdown-tools">
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('**', '**', 'teks tebal')" title="Tebal (Bold)"><i class="fa-solid fa-bold"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('*', '*', 'teks miring')" title="Miring (Italic)"><i class="fa-solid fa-italic"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('### ', '', 'Judul Bagian')" title="Heading 3"><i class="fa-solid fa-heading"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('- ', '', 'Poin daftar')" title="Daftar Berbutir"><i class="fa-solid fa-list-ul"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('[', '](https://bmkg.go.id)', 'Tautan BMKG')" title="Sisipkan Tautan"><i class="fa-solid fa-link"></i></button>
+            <button type="button" class="md-tool-btn" onclick="insertMarkdownTag('`', '`', 'parameter_sensor')" title="Format Kode / Satuan"><i class="fa-solid fa-code"></i></button>
+          </div>
+          <span class="markdown-count" id="descCharCount">0 karakter</span>
+        </div>
+        <div class="textarea-container">
+          <textarea id="field-description" name="description" class="bmkg-textarea form-control has-toolbar" rows="6"
+            placeholder="Tuliskan latar belakang grup, ragam parameter observasi yang dihimpun, metodologi pengumpulan, serta pemanfaatan data terbuka ini bagi riset, peringatan dini, dan mitigasi bencana...">Pilar observasi, prediksi cuaca permukaan, angin maritim, radar, citra satelit resolusi tinggi, dan layanan informasi cuaca penerbangan di seluruh wilayah Indonesia.</textarea>
+        </div>
+        
+        <span class="field-helper-text">Gunakan format Markdown untuk menata teks paragraf, poin spesifikasi teknis, atau tautan portal resmi BMKG.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Visual & Lambang Identitas Grup -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(0, 135, 90, 0.1); color: #00875a;">
+        <i class="fa-solid fa-image"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">2. Logo &amp; Lambang Visual Grup</h3>
+        <p class="section-subheading">Sematkan lambang pilar MKG atau logo proyek riset agar mudah dikenali dalam katalog dan kartu beranda.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      <div class="bmkg-media-custom-container">
+        <!-- Media Mode Switcher Tabs -->
+        <div class="media-mode-switcher">
+          <button type="button" class="media-mode-btn is-active" id="btnTabUrl" onclick="switchMediaMode('url')">
+            <i class="fa-solid fa-link"></i> Tautan URL Gambar
+          </button>
+          <button type="button" class="media-mode-btn" id="btnTabUpload" onclick="switchMediaMode('upload')">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Berkas
+          </button>
+          <button type="button" class="media-mode-btn" id="btnTabPreset" onclick="switchMediaMode('preset')">
+            <i class="fa-solid fa-shapes"></i> Preset Lambang BMKG
+          </button>
+        </div>
+
+        <!-- Live Preview Strip -->
+        <div class="media-preview-strip">
+          <div class="media-preview-avatar" id="mediaPreviewBox">
+            
+              <img id="mediaPreviewImg" src="http://localhost:5000/uploads/group//img/pilar-met.png" alt="Logo Grup" onerror="this.style.display='none'; document.getElementById('mediaPreviewFallback').style.display='flex';" />
+              <div id="mediaPreviewFallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center;"><i class="fa-solid fa-layer-group"></i></div>
+            
+          </div>
+          <div class="media-preview-info">
+            <h5 id="mediaPreviewTitle">
+              Citra / Lambang Terpasang
+            </h5>
+            <p id="mediaPreviewDesc">
+              http://localhost:5000/uploads/group//img/pilar-met.png
+            </p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <button type="button" class="btn-media-clear" id="btnMediaClear" onclick="clearGroupImage()">
+                <i class="fa-solid fa-trash-can"></i> Hapus / Reset Gambar
+              </button>
+              <span style="font-size: 0.74rem; color: #64748b;">(Disarankan rasio 1:1 atau 16:9, PNG transparan)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Input to signal clear upload to CKAN -->
+        <input type="hidden" name="clear_upload" id="field-clear-upload" value="" />
+
+        <!-- Panel 1: URL Input -->
+        <div id="panelMediaUrl" class="media-panel">
+          <div class="bmkg-form-group" style="margin-bottom: 0;">
+            <label for="field-image-url" class="bmkg-label">
+              Tautan URL Gambar / Ikon Online
+            </label>
+            <div class="input-with-icon-wrap">
+              <i class="fa-solid fa-link input-prefix-icon"></i>
+              <input id="field-image-url" type="url" name="image_url" value="/img/pilar-met.png"
+                placeholder="https://bmkg.go.id/asset/img/icons/meteorologi.png"
+                oninput="updateImagePreviewFromUrl(this.value)"
+                class="bmkg-input with-prefix-icon form-control " />
+            </div>
+            <span class="field-helper-text">Masukkan tautan langsung gambar lambang publik berformat PNG, SVG, atau WebP.</span>
+          </div>
+        </div>
+
+        <!-- Panel 2: File Upload (Dropzone) -->
+        <div id="panelMediaUpload" class="media-panel" style="display: none;">
+          <div class="media-dropzone" id="mediaDropzone">
+            <input id="field-image-upload" type="file" name="image_upload" accept="image/png, image/jpeg, image/svg+xml, image/webp" onchange="handleFileSelect(this)" />
+            <div class="dropzone-inner-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="dropzone-inner-title" id="dropzoneTitle">Klik atau Seret Berkas Gambar ke Sini</div>
+            <div class="dropzone-inner-subtitle">Mendukung format PNG, SVG, JPG, WebP hingga ukuran 2 MB</div>
+          </div>
+        </div>
+
+        <!-- Panel 3: BMKG Official Preset Icons -->
+        <div id="panelMediaPreset" class="media-panel" style="display: none;">
+          <div class="preset-icon-gallery">
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-met.png', 'Meteorologi')">
+              <div class="preset-icon-circle" style="background: #e0f2fe; color: #0284c7;">
+                <i class="fa-solid fa-cloud-sun"></i>
+              </div>
+              <span class="preset-icon-label">Meteorologi</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-klim.png', 'Klimatologi')">
+              <div class="preset-icon-circle" style="background: #fef3c7; color: #d97706;">
+                <i class="fa-solid fa-temperature-half"></i>
+              </div>
+              <span class="preset-icon-label">Klimatologi</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-geo.png', 'Geofisika')">
+              <div class="preset-icon-circle" style="background: #fee2e2; color: #dc2626;">
+                <i class="fa-solid fa-volcano"></i>
+              </div>
+              <span class="preset-icon-label">Geofisika</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-ku.png', 'Kualitas Udara')">
+              <div class="preset-icon-circle" style="background: #dcfce7; color: #059669;">
+                <i class="fa-solid fa-wind"></i>
+              </div>
+              <span class="preset-icon-label">Kualitas Udara</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/pilar-maritim.png', 'Maritim')">
+              <div class="preset-icon-circle" style="background: #cffafe; color: #0891b2;">
+                <i class="fa-solid fa-water"></i>
+              </div>
+              <span class="preset-icon-label">Maritim</span>
+            </div>
+            <div class="preset-icon-card" onclick="selectPresetIcon('/img/logo-bmkg.png', 'Logo Resmi BMKG')">
+              <div class="preset-icon-circle" style="background: #f1f5f9; color: #003865;">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <span class="preset-icon-label">BMKG Resmi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3: Kontak Pengelola & Status Visibilitas -->
+  <div class="bmkg-form-card">
+    <div class="card-section-header">
+      <div class="section-icon-badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+        <i class="fa-solid fa-address-card"></i>
+      </div>
+      <div>
+        <h3 class="section-heading">3. Penanggung Jawab &amp; Metadata Tematik</h3>
+        <p class="section-subheading">Informasi penanggung jawab teknis, surat elektronik koordinasi, dan status taksonomi grup.</p>
+      </div>
+    </div>
+
+    <div class="card-section-body">
+      
+      
+      
+      
+      
+        
+          
+            
+            
+            
+          
+        
+          
+            
+            
+            
+          
+        
+          
+            
+            
+            
+          
+        
+      
+
+      <div class="form-row-3col">
+        <!-- PIC Penanggung Jawab -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__0__key" value="penanggung_jawab" />
+          <label for="field-pic" class="bmkg-label">Koordinator / Tim Teknis</label>
+          <div class="input-with-icon-wrap">
+            <i class="fa-solid fa-user-tie input-prefix-icon"></i>
+            <input id="field-pic" type="text" name="extras__0__value" value=""
+              placeholder="Contoh: Kedeputian Bidang Meteorologi" class="bmkg-input with-prefix-icon form-control" />
+          </div>
+          <span class="field-helper-text">Kedeputian, Balai Besar, atau Tim Pokja pengampu data.</span>
+        </div>
+
+        <!-- Email Kontak -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__1__key" value="email_kontak" />
+          <label for="field-email-kontak" class="bmkg-label">Email Dinas Koordinasi</label>
+          <div class="input-with-icon-wrap">
+            <i class="fa-solid fa-envelope input-prefix-icon"></i>
+            <input id="field-email-kontak" type="email" name="extras__1__value" value=""
+              placeholder="Contoh: data.mkg@bmkg.go.id" class="bmkg-input with-prefix-icon form-control" />
+          </div>
+          <span class="field-helper-text">Alamat surat elektronik untuk korespondensi kurasi dataset.</span>
+        </div>
+
+        <!-- Klasifikasi Taksonomi -->
+        <div class="bmkg-form-group">
+          <input type="hidden" name="extras__2__key" value="kategori_tematik" />
+          <label for="field-kategori-tematik" class="bmkg-label">Kategori Klaster</label>
+          <div class="select-container">
+            <select id="field-kategori-tematik" name="extras__2__value" class="bmkg-select form-control">
+              <option value="Pilar Utama" selected="selected">🏛️ Pilar Utama BMKG</option>
+              <option value="Proyek Strategis" >🎯 Proyek Strategis Nasional</option>
+              <option value="Inisiatif Riset" >🔬 Inisiatif Riset &amp; Inovasi</option>
+              <option value="Mitigasi Bencana" >🚨 Mitigasi Kebencanaan Khusus</option>
+            </select>
+          </div>
+          <span class="field-helper-text">Pengelompokan dalam direktori taksonomi portal terbuka.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+
+
+  <!-- CARD 4: Tombol Aksi Formulir (Batal / Hapus / Simpan) -->
+  <div class="bmkg-form-actions-bar">
+    <div class="actions-left">
+      
+      <a href="/group/meteorologi" class="btn-action-cancel">
+        <i class="fa-solid fa-arrow-left"></i> Batal &amp; Kembali
+      </a>
+      
+  
+
+    </div>
+
+    <div class="actions-right">
+      <button class="btn-action-submit" name="save" type="submit" id="btnSubmitGroup">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Create Group</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<script>
+  // 1. Slug Generator & Lock Controller
+  var isSlugLocked = true;
+  var titleInput = document.getElementById('field-title');
+  var slugInput = document.getElementById('field-name');
+  var slugWrapper = document.getElementById('slugWrapper');
+  var slugLockIcon = document.getElementById('slugLockIcon');
+  var slugLockLabel = document.getElementById('slugLockLabel');
+
+  function generateSlugString(str) {
+    if (!str) return '';
+    return str.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function syncSlugFromTitle() {
+    if (titleInput && slugInput) {
+      slugInput.value = generateSlugString(titleInput.value);
+    }
+  }
+
+  function toggleSlugLock(btn) {
+    isSlugLocked = !isSlugLocked;
+    if (slugInput) {
+      slugInput.readOnly = isSlugLocked;
+    }
+    if (slugWrapper) {
+      if (isSlugLocked) {
+        slugWrapper.classList.add('is-locked');
+      } else {
+        slugWrapper.classList.remove('is-locked');
+        slugInput.focus();
+      }
+    }
+    if (slugLockIcon) {
+      slugLockIcon.className = isSlugLocked ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open';
+    }
+    if (slugLockLabel) {
+      slugLockLabel.textContent = isSlugLocked ? 'Terkunci' : 'Terbuka';
+    }
+  }
+
+  if (titleInput && slugInput) {
+    titleInput.addEventListener('input', function() {
+      if (!isSlugLocked) {
+        slugInput.value = generateSlugString(this.value);
+      }
+    });
+  }
+
+  // 2. Preset Pilar BMKG (Quick Fill)
+  var bmkgPilarPresets = {
+    'meteorologi': {
+      title: 'Meteorologi',
+      slug: 'meteorologi',
+      desc: 'Pilar observasi, prediksi cuaca permukaan, angin maritim, radar, citra satelit resolusi tinggi, dan layanan informasi cuaca penerbangan di seluruh wilayah Indonesia.',
+      icon: '/img/pilar-met.png'
+    },
+    'klimatologi': {
+      title: 'Klimatologi',
+      slug: 'klimatologi',
+      desc: 'Data analisis variabilitas iklim, tren suhu udara global, anomali curah hujan dasarian, indeks kekeringan hidrometeorologi, dan prediksi dinamika musim kepulauan Nusantara.',
+      icon: '/img/pilar-klim.png'
+    },
+    'geofisika': {
+      title: 'Geofisika',
+      slug: 'geofisika',
+      desc: 'Pemantauan seismisitas gempabumi real-time, sistem peringatan dini tsunami (InaTEWS), anomali geomagnet, gravitasi bumi, serta rekaman petir atmosferik.',
+      icon: '/img/pilar-geo.png'
+    },
+    'kualitas-udara': {
+      title: 'Kualitas Udara',
+      slug: 'kualitas-udara',
+      desc: 'Pengukuran konsentrasi partikulat aerosol PM2.5, PM10, sulfur dioksida, ozon permukaan, dan gas rumah kaca melalui jaringan stasiun Global Atmosphere Watch (GAW) BMKG.',
+      icon: '/img/pilar-ku.png'
+    },
+    'maritim': {
+      title: 'Maritim & Kelautan',
+      slug: 'maritim-kelautan',
+      desc: 'Informasi tinggi gelombang laut, kecepatan arus perairan, angin permukaan maritim, pasang surut, dan keselamatan pelayaran di perairan Indonesia.',
+      icon: '/img/pilar-maritim.png'
+    },
+    'radar': {
+      title: 'Radar & Citra Satelit',
+      slug: 'radar-citra-satelit',
+      desc: 'Produk komposit radar cuaca pita-C/S, citra satelit Himawari saluran inframerah, estimasi liputan awan, dan pergerakan sel konvektif awan cumulonimbus.',
+      icon: '/img/pilar-met.png'
+    }
+  };
+
+  function applyBmkgThemePreset(key) {
+    var p = bmkgPilarPresets[key];
+    if (!p) return;
+
+    if (titleInput) {
+      titleInput.value = p.title;
+      titleInput.dispatchEvent(new Event('input'));
+    }
+    if (slugInput && !isSlugLocked) {
+      slugInput.value = p.slug;
+    }
+    var descEl = document.getElementById('field-description');
+    if (descEl) {
+      descEl.value = p.desc;
+      updateDescCount();
+    }
+    selectPresetIcon(p.icon, p.title);
+  }
+
+  // 3. Media Mode Switcher (URL vs Upload vs Preset)
+  function switchMediaMode(mode) {
+    var btnUrl = document.getElementById('btnTabUrl');
+    var btnUpload = document.getElementById('btnTabUpload');
+    var btnPreset = document.getElementById('btnTabPreset');
+
+    var panelUrl = document.getElementById('panelMediaUrl');
+    var panelUpload = document.getElementById('panelMediaUpload');
+    var panelPreset = document.getElementById('panelMediaPreset');
+
+    if (btnUrl) btnUrl.classList.toggle('is-active', mode === 'url');
+    if (btnUpload) btnUpload.classList.toggle('is-active', mode === 'upload');
+    if (btnPreset) btnPreset.classList.toggle('is-active', mode === 'preset');
+
+    if (panelUrl) panelUrl.style.display = (mode === 'url') ? 'block' : 'none';
+    if (panelUpload) panelUpload.style.display = (mode === 'upload') ? 'block' : 'none';
+    if (panelPreset) panelPreset.style.display = (mode === 'preset') ? 'block' : 'none';
+  }
+
+  function updateImagePreviewFromUrl(url) {
+    var previewImg = document.getElementById('mediaPreviewImg');
+    var fallback = document.getElementById('mediaPreviewFallback');
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    var clearInput = document.getElementById('field-clear-upload');
+
+    if (clearInput) clearInput.value = '';
+
+    if (url && url.trim().length > 0) {
+      if (previewImg) {
+        previewImg.src = url.trim();
+        previewImg.style.display = 'block';
+      }
+      if (fallback) fallback.style.display = 'none';
+      if (title) title.textContent = 'Citra dari Tautan URL';
+      if (desc) desc.textContent = url.trim();
+    } else {
+      if (previewImg) {
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+      }
+      if (fallback) fallback.style.display = 'flex';
+      if (title) title.textContent = 'Belum Ada Lambang';
+      if (desc) desc.textContent = 'Masukkan URL atau unggah berkas citra.';
+    }
+  }
+
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      var file = input.files[0];
+      var dropTitle = document.getElementById('dropzoneTitle');
+      if (dropTitle) dropTitle.textContent = 'Berkas dipilih: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var previewImg = document.getElementById('mediaPreviewImg');
+        var fallback = document.getElementById('mediaPreviewFallback');
+        var title = document.getElementById('mediaPreviewTitle');
+        var desc = document.getElementById('mediaPreviewDesc');
+        var clearInput = document.getElementById('field-clear-upload');
+
+        if (clearInput) clearInput.value = '';
+        if (previewImg) {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        }
+        if (fallback) fallback.style.display = 'none';
+        if (title) title.textContent = 'Berkas Siap Diunggah';
+        if (desc) desc.textContent = file.name + ' — ' + (file.size / 1024).toFixed(1) + ' KB';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function selectPresetIcon(iconUrl, label) {
+    var urlInput = document.getElementById('field-image-url');
+    if (urlInput) {
+      urlInput.value = iconUrl;
+    }
+    updateImagePreviewFromUrl(iconUrl);
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    if (title) title.textContent = 'Preset BMKG: ' + label;
+    if (desc) desc.textContent = iconUrl;
+  }
+
+  function clearGroupImage() {
+    var urlInput = document.getElementById('field-image-url');
+    var fileInput = document.getElementById('field-image-upload');
+    var clearInput = document.getElementById('field-clear-upload');
+    var previewImg = document.getElementById('mediaPreviewImg');
+    var fallback = document.getElementById('mediaPreviewFallback');
+    var title = document.getElementById('mediaPreviewTitle');
+    var desc = document.getElementById('mediaPreviewDesc');
+    var dropTitle = document.getElementById('dropzoneTitle');
+
+    if (urlInput) urlInput.value = '';
+    if (fileInput) fileInput.value = '';
+    if (clearInput) clearInput.value = '1';
+
+    if (previewImg) {
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+    }
+    if (fallback) fallback.style.display = 'flex';
+    if (title) title.textContent = 'Citra Dihapus';
+    if (desc) desc.textContent = 'Perubahan akan diterapkan saat Anda menekan tombol Simpan.';
+    if (dropTitle) dropTitle.textContent = 'Klik atau Seret Berkas Gambar ke Sini';
+  }
+
+  // 4. Markdown Toolbar Insert Helper
+  function insertMarkdownTag(startTag, endTag, defaultText) {
+    var textarea = document.getElementById('field-description');
+    if (!textarea) return;
+
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var text = textarea.value;
+    var selected = text.substring(start, end) || defaultText;
+    var replacement = startTag + selected + endTag;
+
+    textarea.value = text.substring(0, start) + replacement + text.substring(end);
+    textarea.focus();
+    textarea.selectionStart = start + startTag.length;
+    textarea.selectionEnd = start + startTag.length + selected.length;
+    updateDescCount();
+  }
+
+  function updateDescCount() {
+    var descEl = document.getElementById('field-description');
+    var countEl = document.getElementById('descCharCount');
+    if (descEl && countEl) {
+      var len = (descEl.value || '').length;
+      countEl.textContent = len + ' karakter';
+    }
+  }
+
+  var descTextarea = document.getElementById('field-description');
+  if (descTextarea) {
+    descTextarea.addEventListener('input', updateDescCount);
+    updateDescCount();
+  }
+</script>
+      
+    </div>
+
+    <!-- Sidebar Guidance & Information -->
+    <aside class="dataset-form-sidebar-col">
+      <!-- Card 1: Pedoman Grup Tematik -->
+      <div class="bmkg-guide-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-layer-group" style="color: var(--bmkg-blue, #005a9e);"></i>
+          <span>Pedoman Grup Tematik</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <div class="guide-item">
+            <i class="fa-solid fa-circle-check guide-icon"></i>
+            <div>
+              <strong>Nama Grup yang Jelas</strong>
+              <p>Gunakan nama topik atau bidang pengamatan yang komunikatif (contoh: <em>Prakiraan Musim</em>, <em>Gempabumi &amp; Tsunami</em>, <em>Kualitas Udara</em>).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-link guide-icon"></i>
+            <div>
+              <strong>Tautan Slug Ringkas</strong>
+              <p>Gunakan huruf kecil dan tanda hubung (-) yang ramah SEO, misalnya <code>cuaca-penerbangan</code>.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <i class="fa-solid fa-image guide-icon"></i>
+            <div>
+              <strong>Ikon / Lambang Tematik</strong>
+              <p>Sertakan logo atau citra simbolis beresolusi baik agar mudah dikenali pada galeri katalog.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Perbedaan Grup vs Organisasi -->
+      <div class="bmkg-guide-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-circle-info" style="color: var(--bmkg-green, #00875a);"></i>
+          <span>Fungsi Grup di Portal Data</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin: 0 0 0.65rem 0;">
+            <strong>Grup</strong> mengelompokkan dataset lintas unit kerja berdasarkan topik atau proyek riset, sedangkan <strong>Organisasi</strong> mewakili struktur instansi/unit kedinasan pemilik data di lingkungan BMKG.
+          </p>
+          <div style="background: rgba(0, 90, 158, 0.08); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.82rem; color: #003865; display: flex; align-items: flex-start; gap: 0.5rem;">
+            <i class="fa-solid fa-lightbulb" style="color: #005a9e; margin-top: 2px;"></i>
+            <span>Satu dataset dapat masuk ke dalam beberapa grup sekaligus sesuai relevansi kajian ilmiah.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Bantuan Pengelola -->
+      <div class="bmkg-guide-card help-card">
+        <div class="bmkg-guide-header">
+          <i class="fa-solid fa-headset" style="color: #003865;"></i>
+          <span>Bantuan Administrator</span>
+        </div>
+        <div class="bmkg-guide-body">
+          <p style="font-size: 0.82rem; color: #64748b; margin: 0 0 0.5rem 0;">
+            Butuh penyesuaian taksonomi data atau pengaturan hak akses kurator grup?
+          </p>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #003865;">
+            <i class="fa-solid fa-envelope" style="color: #005a9e; margin-right: 4px;"></i> pusdatin@bmkg.go.id
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+    <!-- 6. Institutional Footer with Official Logo -->
+<footer class="gov-footer" id="kontak">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-brand-header">
+        <div class="footer-logo-svg">
+          <img src="/img/logo-bmkg.png" alt="Logo Resmi BMKG" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div>
+          <h4 style="margin-bottom: 2px;">Portal Data BMKG</h4>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Portal Data Terbuka Resmi</div>
+        </div>
+      </div>
+      <p>
+        Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)<br>
+        Jl. Angkasa I No. 2, Kemayoran, Jakarta Pusat 10610<br>
+        Email: portaldata@bmkg.go.id • Call Center: 196
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>5 Pilar Layanan</h4>
+      <ul>
+        <li><a href="/dataset/?groups=meteorologi">Katalog Meteorologi</a></li>
+        <li><a href="/dataset/?groups=klimatologi">Katalog Klimatologi</a></li>
+        <li><a href="/dataset/?groups=geofisika">Katalog Geofisika</a></li>
+        <li><a href="/dataset/?groups=instrumen-mkg">Katalog Instrumen MKG</a></li>
+        <li><a href="/dataset/?groups=modifikasi-cuaca">Katalog Modifikasi Cuaca</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Akses Pengembang</h4>
+      <ul>
+        <li><a href="/api/csv/docs" target="_blank" style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-code"></i> Public CSV REST API</a></li>
+        <li><a href="/api/csv/datasets" target="_blank">Katalog API Dataset CSV</a></li>
+        <li><a href="/api/3/action/package_list" target="_blank">CKAN 2.12 Action API</a></li>
+        <li><a href="/api/3/action/help_show?name=datastore_search" target="_blank">DataStore SQL Query</a></li>
+        <li><a href="/api/gempa/realtime" target="_blank">Real-time Seismik API</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Kepatuhan &amp; Regulasi</h4>
+      <ul>
+        <li><a href="https://data.go.id" target="_blank">Perpres No. 39 Tahun 2019 (SDI)</a></li>
+        <li><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Lisensi Terbuka CC-BY 4.0</a></li>
+        <li><a href="https://wmo.int" target="_blank">Prinsip Data Terbuka WMO</a></li>
+        <li><a href="#">Standar Metadata Nasional</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom-bar">
+    <div>&copy; 2026 Badan Meteorologi, Klimatologi, dan Geofisika. Hak Cipta Dilindungi Undang-Undang.</div>
+    <div>Platform CKAN 2.12 Stable • Native Ubuntu 22.04 LTS Stack</div>
+  </div>
+</footer>
+  
+  
+  
+  
+  
+    
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- BMKG Real-Time Clock Module -->
+  <script src="/js/bmkg-realtime-clock.js"></script>
+
+  
+  <script src="/js/bmkg-realtime-clock.js"></script>
+
+
+    
+    
+    <link href="/webassets/vendor/f3b8236b_select2.css" rel="stylesheet"/>
+<link href="/webassets/vendor/53df638c_fontawesome.css" rel="stylesheet"/>
+    <script src="/webassets/vendor/240e5086_jquery.js" type="text/javascript"></script>
+<script src="/webassets/vendor/71bc2bbc_vendor.js" type="text/javascript"></script>
+<script src="/webassets/vendor/6d1ad7e6_bootstrap.js" type="text/javascript"></script>
+<script src="/webassets/vendor/529a0eb7_htmx.js" type="text/javascript"></script>
+<script src="/webassets/base/ebc2f0b9_main.js" type="text/javascript"></script>
+<script src="/webassets/base/78ac888d_ckan.js" type="text/javascript"></script>
+  </body>
+</html>

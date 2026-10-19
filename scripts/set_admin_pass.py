@@ -1,22 +1,19 @@
 import os
 os.environ['CKAN_INI'] = '/etc/ckan/default/ckan.ini'
-# pyrefly: ignore [missing-import]
 from ckan.cli import load_config
 conf = load_config('/etc/ckan/default/ckan.ini')
-# pyrefly: ignore [missing-import]
 import ckan.model as model
-# pyrefly: ignore [missing-import]
 import sqlalchemy as sa
 
 engine = sa.create_engine(conf.get('sqlalchemy.url'))
 model.init_model(engine)
 
-user = model.User.by_name('admin')
-if user:
-    user._set_password('AdminBMKG2026!')
-    user.sysadmin = True
-    model.repo.commit()
-    print("SUCCESS: Admin password set to AdminBMKG2026! and sysadmin enabled.")
-else:
-    print("User admin not found.")
-
+for username in ['admin', 'admin_bmkg', 'bmkgmdu']:
+    user = model.User.by_name(username)
+    if user:
+        user._set_password('AdminBMKG2026!')
+        user.sysadmin = True
+        model.repo.commit()
+        print(f"SUCCESS: {username} password set to AdminBMKG2026! and sysadmin enabled.")
+    else:
+        print(f"User {username} not found.")
