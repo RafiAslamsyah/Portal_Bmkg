@@ -6502,6 +6502,314 @@ footer.gov-footer, .gov-footer {
   box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
 }
 
+/* ==========================================================================
+   BMKG OVERRIDES FOR REMAINING CKAN TEMPLATE COMPONENTS
+   (Breadcrumb, Media Grid, Media Item, Pagination, Module Cards & Nav Tabs)
+   ========================================================================== */
+
+/* 1. Breadcrumb Toolbar */
+.toolbar {
+  margin: 1.25rem 0 1.25rem 0;
+  padding: 0;
+}
+
+ol.breadcrumb {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.65rem 1.2rem !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(0, 56, 101, 0.04) !important;
+  list-style: none !important;
+  margin: 0 !important;
+  font-size: 0.84rem !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+ol.breadcrumb > li {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+ol.breadcrumb > li + li::before {
+  content: "\f054" !important;
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  font-size: 0.65rem !important;
+  color: #94a3b8 !important;
+  padding: 0 0.35rem 0 0 !important;
+  float: none !important;
+}
+
+ol.breadcrumb > li a {
+  color: var(--bmkg-blue, #005a9e) !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+
+ol.breadcrumb > li a:hover {
+  color: var(--bmkg-blue-deep, #003865) !important;
+  text-decoration: underline !important;
+}
+
+ol.breadcrumb > li.active,
+ol.breadcrumb > li.active a,
+ol.breadcrumb > li:last-child {
+  color: var(--bmkg-blue-deep, #003865) !important;
+  font-weight: 700 !important;
+}
+
+ol.breadcrumb > li.home a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  color: var(--bmkg-blue, #005a9e) !important;
+}
+
+/* 2. Media Grid & Media Items (Group & Organization Index Pages) */
+ul.media-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+  gap: 1.5rem !important;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 1.5rem 0 !important;
+}
+
+ul.media-grid > li.media-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, border-color 0.2s !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  float: none !important;
+  width: auto !important;
+}
+
+ul.media-grid > li.media-item:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 20px -3px rgba(0, 56, 101, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border-color: #93c5fd !important;
+}
+
+.media-item .media-image {
+  width: 72px !important;
+  height: 72px !important;
+  object-fit: contain !important;
+  margin-bottom: 1rem !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.media-item .media-heading {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: var(--bmkg-blue-deep, #003865) !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.3 !important;
+}
+
+.media-item .media-description {
+  font-size: 0.85rem !important;
+  color: #475569 !important;
+  line-height: 1.5 !important;
+  margin-bottom: 1rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.media-item .count {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  padding: 0.3rem 0.75rem !important;
+  border-radius: 20px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  border: 1px solid #bfdbfe !important;
+  margin-top: auto !important;
+}
+
+.media-item .media-view {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+}
+
+.media-item .media-view span {
+  display: none !important;
+}
+
+/* 3. Pagination Controls (CKAN Page Navigation) */
+.pagination {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 2rem 0 !important;
+}
+
+.pagination > li > a,
+.pagination > li > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  color: var(--bmkg-blue-deep, #003865) !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.pagination > li > a:hover {
+  background: #f0f7ff !important;
+  border-color: var(--bmkg-blue, #005a9e) !important;
+  color: var(--bmkg-blue, #005a9e) !important;
+}
+
+.pagination > li.active > a,
+.pagination > li.active > span {
+  background: var(--bmkg-blue-deep, #003865) !important;
+  color: #ffffff !important;
+  border-color: var(--bmkg-blue-deep, #003865) !important;
+  font-weight: 700 !important;
+}
+
+.pagination > li.disabled > a,
+.pagination > li.disabled > span {
+  color: #94a3b8 !important;
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+}
+
+/* 4. CKAN Modules & Page Header Cards */
+article.module {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 2rem !important;
+  overflow: hidden !important;
+}
+
+article.module .module-content {
+  padding: 1.5rem !important;
+}
+
+article.module .module-content.page-header {
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #fafbfc !important;
+  padding: 1.25rem 1.5rem !important;
+  margin: 0 !important;
+}
+
+/* 5. Nav Tabs (Navigation Tabs across Detail Pages) */
+.nav-tabs {
+  border-bottom: 2px solid #e2e8f0 !important;
+  display: flex !important;
+  gap: 0.5rem !important;
+  margin-top: 0.75rem !important;
+}
+
+.nav-tabs > li > a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  padding: 0.65rem 1.15rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+  margin-bottom: -2px !important;
+}
+
+.nav-tabs > li > a:hover {
+  color: var(--bmkg-blue, #005a9e) !important;
+  border-bottom-color: #93c5fd !important;
+  background: transparent !important;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: var(--bmkg-blue-deep, #003865) !important;
+  border-bottom-color: var(--bmkg-blue-deep, #003865) !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+}
+
+/* 6. Flash Messages (Alerts) */
+.flash-messages .alert {
+  border-radius: 10px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  padding: 0.85rem 1.25rem !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.flash-messages .alert-success {
+  background: #ecfdf5 !important;
+  color: #065f46 !important;
+  border-color: #a7f3d0 !important;
+}
+
+.flash-messages .alert-info {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  border-color: #bfdbfe !important;
+}
+
+.flash-messages .alert-warning {
+  background: #fffbeb !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
+
+.flash-messages .alert-danger,
+.flash-messages .alert-error {
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+  border-color: #fecaca !important;
+}
+
+
 
 
 

@@ -1,4 +1,15 @@
 {% ckan_extends %}
+{% block links %}
+  <link rel="shortcut icon" href="/img/logo-bmkg.png" type="image/png" />
+  <link rel="icon" href="/img/logo-bmkg.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/img/logo-bmkg.png" />
+{% endblock %}
+
+{% block title %}
+  {%- block subtitle %}{% endblock -%}
+  {%- if self.subtitle()|trim %} - {% endif -%}
+  Portal Data BMKG
+{% endblock %}
 
 {% block styles %}
   {{ super() }}

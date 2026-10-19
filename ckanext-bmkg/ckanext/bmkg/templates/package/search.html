@@ -1,6 +1,7 @@
 {% extends "page.html" %}
 
-{% block subtitle %}{{ _('Katalog Dataset Terbuka BMKG') }}{% endblock %}
+{% block title %}Badan Meteorologi Klimatologi dan Geofisika - Katalog Dataset{% endblock %}
+{% block subtitle %}Badan Meteorologi Klimatologi dan Geofisika - Katalog Dataset{% endblock %}
 
 {% block content %}
   <!-- Flash Messages -->
@@ -82,7 +83,7 @@
       <!-- Spatial Filter Callout -->
       <div class="spatial-filter-box">
         <h5><i class="fa-solid fa-map-location-dot"></i> Filter Wilayah Spasial</h5>
-        <p>Saring dataset observasi berdasarkan Bounding Box peta (ckanext-spatial).</p>
+        <p>Saring dataset observasi berdasarkan Bounding Box peta wilayah observasi BMKG.</p>
         <a href="{{ h.url_for('home.index') }}#peta" class="btn-interactive btn-spatial-toggle" style="text-decoration: none; text-align: center; display: block;">
           <i class="fa-solid fa-draw-polygon"></i> Buka Peta Observasi
         </a>
@@ -224,7 +225,7 @@
       <div class="preview-modal-body" id="previewModalBody">
         <div style="text-align: center; padding: 2.5rem;">
           <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--bmkg-blue);"></i>
-          <p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Mengambil sampel data dari CKAN DataStore...</p>
+          <p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Mengambil sampel data observasi BMKG...</p>
         </div>
       </div>
       <div class="preview-modal-footer">
