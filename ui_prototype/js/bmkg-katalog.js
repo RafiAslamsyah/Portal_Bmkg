@@ -45,10 +45,10 @@ const SEED_DATASETS = [
 ];
 
 const PILAR_CONFIG = {
-  'meteorologi':    { cls: 'met',  icon: 'fa-cloud-sun',        label: 'Meteorologi' },
-  'klimatologi':    { cls: 'klim', icon: 'fa-temperature-half', label: 'Klimatologi' },
-  'geofisika':      { cls: 'geo',  icon: 'fa-volcano',          label: 'Geofisika' },
-  'kualitas-udara': { cls: 'ku',   icon: 'fa-wind',             label: 'Kualitas Udara' }
+  'meteorologi': { cls: 'met', icon: 'fa-cloud-sun', label: 'Meteorologi' },
+  'klimatologi': { cls: 'klim', icon: 'fa-temperature-half', label: 'Klimatologi' },
+  'geofisika': { cls: 'geo', icon: 'fa-volcano', label: 'Geofisika' },
+  'kualitas-udara': { cls: 'ku', icon: 'fa-wind', label: 'Kualitas Udara' }
 };
 
 const STORAGE_KEY = 'bmkg_datasets';
@@ -120,7 +120,7 @@ function renderDatasetCards() {
 
     const previewBtnClass = isGeoJSON ? 'btn-interactive card-sub-btn preview-geo-btn' : 'btn-interactive card-sub-btn';
     const previewBtnStyle = isGeoJSON ? 'style="background: linear-gradient(135deg, #003865, #005a9e); color: #ffffff; border-color: #003865; font-weight: 700;"' : '';
-    const previewBtnIcon  = isGeoJSON ? 'fa-map-location-dot' : 'fa-table-cells';
+    const previewBtnIcon = isGeoJSON ? 'fa-map-location-dot' : 'fa-table-cells';
     const previewBtnLabel = isGeoJSON ? 'Peta' : 'Pratinjau';
     const previewBtnTitle = isGeoJSON ? 'Lihat visualisasi peta spasial interaktif GeoJSON' : 'Pratinjau tabel DataStore';
 
@@ -172,29 +172,29 @@ function openPreviewModal(datasetId) {
   const ds = datasets.find(d => d.id === datasetId);
   if (!ds) return;
 
-  const modal      = document.getElementById('previewModal');
-  const body       = document.getElementById('previewModalBody');
-  const titleEl    = document.getElementById('previewModalTitle');
+  const modal = document.getElementById('previewModal');
+  const body = document.getElementById('previewModalBody');
+  const titleEl = document.getElementById('previewModalTitle');
   const subtitleEl = document.getElementById('previewModalSubtitle');
-  const iconEl     = document.getElementById('previewModalIcon');
-  const footerTxt  = document.getElementById('previewFooterText');
+  const iconEl = document.getElementById('previewModalIcon');
+  const footerTxt = document.getElementById('previewFooterText');
   if (!modal || !body) return;
 
   window._previewState.datasetId = datasetId;
   if (window._previewState.leafletMap) {
-    try { window._previewState.leafletMap.remove(); } catch(_) {}
+    try { window._previewState.leafletMap.remove(); } catch (_) { }
     window._previewState.leafletMap = null;
   }
 
   if (titleEl) titleEl.textContent = ds.title || 'Pratinjau Dataset';
 
-  const formats   = (ds.formats || []).map(f => f.toLowerCase());
+  const formats = (ds.formats || []).map(f => f.toLowerCase());
   const isGeoJSON = formats.includes('geojson');
 
   if (isGeoJSON) {
     if (iconEl) { iconEl.className = 'preview-modal-header-icon geojson'; iconEl.innerHTML = '<i class="fa-solid fa-map-location-dot"></i>'; }
     if (subtitleEl) subtitleEl.textContent = 'Pratinjau Peta Spasial Interaktif GeoJSON — Leaflet Map Engine';
-    if (footerTxt)  footerTxt.textContent  = 'Klik marker / geometri di peta untuk memeriksa atribut lengkap';
+    if (footerTxt) footerTxt.textContent = 'Klik marker / geometri di peta untuk memeriksa atribut lengkap';
 
     body.innerHTML = `
       <div class="preview-map-infobar" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;">
@@ -219,7 +219,7 @@ function openPreviewModal(datasetId) {
   } else {
     if (iconEl) { iconEl.className = 'preview-modal-header-icon csv'; iconEl.innerHTML = '<i class="fa-solid fa-table-cells"></i>'; }
     if (subtitleEl) subtitleEl.textContent = 'Pratinjau Tabel Observasi CSV';
-    if (footerTxt)  footerTxt.textContent  = 'Menampilkan baris data observasi BMKG';
+    if (footerTxt) footerTxt.textContent = 'Menampilkan baris data observasi BMKG';
 
     body.innerHTML = _buildCsvTableHtml(ds);
     modal.classList.add('active');
@@ -242,7 +242,7 @@ function _initGeojsonMap(ds) {
   if (ds.geojsonContent) {
     let raw = ds.geojsonContent;
     if (typeof raw === 'string') {
-      try { raw = JSON.parse(raw); } catch(e) {
+      try { raw = JSON.parse(raw); } catch (e) {
         _showMapEmpty(mapEl, featureCountEl, 'Konten GeoJSON tidak valid (gagal parse JSON).');
         return;
       }
@@ -266,12 +266,12 @@ function resetPreviewMapZoom() {
 function _normalizeToFeatureCollection(raw) {
   if (!raw) return null;
   if (typeof raw === 'string') {
-    try { raw = JSON.parse(raw); } catch(e) { return null; }
+    try { raw = JSON.parse(raw); } catch (e) { return null; }
   }
   if (raw.type === 'FeatureCollection' && Array.isArray(raw.features)) return raw;
-  if (raw.type === 'Feature') return { type:'FeatureCollection', features:[raw] };
-  const GEOM = ['Point','MultiPoint','LineString','MultiLineString','Polygon','MultiPolygon','GeometryCollection'];
-  if (GEOM.includes(raw.type)) return { type:'FeatureCollection', features:[{type:'Feature',geometry:raw,properties:{}}] };
+  if (raw.type === 'Feature') return { type: 'FeatureCollection', features: [raw] };
+  const GEOM = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
+  if (GEOM.includes(raw.type)) return { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: raw, properties: {} }] };
 
   // Format BMKG InaTEWS: { info: [ { point: { coordinates: "lon,lat" }, ... } ] }
   if (Array.isArray(raw.info)) {
@@ -283,12 +283,12 @@ function _normalizeToFeatureCollection(raw) {
       if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
         features.push({
           type: 'Feature',
-          geometry: { type:'Point', coordinates:[parts[0], parts[1]] },
+          geometry: { type: 'Point', coordinates: [parts[0], parts[1]] },
           properties: Object.assign({}, item)
         });
       }
     });
-    return { type:'FeatureCollection', features };
+    return { type: 'FeatureCollection', features };
   }
 
   // Array flat dengan lat/lon
@@ -298,10 +298,10 @@ function _normalizeToFeatureCollection(raw) {
       const lat = parseFloat(item.lat || item.latitude || item.Lintang || item.y);
       const lon = parseFloat(item.lon || item.lng || item.longitude || item.Bujur || item.x);
       if (!isNaN(lat) && !isNaN(lon)) {
-        features.push({ type:'Feature', geometry:{type:'Point',coordinates:[lon,lat]}, properties:Object.assign({},item) });
+        features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties: Object.assign({}, item) });
       }
     });
-    return { type:'FeatureCollection', features };
+    return { type: 'FeatureCollection', features };
   }
 
   return null;
@@ -328,22 +328,22 @@ function _renderGeojsonLayer(leafMap, raw, featureCountEl) {
     else if (mag >= 4.0) fillColor = '#f59e0b';
 
     const radius = mag > 0 ? Math.max(6, Math.min(16, (mag - 2) * 2.8)) : 7;
-    return { color:'#ffffff', fillColor: fillColor, fillOpacity:0.85, weight:2, radius: radius };
+    return { color: '#ffffff', fillColor: fillColor, fillOpacity: 0.85, weight: 2, radius: radius };
   }
 
   function buildPopup(feature) {
     const props = feature.properties || {};
     const rows = Object.entries(props)
-      .filter(([,v]) => v !== null && v !== undefined && String(v).trim() !== '')
+      .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
       .slice(0, 14)
-      .map(([k,v]) => `<tr>
+      .map(([k, v]) => `<tr>
         <td style="padding:3px 8px;font-weight:700;color:#003865;white-space:nowrap;font-size:11px;">${escapeHtml(String(k))}</td>
         <td style="padding:3px 8px;color:#334155;font-size:11.5px;word-break:break-word;">${escapeHtml(String(v))}</td></tr>`).join('');
     return `<div style="font-family:'Plus Jakarta Sans',sans-serif;max-width:280px;">
       <div style="background:linear-gradient(135deg,#003865,#005a9e);color:#fff;padding:7px 10px;margin:-8px -8px 6px;border-radius:6px 6px 0 0;font-weight:800;font-size:12.5px;">
         <i class="fa-solid fa-map-pin" style="margin-right:5px;"></i>Atribut Fitur BMKG</div>
       <table style="width:100%;border-collapse:collapse;">
-        ${rows||'<tr><td colspan="2" style="padding:6px;color:#64748b;font-size:11px;">Tidak ada properti</td></tr>'}
+        ${rows || '<tr><td colspan="2" style="padding:6px;color:#64748b;font-size:11px;">Tidak ada properti</td></tr>'}
       </table></div>`;
   }
 
@@ -353,7 +353,7 @@ function _renderGeojsonLayer(leafMap, raw, featureCountEl) {
       style: getStyle,
       onEachFeature: (feature, lyr) => {
         if (feature.properties && Object.keys(feature.properties).length > 0) {
-          lyr.bindPopup(buildPopup(feature), { maxWidth:320 });
+          lyr.bindPopup(buildPopup(feature), { maxWidth: 320 });
         }
       }
     }).addTo(leafMap);
@@ -361,15 +361,15 @@ function _renderGeojsonLayer(leafMap, raw, featureCountEl) {
     window._previewState.geoLayer = layer;
     const bounds = layer.getBounds();
     if (bounds.isValid()) {
-      leafMap.fitBounds(bounds, { padding:[35,35], maxZoom:12 });
+      leafMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
     }
 
     setTimeout(() => {
       leafMap.invalidateSize();
-      if (bounds.isValid()) leafMap.fitBounds(bounds, { padding:[35,35], maxZoom:12 });
+      if (bounds.isValid()) leafMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
     }, 200);
 
-  } catch(err) {
+  } catch (err) {
     console.warn('[BMKG Preview] GeoJSON render error:', err);
     _showMapEmpty(mapEl, featureCountEl, `GeoJSON tidak dapat dirender: ${err.message}`);
   }
@@ -378,11 +378,11 @@ function _renderGeojsonLayer(leafMap, raw, featureCountEl) {
 async function _fetchAndRenderGeojson(leafMap, url, featureCountEl) {
   if (featureCountEl) featureCountEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengambil GeoJSON...';
   try {
-    const res = await fetch(url, { cache:'no-cache' });
+    const res = await fetch(url, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     _renderGeojsonLayer(leafMap, data, featureCountEl);
-  } catch(err) {
+  } catch (err) {
     console.warn('[BMKG Preview] Fetch error:', err);
     _showMapEmpty(document.getElementById('previewGeojsonMap'), featureCountEl, `Gagal memuat GeoJSON dari server (${err.message}).`);
   }
@@ -397,8 +397,7 @@ function _showMapEmpty(mapEl, featureCountEl, msg) {
   overlay.innerHTML = `
     <i class="fa-solid fa-map-location-dot" style="font-size:2.5rem;color:var(--border-medium);margin-bottom:0.5rem;"></i>
     <strong style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:0.35rem;">Data peta tidak tersedia</strong>
-    <p style="font-size:0.82rem;max-width:360px;line-height:1.55;color:var(--text-muted);">${
-      msg || 'Dataset belum memiliki konten GeoJSON. Upload ulang berkas GeoJSON melalui tombol Unggah Dataset.'
+    <p style="font-size:0.82rem;max-width:360px;line-height:1.55;color:var(--text-muted);">${msg || 'Dataset belum memiliki konten GeoJSON. Upload ulang berkas GeoJSON melalui tombol Unggah Dataset.'
     }</p>`;
   mapEl.appendChild(overlay);
 }
@@ -414,11 +413,11 @@ function _buildCsvTableHtml(ds) {
   const lines = csvRaw.trim().split(/\r?\n/);
   if (lines.length < 2) return `<div class="preview-table-wrapper" style="padding:2rem;text-align:center;color:var(--text-muted);">CSV tidak memiliki baris data.</div>`;
 
-  const delim   = lines[0].includes(';') ? ';' : ',';
-  const headers = lines[0].split(delim).map(h => h.replace(/^"|"$/g,'').trim());
-  const rows    = lines.slice(1,51);
+  const delim = lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(delim).map(h => h.replace(/^"|"$/g, '').trim());
+  const rows = lines.slice(1, 51);
   const headerHtml = headers.map(h => `<th>${escapeHtml(h)}</th>`).join('');
-  const rowsHtml   = rows.map(line => `<tr>${line.split(delim).map(c => `<td>${escapeHtml(c.replace(/^"|"$/g,'').trim())}</td>`).join('')}</tr>`).join('');
+  const rowsHtml = rows.map(line => `<tr>${line.split(delim).map(c => `<td>${escapeHtml(c.replace(/^"|"$/g, '').trim())}</td>`).join('')}</tr>`).join('');
   return `<div class="preview-table-wrapper"><table class="preview-table"><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
 }
 
@@ -428,7 +427,7 @@ function closePreviewModal() {
   modal.classList.remove('active');
   document.body.style.overflow = '';
   if (window._previewState && window._previewState.leafletMap) {
-    try { window._previewState.leafletMap.remove(); } catch(_) {}
+    try { window._previewState.leafletMap.remove(); } catch (_) { }
     window._previewState.leafletMap = null;
   }
   setTimeout(() => {
@@ -514,7 +513,7 @@ function handleFileSelected(event) {
   const ext = file.name.split('.').pop().toLowerCase();
   const reader = new FileReader();
 
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     const content = e.target.result;
     _uploadedFileContent = content;
 
@@ -656,7 +655,7 @@ function updateFacetCounts() {
 function applyFilterAndSearch() {
   const searchInputEl = document.getElementById('catalogSearchInput');
   const searchInput = searchInputEl ? searchInputEl.value.trim().toLowerCase() : '';
-  
+
   const selectedPilars = Array.from(document.querySelectorAll('.facet-pilar:checked')).map(cb => cb.value);
   const selectedFormats = Array.from(document.querySelectorAll('.facet-format:checked')).map(cb => cb.value);
   const selectedOrgs = Array.from(document.querySelectorAll('.facet-org:checked')).map(cb => cb.value);
@@ -992,8 +991,8 @@ function initKatalogPage() {
 
 // Auto init on DOM ready
 document.addEventListener('DOMContentLoaded', initKatalogPage);
-  setTimeout(() => toast.classList.remove('show'), 3500);
-}
+setTimeout(() => toast.classList.remove('show'), 3500);
+
 
 function escapeHtml(str) {
   if (!str) return '';
